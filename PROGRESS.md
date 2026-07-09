@@ -4,7 +4,7 @@ Last Updated: 2026-07-09
 
 ## Current Phase
 
-Phase 5 - Screen Implementation (Step 6: Reflection Flow)
+Phase 5 - Screen Implementation (Step 7: Goals & Insights Tabs)
 
 ## Completed Tasks
 
@@ -76,16 +76,19 @@ Phase 5 - Screen Implementation (Step 6: Reflection Flow)
 - Daily Reflection (multi-step flow: completed tasks, pending tasks, why delay)
 - Weekly Review (bento grid with wins, commitments, behavior patterns, AI recommendation)
 
+#### Step 7: Goals & Insights Tabs ✓
+- Goals Tab (goal list with status, progress, velocity, AI suggestions)
+- Insights Tab (pattern recognition, learning cards, AI synthesis)
+
 ## Screen Progress
 
 Completed Screens:
-- 12/25 implementation screens
+- 14/25 implementation screens
 
 In Progress:
-- Step 7: Goals & Insights Tabs
+- Step 8: Profile & Settings
 
 Remaining:
-- Step 8: Profile & Settings
 - Step 9: Empty & Error States
 - Step 10: UI Polish & Accessibility
 
@@ -114,6 +117,8 @@ Remaining:
 - `apps/mobile/app/focus/[taskId]/simplify.tsx`
 - `apps/mobile/app/(app)/today/reflection.tsx` (Daily Reflection)
 - `apps/mobile/app/(app)/insights/weekly-review.tsx` (Weekly Review)
+- `apps/mobile/app/(app)/goals/index.tsx` (Goals Tab)
+- `apps/mobile/app/(app)/insights/index.tsx` (Insights Tab)
 
 ### Supporting Files
 - `apps/mobile/src/store/onboarding.store.ts`
@@ -152,4 +157,5 @@ feat(goals): implement goal creation flow
 feat(today): implement today experience
 feat(focus): implement focus session with resistance and simplify flows
 feat(reflection): implement daily reflection and weekly review
+feat(tabs): implement goals and insights tabs
 ```

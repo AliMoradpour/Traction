@@ -1,114 +1,164 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import Button from '@/components/ui/Button';
 
-const GOAL_TYPES = [
+const MOCK_GOALS = [
   {
-    id: 'ielts',
-    icon: '📝',
-    title: 'IELTS Preparation',
-    description: 'Track your study bands and test date.',
+    id: '1',
+    title: 'IELTS Prep',
+    status: 'on-track',
+    statusText: 'On Track - 17 weeks remaining',
+    dueDate: 'Due Dec 15, 2024',
+    progress: 65,
+    velocity: 'Stable',
+    aiSuggestion: 'AI suggests focusing on Writing Section next.',
   },
   {
-    id: 'programming',
-    icon: '💻',
-    title: 'Programming Project',
-    description: 'Manage milestones for your next big build.',
+    id: '2',
+    title: 'Learn Rust',
+    status: 'at-risk',
+    statusText: 'At Risk - 5 days inactive',
+    dueDate: 'Due Jan 20, 2025',
+    progress: 12,
+    velocity: 'Down 40%',
+    aiSuggestion: 'Recovery needed to meet January deadline.',
   },
   {
-    id: 'fitness',
-    icon: '💪',
-    title: 'Fitness',
-    description: 'Consistent habits and performance targets.',
+    id: '3',
+    title: 'Marathon Training',
+    status: 'on-track',
+    statusText: 'On Track - Peak Week',
+    dueDate: 'Due Nov 02, 2024',
+    progress: 88,
+    velocity: 'Increasing',
+    aiSuggestion: null,
   },
   {
-    id: 'savings',
-    icon: '💰',
-    title: 'Saving Money',
-    description: 'Build your emergency fund or big purchase.',
-  },
-  {
-    id: 'custom',
-    icon: '➕',
-    title: 'Custom Goal',
-    description: 'Define your own path and success metrics.',
+    id: '4',
+    title: 'Design Portfolio',
+    status: 'behind',
+    statusText: 'Behind Schedule - 11 days behind',
+    dueDate: 'Due Dec 01, 2024',
+    progress: 42,
+    velocity: 'Recovery Needed',
+    aiSuggestion: null,
   },
 ];
 
-export default function GoalTypeScreen() {
+const getStatusColor = (status: string, theme: any) => {
+  switch (status) {
+    case 'on-track':
+      return { bg: theme.colors.successMuted, text: theme.colors.success, dot: theme.colors.success };
+    case 'at-risk':
+      return { bg: theme.colors.warningMuted, text: theme.colors.warning, dot: theme.colors.warning };
+    case 'behind':
+      return { bg: theme.colors.errorMuted, text: theme.colors.error, dot: theme.colors.error };
+    default:
+      return { bg: theme.colors.surfaceMuted, text: theme.colors.textMuted, dot: theme.colors.textMuted };
+  }
+};
+
+export default function GoalsScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-
-  const handleSelect = (goalId: string) => {
-    router.push('/(app)/goals/select');
-  };
-
-  const handleBack = () => {
-    router.back();
-  };
-
-  const handleSkip = () => {
-    router.back();
-  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <Pressable onPress={handleBack} style={styles.backButton}>
-          <Text style={[styles.backText, { color: theme.colors.textMuted }]}>← Back</Text>
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>New Goal</Text>
-        <Pressable onPress={handleSkip}>
-          <Text style={[styles.skipText, { color: theme.colors.textSubtle }]}>Skip</Text>
-        </Pressable>
+        <View>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Goals</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <Pressable style={[styles.iconButton, { backgroundColor: theme.colors.surfaceElevated }]}>
+            <Text style={[styles.iconText, { color: theme.colors.text }]}>🔍</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.iconButton, { backgroundColor: theme.colors.surfaceElevated }]}
+            onPress={() => router.push('/(app)/goals/select')}
+          >
+            <Text style={[styles.iconText, { color: theme.colors.text }]}>+</Text>
+          </Pressable>
+        </View>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            What are you working toward?
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-            Goals are optional. You can add them later.
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.summarySection}>
+          <Text style={[styles.summaryLabel, { color: theme.colors.primary }]}>ACTIVE FOCUS</Text>
+          <Text style={[styles.summaryTitle, { color: theme.colors.text }]}>
+            You have {MOCK_GOALS.length} goals in progress.
           </Text>
         </View>
 
-        <View style={styles.goalList}>
-          {GOAL_TYPES.map((goal) => (
-            <Pressable
-              key={goal.id}
-              style={[styles.goalCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => handleSelect(goal.id)}
-            >
-              <View style={styles.goalContent}>
-                <View style={[styles.goalIcon, { backgroundColor: theme.colors.accentMuted }]}>
-                  <Text style={styles.goalIconText}>{goal.icon}</Text>
-                </View>
-                <View style={styles.goalInfo}>
+        <View style={styles.goalsList}>
+          {MOCK_GOALS.map((goal) => {
+            const statusColors = getStatusColor(goal.status, theme);
+            return (
+              <Pressable
+                key={goal.id}
+                style={[styles.goalCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                onPress={() => router.push(`/(app)/goals/${goal.id}`)}
+              >
+                <View style={styles.goalHeader}>
                   <Text style={[styles.goalTitle, { color: theme.colors.text }]}>{goal.title}</Text>
-                  <Text style={[styles.goalDescription, { color: theme.colors.textMuted }]}>
-                    {goal.description}
-                  </Text>
+                  <View style={[styles.statusBadge, { backgroundColor: statusColors.bg }]}>
+                    <View style={[styles.statusDot, { backgroundColor: statusColors.dot }]} />
+                    <Text style={[styles.statusText, { color: statusColors.text }]}>{goal.statusText}</Text>
+                  </View>
                 </View>
-              </View>
-              <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-            </Pressable>
-          ))}
+
+                <View style={styles.goalMeta}>
+                  <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>📅 {goal.dueDate}</Text>
+                </View>
+
+                <View style={styles.progressSection}>
+                  <View style={[styles.progressTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        {
+                          backgroundColor: statusColors.dot,
+                          width: `${goal.progress}%`,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <View style={styles.progressMeta}>
+                    <Text style={[styles.progressLabel, { color: theme.colors.textMuted }]}>
+                      Velocity: {goal.velocity}
+                    </Text>
+                    <Text style={[styles.progressPercent, { color: theme.colors.textMuted }]}>
+                      {goal.progress}% complete
+                    </Text>
+                  </View>
+                </View>
+
+                {goal.aiSuggestion && (
+                  <View style={[styles.aiSuggestion, { borderTopColor: theme.colors.border }]}>
+                    <Text style={styles.aiIcon}>✨</Text>
+                    <Text style={[styles.aiText, { color: theme.colors.textMuted }]}>{goal.aiSuggestion}</Text>
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
         </View>
 
-        <View style={[styles.infoCard, { backgroundColor: theme.colors.primary }]}>
-          <Text style={styles.infoTitle}>Why set goals?</Text>
-          <Text style={styles.infoDescription}>
-            AI analysis helps prioritize your daily tasks based on how they impact your long-term
-            ambitions.
-          </Text>
-          <Button variant="secondary" size="sm" style={styles.learnMoreButton}>
-            Learn more
-          </Button>
-        </View>
-      </View>
+        <Pressable
+          style={[styles.addMilestoneCard, { backgroundColor: theme.colors.primary }]}
+          onPress={() => router.push('/(app)/goals/select')}
+        >
+          <View style={styles.addMilestoneContent}>
+            <Text style={[styles.addMilestoneTitle, { color: '#FFFFFF' }]}>New Milestone?</Text>
+            <Text style={[styles.addMilestoneSubtitle, { color: 'rgba(255,255,255,0.8)' }]}>
+              Add a sub-goal to maintain momentum.
+            </Text>
+          </View>
+          <View style={[styles.addButton, { backgroundColor: '#FFFFFF' }]}>
+            <Text style={[styles.addButtonText, { color: theme.colors.primary }]}>+ Add</Text>
+          </View>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -123,106 +173,152 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 8,
-    height: 56,
-  },
-  backButton: {
-    width: 40,
-    justifyContent: 'center',
-  },
-  backText: {
-    fontSize: 15,
-    fontWeight: '500',
+    paddingBottom: 16,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  skipText: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  titleContainer: {
-    marginBottom: 24,
-  },
-  title: {
     fontSize: 28,
     fontWeight: '700',
-    marginBottom: 8,
-    letterSpacing: -0.01,
   },
-  subtitle: {
-    fontSize: 17,
-    lineHeight: 24,
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
   },
-  goalList: {
-    gap: 12,
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 18,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 100,
+  },
+  summarySection: {
     marginBottom: 24,
   },
+  summaryLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.1,
+    marginBottom: 4,
+  },
+  summaryTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+  },
+  goalsList: {
+    gap: 16,
+  },
   goalCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
   },
-  goalContent: {
+  goalHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flex: 1,
-  },
-  goalIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  goalIconText: {
-    fontSize: 24,
-  },
-  goalInfo: {
-    flex: 1,
-    gap: 4,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
   goalTitle: {
-    fontSize: 17,
+    fontSize: 18,
+    fontWeight: '600',
+    flex: 1,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 11,
     fontWeight: '600',
   },
-  goalDescription: {
+  goalMeta: {
+    marginBottom: 12,
+  },
+  metaText: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  progressSection: {
+    marginBottom: 12,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  progressMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  progressLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  progressPercent: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  aiSuggestion: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+  },
+  aiIcon: {
+    fontSize: 16,
+  },
+  aiText: {
+    flex: 1,
     fontSize: 13,
     lineHeight: 18,
   },
-  chevron: {
-    fontSize: 24,
-    fontWeight: '300',
-  },
-  infoCard: {
-    padding: 20,
-    borderRadius: 16,
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  infoTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginBottom: 8,
-  },
-  infoDescription: {
-    fontSize: 15,
-    lineHeight: 20,
-    color: 'rgba(255, 255, 255, 0.8)',
-    maxWidth: '80%',
-  },
-  learnMoreButton: {
+  addMilestoneCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 12,
     marginTop: 16,
-    alignSelf: 'flex-start',
+  },
+  addMilestoneContent: {
+    flex: 1,
+    gap: 4,
+  },
+  addMilestoneTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  addMilestoneSubtitle: {
+    fontSize: 13,
+  },
+  addButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  addButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
