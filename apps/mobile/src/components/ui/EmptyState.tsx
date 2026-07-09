@@ -27,6 +27,91 @@ export function EmptyState({ title, description, icon, action, style }: EmptySta
   );
 }
 
+export function EmptyGoalsState({ onAddGoal }: { onAddGoal: () => void }) {
+  const theme = useTractionTheme();
+
+  return (
+    <EmptyState
+      icon={<Text style={{ fontSize: 32 }}>🎯</Text>}
+      title="No goals yet"
+      description="Setting goals helps AI prioritize your daily tasks based on what matters most to you."
+      action={{
+        title: 'Create Your First Goal',
+        onPress: onAddGoal,
+        variant: 'primary',
+      }}
+    />
+  );
+}
+
+export function EmptyTasksState({ onAddTask }: { onAddTask: () => void }) {
+  const theme = useTractionTheme();
+
+  return (
+    <EmptyState
+      icon={<Text style={{ fontSize: 32 }}>📋</Text>}
+      title="No tasks for today"
+      description="Add tasks to your day and let AI help you prioritize based on your energy and friction patterns."
+      action={{
+        title: 'Add a Task',
+        onPress: onAddTask,
+        variant: 'primary',
+      }}
+    />
+  );
+}
+
+export function EmptyInsightsState() {
+  const theme = useTractionTheme();
+
+  return (
+    <EmptyState
+      icon={<Text style={{ fontSize: 32 }}>🧠</Text>}
+      title="No insights yet"
+      description="Keep using Traction and we'll start identifying patterns in your behavior to help you work smarter."
+    />
+  );
+}
+
+export function ErrorState({
+  title = 'Something went wrong',
+  description = 'We encountered an unexpected error. Please try again.',
+  onRetry,
+}: {
+  title?: string;
+  description?: string;
+  onRetry?: () => void;
+}) {
+  const theme = useTractionTheme();
+
+  return (
+    <EmptyState
+      icon={<Text style={{ fontSize: 32 }}>⚠️</Text>}
+      title={title}
+      description={description}
+      action={
+        onRetry
+          ? {
+              title: 'Try Again',
+              onPress: onRetry,
+              variant: 'primary',
+            }
+          : undefined
+      }
+    />
+  );
+}
+
+export function NetworkErrorState({ onRetry }: { onRetry?: () => void }) {
+  return (
+    <ErrorState
+      title="No connection"
+      description="Please check your internet connection and try again."
+      onRetry={onRetry}
+    />
+  );
+}
+
 function createStyles(theme: TractionTheme) {
   return StyleSheet.create({
     container: {
@@ -59,4 +144,3 @@ function createStyles(theme: TractionTheme) {
     },
   });
 }
-
