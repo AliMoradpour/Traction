@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTractionTheme } from '@/theme';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations';
+import { resetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations';
 
-export default function ForgotPasswordScreen() {
+export default function ResetPasswordScreen() {
   const theme = useTractionTheme();
+  const router = useRouter();
+  const { token } = useLocalSearchParams<{ token: string }>();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -18,22 +20,23 @@ export default function ForgotPasswordScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordFormData>({
-    resolver: zodResolver(forgotPasswordSchema),
+  } = useForm<ResetPasswordFormData>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ResetPasswordFormData) => {
     setIsLoading(true);
     try {
       // TODO: Call actual auth service
-      // For now, simulate sending reset email
+      // For now, simulate resetting password
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setIsSuccess(true);
     } catch (error) {
-      console.error('Forgot password failed:', error);
+      console.error('Reset password failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -44,15 +47,15 @@ export default function ForgotPasswordScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.content}>
           <View style={[styles.successIcon, { backgroundColor: theme.colors.successSurface }]}>
-            <Text style={{ fontSize: 32 }}>✉️</Text>
+            <Text style={{ fontSize: 32 }}>✅</Text>
           </View>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Check Your Email</Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Password Reset</Text>
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-            We've sent a password reset link to your email address.
+            Your password has been successfully reset. You can now sign in with your new password.
           </Text>
           <Link href="/(auth)/login" asChild>
-            <Button variant="primary" size="lg" style={styles.backButton}>
-              Back to Sign In
+            <Button variant="primary" size="lg" style={styles.signInButton}>
+              Sign In
             </Button>
           </Link>
         </View>
@@ -68,21 +71,29 @@ export default function ForgotPasswordScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>Reset Password</Text>
+            <Text style={[styles.title, { color: theme.colors.text }]}>New Password</Text>
             <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-              Enter your email and we'll send you a link to reset your password
+              Enter your new password below
             </Text>
           </View>
 
           <View style={styles.form}>
             <Input
               control={control}
-              name="email"
-              label="Email"
-              placeholder="alex@traction.ai"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              error={errors.email?.message}
+              name="password"
+              label="New Password"
+              placeholder="Create a new password"
+              secureTextEntry
+              error={errors.password?.message}
+            />
+
+            <Input
+              control={control}
+              name="confirmPassword"
+              label="Confirm New Password"
+              placeholder="Confirm your new password"
+              secureTextEntry
+              error={errors.confirmPassword?.message}
             />
           </View>
 
@@ -91,9 +102,9 @@ export default function ForgotPasswordScreen() {
             size="lg"
             onPress={handleSubmit(onSubmit)}
             loading={isLoading}
-            style={styles.sendButton}
+            style={styles.resetButton}
           >
-            Send Reset Link
+            Reset Password
           </Button>
 
           <View style={styles.footer}>
@@ -147,7 +158,7 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 24,
   },
-  sendButton: {
+  resetButton: {
     marginBottom: 32,
   },
   successIcon: {
@@ -158,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
-  backButton: {
+  signInButton: {
     marginTop: 24,
   },
   footer: {

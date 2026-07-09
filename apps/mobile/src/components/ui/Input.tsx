@@ -8,9 +8,10 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { Controller, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 import { useTractionTheme, type TractionTheme } from '../../theme';
 
-export interface InputProps extends TextInputProps {
+interface BaseInputProps extends TextInputProps {
   label?: string;
   error?: string;
   helperText?: string;
@@ -20,7 +21,90 @@ export interface InputProps extends TextInputProps {
   inputContainerStyle?: StyleProp<ViewStyle>;
 }
 
-export const Input = forwardRef<TextInput, InputProps>(function Input(
+interface InputWithControlProps<T extends FieldValues> extends BaseInputProps {
+  control: Control<T>;
+  name: FieldPath<T>;
+}
+
+interface InputWithoutControlProps extends BaseInputProps {
+  control?: never;
+  name?: never;
+}
+
+type InputProps<T extends FieldValues = FieldValues> = InputWithControlProps<T> | InputWithoutControlProps;
+
+function InputComponent<T extends FieldValues>(
+  props: InputProps<T>,
+  ref: React.Ref<TextInput>
+) {
+  const {
+    control,
+    name,
+    label,
+    error,
+    helperText,
+    leftAccessory,
+    rightAccessory,
+    containerStyle,
+    inputContainerStyle,
+    editable = true,
+    onBlur,
+    onFocus,
+    style,
+    ...textInputProps
+  } = props;
+
+  if (control && name) {
+    return (
+      <Controller
+        control={control}
+        name={name}
+        render={({ field: { onChange, onBlur: fieldOnBlur, value } }) => (
+          <InputInner
+            ref={ref}
+            label={label}
+            error={error}
+            helperText={helperText}
+            leftAccessory={leftAccessory}
+            rightAccessory={rightAccessory}
+            containerStyle={containerStyle}
+            inputContainerStyle={inputContainerStyle}
+            editable={editable}
+            onBlur={(e) => {
+              fieldOnBlur();
+              onBlur?.(e);
+            }}
+            onFocus={onFocus}
+            style={style}
+            value={value}
+            onChangeText={onChange}
+            {...textInputProps}
+          />
+        )}
+      />
+    );
+  }
+
+  return (
+    <InputInner
+      ref={ref}
+      label={label}
+      error={error}
+      helperText={helperText}
+      leftAccessory={leftAccessory}
+      rightAccessory={rightAccessory}
+      containerStyle={containerStyle}
+      inputContainerStyle={inputContainerStyle}
+      editable={editable}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      style={style}
+      {...textInputProps}
+    />
+  );
+}
+
+const InputInner = forwardRef<TextInput, BaseInputProps>(function InputInner(
   {
     label,
     error,
@@ -76,6 +160,11 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       {error ? <Text style={styles.errorText}>{error}</Text> : helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
     </View>
   );
+});
+
+// Export a default version for backward compatibility
+export const Input = forwardRef<TextInput, BaseInputProps>(function Input(props, ref) {
+  return <InputInner {...props} ref={ref} />;
 });
 
 function createStyles(theme: TractionTheme) {
@@ -134,4 +223,3 @@ function createStyles(theme: TractionTheme) {
     },
   });
 }
-
