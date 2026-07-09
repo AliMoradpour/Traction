@@ -4,7 +4,7 @@ Last Updated: 2026-07-09
 
 ## Current Phase
 
-Phase 5 - Screen Implementation (Step 5: Focus Flow)
+Phase 5 - Screen Implementation (Step 6: Reflection Flow)
 
 ## Completed Tasks
 
@@ -72,16 +72,19 @@ Phase 5 - Screen Implementation (Step 5: Focus Flow)
 - Resistance Flow screen (friction diagnosis, AI recommendations)
 - Simplify Flow screen (task breakdown, micro-steps)
 
+#### Step 6: Reflection Flow ✓
+- Daily Reflection (multi-step flow: completed tasks, pending tasks, why delay)
+- Weekly Review (bento grid with wins, commitments, behavior patterns, AI recommendation)
+
 ## Screen Progress
 
 Completed Screens:
-- 10/25 implementation screens
+- 12/25 implementation screens
 
 In Progress:
-- Step 6: Reflection Flow
+- Step 7: Goals & Insights Tabs
 
 Remaining:
-- Step 7: Goals & Insights Tabs
 - Step 8: Profile & Settings
 - Step 9: Empty & Error States
 - Step 10: UI Polish & Accessibility
@@ -109,6 +112,8 @@ Remaining:
 - `apps/mobile/app/focus/[taskId].tsx` (Focus Session)
 - `apps/mobile/app/focus/[taskId]/resistance.tsx`
 - `apps/mobile/app/focus/[taskId]/simplify.tsx`
+- `apps/mobile/app/(app)/today/reflection.tsx` (Daily Reflection)
+- `apps/mobile/app/(app)/insights/weekly-review.tsx` (Weekly Review)
 
 ### Supporting Files
 - `apps/mobile/src/store/onboarding.store.ts`
@@ -146,4 +151,5 @@ feat(onboarding): implement onboarding flow
 feat(goals): implement goal creation flow
 feat(today): implement today experience
 feat(focus): implement focus session with resistance and simplify flows
+feat(reflection): implement daily reflection and weekly review
 ```
