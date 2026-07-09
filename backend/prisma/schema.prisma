@@ -1,0 +1,415 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  firstName     String?
+  lastName      String?
+  avatar        String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  profile       UserProfile?
+  tasks         Task[]
+  focusSessions FocusSession[]
+  goals         Goal[]
+  insights      Insight[]
+  behaviors     BehaviorEvent[]
+  notifications Notification[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model UserProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // AI Personality
+  aiPersonality AIPersonality @default(BALANCED)
+  
+  // Productivity Preferences
+  deepWorkMode      DeepWorkMode @default(INTENSE)
+  notificationDensity NotificationDensity @default(LOW)
+  aiAutoScheduling  Boolean @default(true)
+  
+  // Working Hours
+  workStartHour Int @default(9)
+  workEndHour   Int @default(18)
+  workDays      String @default("mon,tue,wed,thu,fri")
+  
+  // Energy Pattern
+  energyPeakStart Int @default(10)
+  energyPeakEnd   Int @default(13)
+  
+  // Energy Settings
+  sleepSync       Boolean @default(false)
+  focusBreakInterval Int @default(90) // minutes
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+enum AIPersonality {
+  DIRECT
+  BALANCED
+  GENTLE
+}
+
+enum DeepWorkMode {
+  INTENSE
+  MODERATE
+  RELAXED
+}
+
+enum NotificationDensity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Task {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  description   String?
+  category      String?
+  priority      TaskPriority @default(MEDIUM)
+  duration      Int?      // minutes
+  friction      Int?      // 0-100
+  energy        EnergyLevel @default(MEDIUM)
+  
+  // Scheduling
+  scheduledAt   DateTime?
+  dueAt         DateTime?
+  completedAt   DateTime?
+  
+  // Status
+  status        TaskStatus @default(PENDING)
+  
+  // Goal linking
+  goalId        String?
+  goal          Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  focusSessions FocusSession[]
+  behaviors     BehaviorEvent[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, scheduledAt])
+  @@index([goalId])
+  @@map("tasks")
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+  CANCELLED
+}
+
+enum EnergyLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model FocusSession {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId        String?
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  
+  // Session details
+  startedAt     DateTime  @default(now())
+  endedAt       DateTime?
+  duration      Int?      // seconds
+  status        FocusStatus @default(ACTIVE)
+  
+  // Completion
+  completed     Boolean   @default(false)
+  
+  // Relations
+  behaviors     BehaviorEvent[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([taskId])
+  @@map("focus_sessions")
+}
+
+enum FocusStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+model Goal {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  type          GoalType
+  category      String?
+  
+  // Timeline
+  startDate     DateTime  @default(now())
+  targetDate    DateTime?
+  completedAt   DateTime?
+  
+  // Progress
+  progress      Int       @default(0) // 0-100
+  status        GoalStatus @default(ACTIVE)
+  
+  // Health
+  health        GoalHealth @default(ON_TRACK)
+  velocity      String?   // "stable", "increasing", "decreasing"
+  
+  // Relations
+  tasks         Task[]
+  milestones    GoalMilestone[]
+  plans         GoalPlan[]
+  insights      Insight[]
+  behaviors     BehaviorEvent[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@map("goals")
+}
+
+enum GoalType {
+  IELTS
+  PROGRAMMING
+  FITNESS
+  SAVINGS
+  CUSTOM
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+  PAUSED
+}
+
+enum GoalHealth {
+  ON_TRACK
+  SLIGHTLY_BEHIND
+  BEHIND_SCHEDULE
+  RECOVERY_NEEDED
+  AT_RISK
+}
+
+model GoalMilestone {
+  id            String    @id @default(cuid())
+  goalId        String
+  goal          Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  targetDate    DateTime?
+  completedAt   DateTime?
+  progress      Int       @default(0) // 0-100
+  status        MilestoneStatus @default(PENDING)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([goalId])
+  @@map("goal_milestones")
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+model GoalPlan {
+  id            String    @id @default(cuid())
+  goalId        String
+  goal          Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  steps         String?   // JSON array of steps
+  recommendedAt DateTime?
+  appliedAt     DateTime?
+  status        PlanStatus @default(PENDING)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([goalId])
+  @@map("goal_plans")
+}
+
+enum PlanStatus {
+  PENDING
+  APPLIED
+  REJECTED
+}
+
+model Insight {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goalId        String?
+  goal          Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  
+  type          InsightType
+  title         String
+  content       String
+  data          String?   // JSON data
+  
+  // AI Generation
+  generatedBy   String?   // "ai" or "system"
+  confidence    Float?
+  
+  // Visibility
+  read          Boolean   @default(false)
+  dismissed     Boolean   @default(false)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, type])
+  @@index([userId, read])
+  @@map("insights")
+}
+
+enum InsightType {
+  FOCUS_PATTERN
+  PRODUCTIVITY_PATTERN
+  FRICTION_TREND
+  WEEKLY_SUMMARY
+  BEHAVIORAL_AWARENESS
+  AI_RECOMMENDATION
+}
+
+model BehaviorEvent {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId        String?
+  task          Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  goalId        String?
+  goal          Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  focusSessionId String?
+  focusSession  FocusSession? @relation(fields: [focusSessionId], references: [id], onDelete: SetNull)
+  
+  type          BehaviorEventType
+  metadata      String?   // JSON metadata
+  value         String?   // For "why am i stuck" responses
+  
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, type])
+  @@index([userId, createdAt])
+  @@map("behavior_events")
+}
+
+enum BehaviorEventType {
+  TASK_COMPLETED
+  TASK_SNOOZED
+  TASK_SKIPPED
+  TASK_CREATED
+  TASK_UPDATED
+  FOCUS_STARTED
+  FOCUS_PAUSED
+  FOCUS_COMPLETED
+  FOCUS_ABANDONED
+  WHY_AM_I_STUCK
+  GOAL_CREATED
+  GOAL_COMPLETED
+  GOAL_UPDATED
+  REFLECTION_COMPLETED
+  WEEKLY_REVIEW_VIEWED
+}
+
+model Notification {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  type          NotificationType
+  title         String
+  body          String
+  data          String?   // JSON data
+  
+  // Status
+  read          Boolean   @default(false)
+  sentAt        DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  REMINDER
+  FOCUS_PROMPT
+  WEEKLY_REVIEW
+  GOAL_UPDATE
+  INSIGHT_GENERATED
+}
+
+model RefreshToken {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  token         String    @unique
+  expiresAt     DateTime
+  revoked       Boolean   @default(false)
+  
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
