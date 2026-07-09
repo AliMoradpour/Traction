@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Reflection | Calm Execution</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#bec6e0",
+                    "inverse-surface": "#303032",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#fcf8fa",
+                    "tertiary-fixed-dim": "#dec29a",
+                    "surface-tint": "#565e74",
+                    "surface-container-high": "#eae7e9",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "secondary": "#515f74",
+                    "primary-fixed": "#dae2fd",
+                    "on-surface-variant": "#45464d",
+                    "on-tertiary-container": "#98805d",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#b9c7e0",
+                    "outline": "#76777d",
+                    "surface-dim": "#dcd9db",
+                    "surface-container-highest": "#e4e2e4",
+                    "surface-container": "#f0edef",
+                    "secondary-fixed": "#d5e3fd",
+                    "on-primary-container": "#7c839b",
+                    "primary": "#000000",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#e4e2e4",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "surface-container-low": "#f6f3f5",
+                    "on-secondary-container": "#57657b",
+                    "tertiary-container": "#271901",
+                    "on-background": "#1b1b1d",
+                    "on-secondary-fixed": "#0d1c2f",
+                    "primary-container": "#131b2e",
+                    "on-error": "#ffffff",
+                    "tertiary": "#000000",
+                    "on-surface": "#1b1b1d",
+                    "on-secondary-fixed-variant": "#3a485c",
+                    "inverse-on-surface": "#f3f0f2",
+                    "background": "#fcf8fa",
+                    "tertiary-fixed": "#fcdeb5",
+                    "surface-bright": "#fcf8fa",
+                    "on-tertiary-fixed-variant": "#574425",
+                    "on-tertiary-fixed": "#271901",
+                    "on-primary-fixed": "#131b2e",
+                    "outline-variant": "#c6c6cd",
+                    "secondary-container": "#d5e3fd",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#bec6e0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "20px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "2xl": "48px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-xs": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcf8fa; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chip-active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .chip-inactive {
+            background-color: #ffffff;
+            border: 1px solid #c6c6cd;
+            color: #45464d;
+        }
+        input:focus { outline: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased text-on-surface overflow-hidden">
+<!-- Subtle Background Shader Placement -->
+<div class="fixed inset-0 pointer-events-none z-0">
+<div class="absolute inset-0 opacity-[0.03] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary to-transparent"></div>
+</div>
+<!-- Navigation Shell (Suppressed because this is a focused task/reflection flow) -->
+<main class="relative z-10 flex flex-col items-center justify-center min-h-screen px-margin-mobile md:px-margin-desktop">
+<!-- Header / Close -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-margin-mobile h-16 max-w-7xl mx-auto">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors" onclick="window.history.back()">
+<span class="material-symbols-outlined text-on-surface">close</span>
+</button>
+<div class="flex space-x-2">
+<div class="w-1.5 h-1.5 rounded-full bg-primary transition-all duration-300" id="dot-1"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant transition-all duration-300" id="dot-2"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant transition-all duration-300" id="dot-3"></div>
+</div>
+<div class="w-10"></div>
+</header>
+<!-- Progress Tracking Canvas -->
+<div class="w-full max-w-md mx-auto">
+<!-- Step 1: What did you complete? -->
+<section class="step-transition opacity-100 translate-y-0" id="step-1">
+<div class="text-center mb-xl">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-sm">
+                        What did you complete?
+                    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Every win counts. Select your finished tasks.
+                    </p>
+</div>
+<div class="space-y-sm">
+<button class="w-full text-left p-lg rounded-xl chip-inactive flex items-center justify-between group hover:border-primary transition-all" onclick="toggleChip(this)">
+<span class="font-body-lg text-body-lg">Quarterly growth review</span>
+<span class="material-symbols-outlined opacity-0 group-[.chip-active]:opacity-100">check_circle</span>
+</button>
+<button class="w-full text-left p-lg rounded-xl chip-inactive flex items-center justify-between group hover:border-primary transition-all" onclick="toggleChip(this)">
+<span class="font-body-lg text-body-lg">Client onboarding flow</span>
+<span class="material-symbols-outlined opacity-0 group-[.chip-active]:opacity-100">check_circle</span>
+</button>
+<button class="w-full text-left p-lg rounded-xl chip-inactive flex items-center justify-between group hover:border-primary transition-all" onclick="toggleChip(this)">
+<span class="font-body-lg text-body-lg">Inbox zero sprint</span>
+<span class="material-symbols-outlined opacity-0 group-[.chip-active]:opacity-100">check_circle</span>
+</button>
+</div>
+<div class="mt-2xl flex justify-center">
+<button class="px-2xl py-md bg-primary text-on-primary font-label-sm text-label-sm rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="nextStep(2)">
+                        Continue
+                    </button>
+</div>
+</section>
+<!-- Step 2: What didn't get done? -->
+<section class="step-transition hidden opacity-0 translate-y-8" id="step-2">
+<div class="text-center mb-xl">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-sm">
+                        What stayed pending?
+                    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        It’s okay. Let’s identify the carry-overs.
+                    </p>
+</div>
+<div class="space-y-sm">
+<button class="w-full text-left p-lg rounded-xl chip-inactive flex items-center justify-between group hover:border-primary transition-all" onclick="toggleChip(this)">
+<span class="font-body-lg text-body-lg">Design system audit</span>
+<span class="material-symbols-outlined opacity-0 group-[.chip-active]:opacity-100">pause_circle</span>
+</button>
+<button class="w-full text-left p-lg rounded-xl chip-inactive flex items-center justify-between group hover:border-primary transition-all" onclick="toggleChip(this)">
+<span class="font-body-lg text-body-lg">Weekly retro notes</span>
+<span class="material-symbols-outlined opacity-0 group-[.chip-active]:opacity-100">pause_circle</span>
+</button>
+</div>
+<div class="mt-2xl flex justify-between items-center">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" onclick="nextStep(1)">Back</button>
+<button class="px-2xl py-md bg-primary text-on-primary font-label-sm text-label-sm rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="nextStep(3)">
+                        Continue
+                    </button>
+</div>
+</section>
+<!-- Step 3: Why? (Insights) -->
+<section class="step-transition hidden opacity-0 translate-y-8" id="step-3">
+<div class="text-center mb-xl">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-sm">
+                        Why the delay?
+                    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                        Understanding the friction helps us adjust.
+                    </p>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<button class="p-lg rounded-xl chip-inactive text-center transition-all flex flex-col items-center gap-sm group" onclick="selectReason(this)">
+<span class="material-symbols-outlined text-2xl group-[.chip-active]:text-on-primary">timer</span>
+<span class="font-label-sm text-label-sm">Time miscalc</span>
+</button>
+<button class="p-lg rounded-xl chip-inactive text-center transition-all flex flex-col items-center gap-sm group" onclick="selectReason(this)">
+<span class="material-symbols-outlined text-2xl group-[.chip-active]:text-on-primary">bolt</span>
+<span class="font-label-sm text-label-sm">Focus energy</span>
+</button>
+<button class="p-lg rounded-xl chip-inactive text-center transition-all flex flex-col items-center gap-sm group" onclick="selectReason(this)">
+<span class="material-symbols-outlined text-2xl group-[.chip-active]:text-on-primary">call_merge</span>
+<span class="font-label-sm text-label-sm">Blockers</span>
+</button>
+<button class="p-lg rounded-xl chip-inactive text-center transition-all flex flex-col items-center gap-sm group" onclick="selectReason(this)">
+<span class="material-symbols-outlined text-2xl group-[.chip-active]:text-on-primary">coffee</span>
+<span class="font-label-sm text-label-sm">Self-care skip</span>
+</button>
+</div>
+<div class="mt-xl">
+<textarea class="w-full bg-white border border-outline-variant/30 rounded-xl p-lg font-body-md text-body-md focus:ring-2 focus:ring-primary/10 transition-shadow min-h-[100px]" placeholder="Add a quick note (optional)..."></textarea>
+</div>
+<div class="mt-2xl flex justify-between items-center">
+<button class="font-label-sm text-label-sm text-on-surface-variant hover:text-primary transition-colors" onclick="nextStep(2)">Back</button>
+<button class="px-2xl py-md bg-primary text-on-primary font-label-sm text-label-sm rounded-full shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all" onclick="completeFlow()">
+                        Finish Day
+                    </button>
+</div>
+</section>
+<!-- Success State -->
+<section class="step-transition hidden opacity-0 translate-y-8 flex flex-col items-center text-center" id="success">
+<div class="w-24 h-24 mb-xl">
+
+<!-- Fallback if no shader: subtle SVG check -->
+<div class="w-full h-full bg-primary rounded-full flex items-center justify-center text-on-primary hidden" id="success-fallback">
+<span class="material-symbols-outlined text-4xl">done_all</span>
+</div>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-sm">
+                    Rest well, Alex
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2xl">
+                    Your reflection is saved. We'll adjust tomorrow's load to match your rhythm.
+                </p>
+<button class="px-2xl py-md bg-surface-container-high text-on-surface font-label-sm text-label-sm rounded-full hover:bg-surface-variant transition-all" onclick="window.location.reload()">
+                    Back to Dashboard
+                </button>
+</section>
+</div>
+</main>
+<!-- Visual Hint Footer -->
+<footer class="fixed bottom-margin-mobile left-0 w-full text-center pointer-events-none">
+<p class="font-label-xs text-label-xs text-outline-variant uppercase tracking-widest">
+            Reflection complete in <span id="timer">42</span>s
+        </p>
+</footer>
+<script>
+        let currentStep = 1;
+        let seconds = 0;
+        
+        // Simple timer logic
+        setInterval(() => {
+            seconds++;
+            document.getElementById('timer').innerText = seconds;
+        }, 1000);
+
+        function toggleChip(el) {
+            el.classList.toggle('chip-active');
+            el.classList.toggle('chip-inactive');
+            // Subtle Haptic Scale
+            el.style.transform = 'scale(0.97)';
+            setTimeout(() => el.style.transform = 'scale(1)', 100);
+        }
+
+        function selectReason(el) {
+            // Unselect others in Step 3 grid for single choice or just toggle
+            const siblings = el.parentElement.children;
+            for(let sib of siblings) {
+                sib.classList.remove('chip-active');
+                sib.classList.add('chip-inactive');
+            }
+            el.classList.add('chip-active');
+            el.classList.remove('chip-inactive');
+        }
+
+        function nextStep(step) {
+            const currentEl = document.getElementById(`step-${currentStep}`);
+            const nextEl = document.getElementById(`step-${step}`);
+            
+            // Fade out current
+            currentEl.classList.add('opacity-0', 'translate-y-[-20px]');
+            setTimeout(() => {
+                currentEl.classList.add('hidden');
+                
+                // Prep next
+                nextEl.classList.remove('hidden');
+                // Force reflow
+                nextEl.offsetHeight;
+                
+                // Fade in next
+                nextEl.classList.remove('opacity-0', 'translate-y-8');
+                nextEl.classList.add('opacity-100', 'translate-y-0');
+                
+                currentStep = step;
+                updateIndicators(step);
+            }, 300);
+        }
+
+        function updateIndicators(step) {
+            for(let i=1; i<=3; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === step) {
+                    dot.classList.add('bg-primary', 'w-4');
+                    dot.classList.remove('bg-outline-variant', 'w-1.5');
+                } else if (i < step) {
+                    dot.classList.add('bg-primary', 'w-1.5');
+                    dot.classList.remove('bg-outline-variant', 'w-4');
+                } else {
+                    dot.classList.add('bg-outline-variant', 'w-1.5');
+                    dot.classList.remove('bg-primary', 'w-4');
+                }
+            }
+        }
+
+        function completeFlow() {
+            const currentEl = document.getElementById(`step-3`);
+            const successEl = document.getElementById('success');
+            const header = document.querySelector('header');
+            const footer = document.querySelector('footer');
+
+            currentEl.classList.add('opacity-0', 'scale-95');
+            header.style.opacity = '0';
+            footer.style.opacity = '0';
+
+            setTimeout(() => {
+                currentEl.classList.add('hidden');
+                successEl.classList.remove('hidden');
+                successEl.offsetHeight;
+                successEl.classList.remove('opacity-0', 'translate-y-8');
+                successEl.classList.add('opacity-100', 'translate-y-0');
+                
+                // Show fallback if shader doesn't load/exist in some contexts
+                setTimeout(() => {
+                   const shader = successEl.querySelector('webgl-shader');
+                   if(!shader || shader.innerHTML === '') {
+                       document.getElementById('success-fallback').classList.remove('hidden');
+                   }
+                }, 1000);
+            }, 400);
+        }
+    </script>
+</body></html>

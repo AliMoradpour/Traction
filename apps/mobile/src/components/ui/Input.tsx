@@ -1,0 +1,137 @@
+import { forwardRef, type ReactNode, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  type TextInputProps,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
+import { useTractionTheme, type TractionTheme } from '../../theme';
+
+export interface InputProps extends TextInputProps {
+  label?: string;
+  error?: string;
+  helperText?: string;
+  leftAccessory?: ReactNode;
+  rightAccessory?: ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
+  inputContainerStyle?: StyleProp<ViewStyle>;
+}
+
+export const Input = forwardRef<TextInput, InputProps>(function Input(
+  {
+    label,
+    error,
+    helperText,
+    leftAccessory,
+    rightAccessory,
+    containerStyle,
+    inputContainerStyle,
+    editable = true,
+    onBlur,
+    onFocus,
+    style,
+    ...textInputProps
+  },
+  ref,
+) {
+  const [focused, setFocused] = useState(false);
+  const theme = useTractionTheme();
+  const styles = createStyles(theme);
+  const hasError = Boolean(error);
+
+  return (
+    <View style={[styles.container, containerStyle]}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
+      <View
+        style={[
+          styles.inputShell,
+          focused && styles.focused,
+          hasError && styles.error,
+          !editable && styles.disabled,
+          inputContainerStyle,
+        ]}
+      >
+        {leftAccessory ? <View style={styles.accessory}>{leftAccessory}</View> : null}
+        <TextInput
+          ref={ref}
+          editable={editable}
+          placeholderTextColor={theme.colors.textSubtle}
+          selectionColor={theme.colors.accent}
+          style={[styles.input, style]}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          {...textInputProps}
+        />
+        {rightAccessory ? <View style={styles.accessory}>{rightAccessory}</View> : null}
+      </View>
+      {error ? <Text style={styles.errorText}>{error}</Text> : helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
+    </View>
+  );
+});
+
+function createStyles(theme: TractionTheme) {
+  return StyleSheet.create({
+    container: {
+      gap: theme.spacing.sm,
+      width: '100%',
+    },
+    label: {
+      ...theme.typography.labelSm,
+      color: theme.colors.text,
+    },
+    inputShell: {
+      alignItems: 'center',
+      backgroundColor: theme.colors.input,
+      borderColor: theme.colors.borderMuted,
+      borderRadius: theme.radius.md,
+      borderWidth: 1,
+      flexDirection: 'row',
+      minHeight: theme.spacing.controlHeightLg,
+      paddingHorizontal: theme.spacing.md,
+    },
+    focused: {
+      borderColor: theme.colors.accent,
+      shadowColor: theme.colors.accent,
+      shadowOpacity: 0.18,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 0 },
+    },
+    error: {
+      borderColor: theme.colors.danger,
+    },
+    disabled: {
+      backgroundColor: theme.colors.disabled,
+      opacity: 0.72,
+    },
+    input: {
+      ...theme.typography.bodyMd,
+      color: theme.colors.text,
+      flex: 1,
+      minHeight: theme.spacing.controlHeightLg,
+      paddingVertical: 0,
+    },
+    accessory: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: theme.spacing.sm,
+    },
+    helper: {
+      ...theme.typography.labelSm,
+      color: theme.colors.textSubtle,
+    },
+    errorText: {
+      ...theme.typography.labelSm,
+      color: theme.colors.dangerText,
+    },
+  });
+}
+

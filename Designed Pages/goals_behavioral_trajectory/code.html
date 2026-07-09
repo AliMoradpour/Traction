@@ -1,0 +1,324 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>Goals - Traction</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#bec6e0",
+                        "inverse-surface": "#303032",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface": "#1b1b1d",
+                        "tertiary": "#000000",
+                        "tertiary-container": "#271901",
+                        "surface": "#fcf8fa",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f6f3f5",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf8fa",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#eae7e9",
+                        "surface-variant": "#e4e2e4",
+                        "on-secondary-container": "#57657b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container": "#f0edef",
+                        "primary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "surface-bright": "#fcf8fa",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e4e2e4",
+                        "primary": "#000000",
+                        "surface-dim": "#dcd9db",
+                        "secondary-fixed": "#d5e3fd",
+                        "secondary-container": "#d5e3fd",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "on-primary-container": "#7c839b",
+                        "on-surface-variant": "#45464d",
+                        "secondary": "#515f74",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-tint": "#565e74",
+                        "on-primary-fixed": "#131b2e",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f3f0f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "8px",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "40px",
+                        "xl": "32px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-xs": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fcf8fa;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .card-shadow {
+            box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.03);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 ios-blur h-16 flex items-center px-margin-mobile">
+<div class="flex justify-between items-center w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAr11dWKcOETjPOj3BUBkyKLiBK2cGx0ZH0_6qvP55Ous8a44A5eEkefBYNlmi4InvbqhA5MnSV4hESOK9imvdmAVTSs-U55rSuSMmqzsJGFSVVduKIg0NCpyQsRuMUG5KZC5aobNpSaqGAba3uMME7SKCtVFieT0zVfsUH2VxkuBzZdFNsHz451gYZymz0R8fOpM1CD7ekWXJik5TDAA0anVWvsuaaYvJOKzMqaTEFpGRBvNe0MAb7RC4oLtv1pj7-uBxwugoRvc">
+</div>
+<h1 class="font-headline-md text-primary">Goals</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">add</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-2xl mx-auto space-y-lg">
+<!-- Header Summary -->
+<section class="space-y-xs">
+<p class="font-label-sm text-on-secondary-container uppercase tracking-widest">Active Focus</p>
+<h2 class="font-display-lg-mobile text-primary">You have 4 goals in progress.</h2>
+</section>
+<!-- Goal Cards List -->
+<div class="flex flex-col gap-md">
+<!-- Goal 1: IELTS Prep -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg card-shadow transition-transform active:scale-[0.98] duration-200">
+<div class="flex flex-col gap-sm mb-lg">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-primary">IELTS Prep</h3>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 border border-green-100">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="font-label-sm text-green-700 font-bold">On Track - 17 weeks remaining</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-sm">Due Dec 15, 2024</span>
+</div>
+</div>
+<div class="space-y-2 mb-lg">
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%] rounded-full"></div>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label-xs">Velocity: Stable</span>
+<span class="font-label-xs">65% complete</span>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant/20 flex gap-md">
+<span class="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+<p class="font-label-sm text-on-surface-variant">AI suggests focusing on Writing Section next.</p>
+</div>
+</div>
+<!-- Goal 2: Learn Rust -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg card-shadow transition-transform active:scale-[0.98] duration-200">
+<div class="flex flex-col gap-sm mb-lg">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-primary">Learn Rust</h3>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-50 border border-orange-100">
+<span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+<span class="font-label-sm text-orange-700 font-bold">At Risk - 5 days inactive</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-sm">Due Jan 20, 2025</span>
+</div>
+</div>
+<div class="space-y-2 mb-lg">
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-orange-400 w-[12%] rounded-full"></div>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label-xs">Velocity: Down 40%</span>
+<span class="font-label-xs">12% complete</span>
+</div>
+</div>
+<div class="pt-md border-t border-outline-variant/20 flex gap-md">
+<span class="material-symbols-outlined text-orange-500 text-[20px]">warning</span>
+<p class="font-label-sm text-on-surface-variant">Recovery needed to meet January deadline.</p>
+</div>
+</div>
+<!-- Goal 3: Marathon Training -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg card-shadow transition-transform active:scale-[0.98] duration-200">
+<div class="flex flex-col gap-sm mb-lg">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-primary">Marathon Training</h3>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 border border-green-100">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-label-sm text-green-700 font-bold">On Track - Peak Week</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-sm">Due Nov 02, 2024</span>
+</div>
+</div>
+<div class="space-y-2 mb-lg">
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[88%] rounded-full"></div>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label-xs">Velocity: Increasing</span>
+<span class="font-label-xs">88% complete</span>
+</div>
+</div>
+</div>
+<!-- Goal 4: Design Portfolio -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-lg card-shadow transition-transform active:scale-[0.98] duration-200">
+<div class="flex flex-col gap-sm mb-lg">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-primary">Design Portfolio</h3>
+<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 border border-red-100">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="font-label-sm text-red-700 font-bold">Behind Schedule - 11 days behind target</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-label-sm">Due Dec 01, 2024</span>
+</div>
+</div>
+<div class="space-y-2 mb-lg">
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-red-400 w-[42%] rounded-full"></div>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span class="font-label-xs text-red-600 font-medium">Recovery Needed</span>
+<span class="font-label-xs">42% complete</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Milestone CTA -->
+<div class="bg-primary p-lg rounded-xl flex items-center justify-between text-on-primary">
+<div class="space-y-1">
+<h4 class="font-headline-md">New Milestone?</h4>
+<p class="font-label-sm opacity-80">Add a sub-goal to maintain momentum.</p>
+</div>
+<button class="bg-white text-primary px-4 py-2 rounded-lg font-label-sm font-bold flex items-center gap-1 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                Add
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full bg-surface/80 ios-blur h-16 border-t border-outline-variant/30 z-50 flex justify-around items-center px-gutter pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-xs mt-1">Today</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-semibold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-label-xs mt-1">Goals</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-xs mt-1">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-xs mt-1">Profile</span>
+</a>
+</nav>
+<!-- Background Effects -->
+<div class="fixed inset-0 pointer-events-none -z-10 opacity-[0.03]">
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-fixed rounded-full blur-[120px]"></div>
+<div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary-fixed rounded-full blur-[100px]"></div>
+</div>
+<script>
+        // Simple micro-interactions
+        document.querySelectorAll('.active\\:scale-\\[0\\.98\\]').forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('touchend', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Header scroll behavior
+        let lastScroll = 0;
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll <= 0) {
+                header.style.transform = 'translateY(0)';
+                return;
+            }
+            if (currentScroll > lastScroll) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            header.style.transition = 'transform 0.3s ease-in-out';
+            lastScroll = currentScroll;
+        });
+    </script>
+</body></html>

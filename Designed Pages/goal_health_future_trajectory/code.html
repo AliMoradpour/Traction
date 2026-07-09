@@ -1,0 +1,342 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Traction | Goal Health Projection</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcf8fa;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .trajectory-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: dash 3s ease-out forwards;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: 0; }
+        }
+        .pulse-accent {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#bec6e0",
+                        "inverse-surface": "#303032",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface": "#1b1b1d",
+                        "tertiary": "#000000",
+                        "tertiary-container": "#271901",
+                        "surface": "#fcf8fa",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f6f3f5",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf8fa",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#eae7e9",
+                        "surface-variant": "#e4e2e4",
+                        "on-secondary-container": "#57657b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container": "#f0edef",
+                        "primary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "surface-bright": "#fcf8fa",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e4e2e4",
+                        "primary": "#000000",
+                        "surface-dim": "#dcd9db",
+                        "secondary-fixed": "#d5e3fd",
+                        "secondary-container": "#d5e3fd",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "on-primary-container": "#7c839b",
+                        "on-surface-variant": "#45464d",
+                        "secondary": "#515f74",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-tint": "#565e74",
+                        "on-primary-fixed": "#131b2e",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f3f0f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "40px",
+                        "xl": "32px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-xs": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed selection:text-primary">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-b border-outline-variant/30 h-16 flex justify-between items-center px-gutter">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="bubble_chart">bubble_chart</span>
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary">Traction</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95" data-icon="notifications">notifications</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a focused student in a minimalist office setting, soft natural lighting, high-end editorial photography style, neutral tones and clean composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmL_9w-ZpgIDBZ9TtIfJDY8hNMb_2EAXJavTqGwtDVm9PzgN3-s_saashpyCedc2XrWVz8Z_sLwVQr_8q8ybdROBThz8a4nVy-hentWOPYwI1DdKNgX-dXn_djePz3HM0yEkHl9YVcSzhkXpUztp76cXWmPdT3BWH-D7-ZclsZSns0LG_S_GFMt69Xl3iGVKSzyBC6vyWzOpTdargTnxHgkzJdroy1oN03FtaCd6SlSekzsJl2hwGMdqWu5nq9WAVjMlcLJKZtkCc">
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop">
+<!-- Goal Overview Section -->
+<section class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-md">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary mb-1">IELTS 7.0</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-2">
+                        Trajectory: <span class="text-secondary font-semibold">On Track</span>
+<span class="w-2 h-2 rounded-full bg-secondary pulse-accent"></span>
+</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-gutter py-sm rounded-lg bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 active:scale-95 transition-all">Adjust Plan</button>
+<button class="px-gutter py-sm rounded-lg bg-surface-container-high text-on-surface font-label-sm text-label-sm hover:bg-surface-variant transition-all">Details</button>
+</div>
+</div>
+</section>
+<!-- Main Forecasting Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Future Projector: Visual Trajectory -->
+<div class="md:col-span-8 glass-panel rounded-xl p-xl overflow-hidden relative min-h-[400px]">
+<div class="flex justify-between items-start mb-xl relative z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary">Readiness Forecast</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Predicted mastery based on behavioral velocity</p>
+</div>
+<div class="text-right">
+<span class="font-label-xs text-label-xs uppercase tracking-widest text-outline">Target Date</span>
+<p class="font-headline-md text-headline-md text-primary">Jan 12</p>
+</div>
+</div>
+<!-- Visualization Canvas -->
+<div class="relative h-64 w-full mt-12">
+<svg class="w-full h-full overflow-visible" viewBox="0 0 800 200">
+<!-- Path: History (Solid) -->
+<path d="M0,180 L100,165 L200,175 L300,140" fill="none" stroke="#e2e8f0" stroke-linecap="round" stroke-width="3"></path>
+<!-- Path: Future Forecast (Projected) -->
+<path class="trajectory-path" d="M300,140 Q450,100 600,50 T800,20" fill="none" stroke="#000000" stroke-dasharray="8 8" stroke-width="4"></path>
+<!-- Marker: Today -->
+<circle cx="300" cy="140" fill="#000000" r="6"></circle>
+<text class="font-label-xs text-label-xs fill-primary" x="290" y="125">Today</text>
+<!-- Marker: Prediction Date -->
+<circle class="fill-primary pulse-accent" cx="600" cy="50" r="8"></circle>
+<rect class="fill-surface-container-highest shadow-sm" height="30" rx="4" width="80" x="580" y="0"></rect>
+<text class="font-label-xs text-label-xs fill-primary font-bold" x="590" y="20">JAN 12</text>
+<!-- Shadow Area of Probability -->
+<path d="M300,140 Q450,80 600,30 T800,0 L800,60 T600,100 Q450,140 300,140" fill="rgba(0,0,0,0.03)"></path>
+</svg>
+<!-- Overlay Legend -->
+<div class="absolute bottom-0 left-0 w-full flex justify-between items-center pt-md border-t border-outline-variant/20">
+<div class="flex gap-gutter">
+<div class="flex items-center gap-2">
+<span class="w-3 h-1 bg-outline rounded-full"></span>
+<span class="font-label-xs text-label-xs text-outline">Past Effort</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-1 border-t-2 border-dashed border-primary"></span>
+<span class="font-label-xs text-label-xs text-outline">AI Projection</span>
+</div>
+</div>
+<div class="px-sm py-1 rounded bg-surface-container text-on-surface-variant font-label-xs text-label-xs">
+                            Risk Level: <span class="text-secondary font-bold">Low</span>
+</div>
+</div>
+</div>
+<!-- Abstract Atmospheric Element -->
+<div class="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 opacity-10 pointer-events-none">
+
+</div>
+</div>
+<!-- Contextual Insights: The 'So What' -->
+<div class="md:col-span-4 flex flex-col gap-gutter">
+<!-- Alternative Scenario Card -->
+<div class="glass-panel rounded-xl p-md flex-1 border-l-4 border-error/40 relative overflow-hidden group">
+<div class="shimmer absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="flex items-start gap-md relative z-10">
+<div class="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-error-container" data-icon="warning">warning</span>
+</div>
+<div>
+<h4 class="font-label-sm text-label-sm font-bold text-primary uppercase tracking-wider mb-2">Alternative Scenario</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">"If current completion rate drops by <span class="text-error font-bold">20%</span>..."</p>
+<div class="p-sm bg-error-container/30 rounded-lg border border-error/10">
+<span class="font-label-xs text-label-xs text-on-error-container uppercase font-bold">Outcome</span>
+<p class="font-headline-md text-headline-md text-error tracking-tight">3 weeks delay</p>
+<p class="font-label-sm text-label-sm text-on-error-container/70">Estimated: Feb 2</p>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Coaching Insight -->
+<div class="glass-panel rounded-xl p-md flex-1 bg-primary-container/5">
+<div class="flex items-start gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div>
+<h4 class="font-label-sm text-label-sm font-bold text-primary uppercase tracking-wider mb-2">Traction AI Tip</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Your momentum is highest between 8AM and 10AM. Scheduling a mock Listening session during this window could pull your target date forward by <span class="font-bold text-primary">4 days</span>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Metric Drill-down -->
+<section class="mt-xl grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="glass-panel rounded-xl p-md">
+<span class="font-label-xs text-label-xs text-outline uppercase">Current Velocity</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">94%</span>
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="trending_up">trending_up</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-4 overflow-hidden">
+<div class="h-full bg-secondary w-[94%]"></div>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-md">
+<span class="font-label-xs text-label-xs text-outline uppercase">Daily Engagement</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">2.4h</span>
+<span class="text-on-surface-variant font-label-sm">/ avg</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full mt-4 overflow-hidden">
+<div class="h-full bg-primary w-[80%]"></div>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-md">
+<span class="font-label-xs text-label-xs text-outline uppercase">Mastery Confidence</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-lg-mobile text-display-lg-mobile text-primary">High</span>
+</div>
+<div class="flex gap-1 mt-4">
+<div class="h-1 flex-1 bg-secondary rounded-full"></div>
+<div class="h-1 flex-1 bg-secondary rounded-full"></div>
+<div class="h-1 flex-1 bg-secondary rounded-full"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile Anchor) -->
+<nav class="fixed bottom-0 w-full z-50 backdrop-blur-xl bg-surface/80 border-t border-outline-variant/30 h-16 flex justify-around items-center px-4 md:hidden pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-xs text-label-xs">Today</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="target" style="font-variation-settings: 'FILL' 1;">target</span>
+<span class="font-label-xs text-label-xs">Goals</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-xs text-label-xs">Insights</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/20 active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-xs text-label-xs">Profile</span>
+</button>
+</nav>
+<!-- Floating Projector Action (Contextual) -->
+<button class="fixed right-6 bottom-20 md:bottom-10 w-14 h-14 rounded-full bg-primary text-on-primary shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 group">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform" data-icon="timeline">timeline</span>
+</button>
+<script>
+        // Micro-interaction for hovering on the trajectory path
+        const panel = document.querySelector('.glass-panel');
+        panel.addEventListener('mousemove', (e) => {
+            const rect = panel.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Subtle parallax/lighting follow effect could be added here
+        });
+
+        // Toggle state for 'Alternative Scenario'
+        const scenarioCard = document.querySelector('.group');
+        scenarioCard.addEventListener('click', () => {
+            scenarioCard.classList.toggle('border-error/40');
+            scenarioCard.classList.toggle('border-secondary/40');
+            // Logic to update text content for 'Scenario B' could go here
+        });
+    </script>
+</body></html>

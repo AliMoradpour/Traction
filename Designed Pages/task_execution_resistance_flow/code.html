@@ -1,0 +1,339 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Task Execution - Calm Execution</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#bec6e0",
+                        "inverse-surface": "#303032",
+                        "outline-variant": "#c6c6cd",
+                        "on-surface": "#1b1b1d",
+                        "tertiary": "#000000",
+                        "tertiary-container": "#271901",
+                        "surface": "#fcf8fa",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f6f3f5",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "background": "#fcf8fa",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#eae7e9",
+                        "surface-variant": "#e4e2e4",
+                        "on-secondary-container": "#57657b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container": "#f0edef",
+                        "primary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "surface-bright": "#fcf8fa",
+                        "primary-fixed-dim": "#bec6e0",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e4e2e4",
+                        "primary": "#000000",
+                        "surface-dim": "#dcd9db",
+                        "secondary-fixed": "#d5e3fd",
+                        "secondary-container": "#d5e3fd",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "on-primary-container": "#7c839b",
+                        "on-surface-variant": "#45464d",
+                        "secondary": "#515f74",
+                        "on-background": "#1b1b1d",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-tint": "#565e74",
+                        "on-primary-fixed": "#131b2e",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f3f0f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-desktop": "40px",
+                        "xl": "32px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-xs": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            min-height: max(884px, 100dvh);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .animate-in {
+            animation: animate-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes animate-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 max-w-7xl mx-auto pointer-events-none">
+<button class="pointer-events-auto bg-surface-container/40 backdrop-blur-md h-10 w-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors duration-200" onclick="window.history.back()">
+<span class="material-symbols-outlined text-on-surface">close</span>
+</button>
+<div class="pointer-events-auto bg-surface-container/40 backdrop-blur-md px-4 py-1.5 rounded-full flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-widest">Focus Session</span>
+</div>
+</header>
+<main class="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden px-margin-mobile">
+<!-- Atmospheric Background Overlay -->
+<div class="absolute inset-0 z-0 opacity-40 pointer-events-none">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] blur-[120px] rounded-full bg-primary-fixed/30"></div>
+</div>
+<div class="relative z-10 w-full max-w-2xl flex flex-col items-center text-center">
+<!-- Task Identity -->
+<div class="mb-xl animate-in">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-sm tracking-wide uppercase">Current Objective</p>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary tracking-tight">Design System Polish</h1>
+</div>
+<!-- Focus Timer & Progress -->
+<div class="relative flex items-center justify-center mb-xl group cursor-default">
+<svg class="w-[300px] h-[300px] md:w-[400px] md:h-[400px]">
+<circle class="text-surface-container stroke-current" cx="150" cy="150" fill="transparent" r="140" stroke-width="2" style="r: clamp(140px, 35vw, 190px); cx: clamp(150px, 37.5vw, 200px); cy: clamp(150px, 37.5vw, 200px);"></circle>
+<circle class="progress-ring__circle text-primary stroke-current transition-all duration-1000 ease-linear" cx="150" cy="150" fill="transparent" id="timer-ring" r="140" stroke-dasharray="1193.8" stroke-dashoffset="1193.8" stroke-linecap="round" stroke-width="3" style="r: clamp(140px, 35vw, 190px); cx: clamp(150px, 37.5vw, 200px); cy: clamp(150px, 37.5vw, 200px);"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center transition-transform duration-500 group-hover:scale-105">
+<span class="font-display-lg-mobile text-[64px] md:text-[88px] leading-none text-primary font-bold tabular-nums" id="timer-text">24:59</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mt-2 tracking-[0.2em] uppercase opacity-60">minutes left</span>
+</div>
+</div>
+<!-- Resistance Prompt (Dynamic Component) -->
+<div class="mb-xl animate-in" id="resistance-trigger" style="animation-delay: 0.2s">
+<button class="group flex items-center gap-sm px-6 py-2.5 rounded-full border border-primary/10 bg-white/50 backdrop-blur-sm text-primary hover:bg-white hover:border-primary/20 transition-all active:scale-95 shadow-sm" onclick="openResistanceModal()">
+<span class="material-symbols-outlined text-primary/60 group-hover:text-primary transition-colors" style="font-variation-settings: 'opsz' 20;">help_center</span>
+<span class="font-label-sm text-label-sm">Why am I stuck?</span>
+</button>
+</div>
+<!-- AI Insights Container -->
+<div class="mb-2xl px-lg py-md rounded-2xl bg-surface-container-low border border-outline-variant/30 max-w-sm transition-all duration-500" id="ai-insight-box">
+<div class="flex items-start gap-md text-left">
+<span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'opsz' 20;">auto_awesome</span>
+<div>
+<h4 class="font-label-sm text-label-sm text-on-surface font-semibold" id="ai-title">AI Assistant</h4>
+<p class="font-body-md text-body-md text-on-surface-variant" id="ai-content">Focus levels are high. Completing this now will clear 15% of your weekly cognitive load.</p>
+</div>
+</div>
+</div>
+<!-- Action Controls -->
+<div class="flex flex-col md:flex-row items-center gap-md w-full justify-center">
+<button class="order-1 md:order-2 w-full md:w-auto px-12 py-4 bg-primary text-on-primary rounded-xl font-label-sm text-headline-md-mobile flex items-center justify-center gap-sm transition-all duration-300 hover:opacity-90 active:scale-95 shadow-lg shadow-primary/10" onclick="handleComplete()">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">check_circle</span>
+                Complete
+            </button>
+<div class="order-2 md:order-1 flex gap-md w-full md:w-auto">
+<button class="flex-1 md:flex-none px-6 py-4 bg-surface-container-high text-on-surface rounded-xl font-label-sm text-label-sm flex items-center justify-center gap-sm transition-all hover:bg-surface-dim active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'opsz' 20;">snooze</span>
+                    Snooze
+                </button>
+<button class="flex-1 md:flex-none px-6 py-4 bg-surface-container-high text-on-surface rounded-xl font-label-sm text-label-sm flex items-center justify-center gap-sm transition-all hover:bg-surface-dim active:scale-95" onclick="openResistanceModal()">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'opsz' 20;">psychology_alt</span>
+                    Too Difficult
+                </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Resistance Diagnosis Modal -->
+<div class="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-6 opacity-0 pointer-events-none transition-all duration-300" id="resistance-modal">
+<div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeResistanceModal()"></div>
+<div class="relative w-full max-w-md bg-white rounded-t-3xl md:rounded-2xl p-xl shadow-2xl translate-y-full transition-transform duration-500" id="modal-content">
+<div class="w-12 h-1.5 bg-surface-container-highest rounded-full mx-auto mb-lg md:hidden"></div>
+<div class="text-center mb-xl">
+<h3 class="font-headline-md text-primary mb-2">Identify the friction</h3>
+<p class="font-body-md text-on-surface-variant">What's preventing you from moving forward?</p>
+</div>
+<div class="grid grid-cols-1 gap-sm">
+<button class="w-full text-left px-md py-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors flex items-center justify-between group" onclick="diagnose('Task feels too large')">
+<span class="font-label-sm">Task feels too large</span>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="w-full text-left px-md py-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors flex items-center justify-between group" onclick="diagnose('I don\'t know where to start')">
+<span class="font-label-sm">I don't know where to start</span>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="w-full text-left px-md py-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors flex items-center justify-between group" onclick="diagnose('Low energy')">
+<span class="font-label-sm">Low energy</span>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="w-full text-left px-md py-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors flex items-center justify-between group" onclick="diagnose('Distracted')">
+<span class="font-label-sm">Distracted</span>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+<button class="w-full text-left px-md py-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors flex items-center justify-between group" onclick="diagnose('Not interested')">
+<span class="font-label-sm">Not interested</span>
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+</button>
+</div>
+<button class="mt-lg w-full py-4 text-on-surface-variant font-label-sm uppercase tracking-widest text-[11px]" onclick="closeResistanceModal()">Cancel</button>
+</div>
+</div>
+<!-- Success Feedback Overlay -->
+<div class="fixed inset-0 z-[110] bg-background flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-700" id="success-overlay">
+<div class="text-center">
+<div class="mb-xl">
+<span class="material-symbols-outlined text-[120px] text-primary" style="font-variation-settings: 'wght' 200, 'FILL' 0;">task_alt</span>
+</div>
+<h2 class="font-display-lg text-primary mb-sm">Momentum Captured</h2>
+<p class="font-body-lg text-on-surface-variant max-w-xs mx-auto">'Design System Polish' has been integrated into your progress.</p>
+<button class="mt-2xl font-label-sm text-label-sm text-primary uppercase tracking-widest border-b border-primary pb-1" onclick="location.reload()">Return to Dashboard</button>
+</div>
+</div>
+<script>
+    // Timer Logic
+    let timeLeft = 25 * 60;
+    const timerText = document.getElementById('timer-text');
+    const timerRing = document.getElementById('timer-ring');
+    const totalLength = 1193.8;
+
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerText.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        const progress = timeLeft / (25 * 60);
+        const offset = totalLength * (1 - progress);
+        timerRing.style.strokeDashoffset = offset;
+        if (timeLeft > 0) timeLeft--;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Resistance UI Logic
+    function openResistanceModal() {
+        const modal = document.getElementById('resistance-modal');
+        const content = document.getElementById('modal-content');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('opacity-100', 'pointer-events-auto');
+        content.classList.remove('translate-y-full');
+        content.classList.add('translate-y-0');
+    }
+
+    function closeResistanceModal() {
+        const modal = document.getElementById('resistance-modal');
+        const content = document.getElementById('modal-content');
+        content.classList.remove('translate-y-0');
+        content.classList.add('translate-y-full');
+        setTimeout(() => {
+            modal.classList.remove('opacity-100', 'pointer-events-auto');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }, 300);
+    }
+
+    function diagnose(reason) {
+        closeResistanceModal();
+        
+        const aiBox = document.getElementById('ai-insight-box');
+        const aiTitle = document.getElementById('ai-title');
+        const aiContent = document.getElementById('ai-content');
+        const resistanceTrigger = document.getElementById('resistance-trigger');
+
+        // Fade out previous state
+        aiBox.classList.add('opacity-0', 'scale-95');
+        resistanceTrigger.classList.add('opacity-0');
+
+        setTimeout(() => {
+            aiTitle.innerText = "Intervention Recommendation";
+            
+            let recommendation = "";
+            switch(reason) {
+                case 'Task feels too large':
+                    recommendation = "Break this task into 3 tiny sub-steps. Just focus on step one for now.";
+                    break;
+                case 'I don\'t know where to start':
+                    recommendation = "Start with a 5-minute 'messy' draft. No pressure for perfection.";
+                    break;
+                case 'Low energy':
+                    recommendation = "Switch to a low-energy variant of this task or take a 2-minute breath break.";
+                    break;
+                case 'Distracted':
+                    recommendation = "Clear your physical workspace. Let's restart the timer for 10 focus minutes.";
+                    break;
+                case 'Not interested':
+                    recommendation = "Connect this to your 'Why'. Completing this unlocks your evening freedom.";
+                    break;
+                default:
+                    recommendation = "Try committing to just 5 minutes of work. You can stop after that.";
+            }
+            
+            aiContent.innerText = recommendation;
+            aiBox.classList.remove('opacity-0', 'scale-95');
+            aiBox.classList.add('bg-primary-container', 'text-on-primary-container', 'border-primary/20');
+            aiBox.querySelector('.material-symbols-outlined').classList.add('text-primary-fixed');
+            aiTitle.classList.add('text-primary-fixed');
+            aiContent.classList.add('text-on-primary-container/80');
+            
+            // Hide the trigger once diagnosed
+            resistanceTrigger.style.display = 'none';
+        }, 500);
+    }
+
+    function handleComplete() {
+        const overlay = document.getElementById('success-overlay');
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+        document.querySelector('main').style.transform = 'scale(0.95)';
+        document.querySelector('main').style.filter = 'blur(20px)';
+        document.querySelector('main').style.transition = 'all 0.8s ease-in-out';
+    }
+</script>
+</body></html>

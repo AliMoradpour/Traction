@@ -1,0 +1,60 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './app/**/*.{js,jsx,ts,tsx}',
+    './src/**/*.{js,jsx,ts,tsx}',
+  ],
+  presets: [require('nativewind/preset')],
+  theme: {
+    extend: {
+      colors: {
+        background: '#F8FAFC',
+        surface: '#FCF8FA',
+        'surface-soft': '#F6F3F5',
+        'surface-card': '#FFFFFF',
+        primary: '#0F172A',
+        accent: '#3B82F6',
+        success: '#22C55E',
+        warning: '#F59E0B',
+        danger: '#EF4444',
+        border: '#E2E8F0',
+        muted: '#45464D',
+      },
+      spacing: {
+        xxs: '2px',
+        xs: '4px',
+        sm: '8px',
+        md: '16px',
+        gutter: '16px',
+        'margin-mobile': '20px',
+        lg: '24px',
+        xl: '32px',
+        '2xl': '48px',
+        '3xl': '64px',
+      },
+      borderRadius: {
+        none: '0px',
+        sm: '4px',
+        DEFAULT: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '24px',
+        sheet: '32px',
+        full: '9999px',
+      },
+      fontFamily: {
+        sans: ['Inter'],
+      },
+      fontSize: {
+        'display-lg': ['34px', { lineHeight: '41px', fontWeight: '700' }],
+        'display-mobile': ['28px', { lineHeight: '34px', fontWeight: '700' }],
+        headline: ['22px', { lineHeight: '28px', fontWeight: '600' }],
+        title: ['18px', { lineHeight: '24px', fontWeight: '600' }],
+        body: ['15px', { lineHeight: '20px', fontWeight: '400' }],
+        label: ['13px', { lineHeight: '18px', fontWeight: '500' }],
+        caption: ['11px', { lineHeight: '13px', fontWeight: '600' }],
+      },
+    },
+  },
+  plugins: [],
+};

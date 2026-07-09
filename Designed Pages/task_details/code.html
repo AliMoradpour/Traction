@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Task Details - Project Alpha</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --font-inter: 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--font-inter);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .task-card-shadow {
+            box-shadow: 0px 4px 12px rgba(15, 23, 42, 0.03);
+        }
+        .active-scale:active {
+            transform: scale(0.98);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#bec6e0",
+                        "inverse-surface": "#303032",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#fcf8fa",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-tint": "#565e74",
+                        "surface-container-high": "#eae7e9",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#515f74",
+                        "primary-fixed": "#dae2fd",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#b9c7e0",
+                        "outline": "#76777d",
+                        "surface-dim": "#dcd9db",
+                        "surface-container-highest": "#e4e2e4",
+                        "surface-container": "#f0edef",
+                        "secondary-fixed": "#d5e3fd",
+                        "on-primary-container": "#7c839b",
+                        "primary": "#000000",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e4e2e4",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-low": "#f6f3f5",
+                        "on-secondary-container": "#57657b",
+                        "tertiary-container": "#271901",
+                        "on-background": "#1b1b1d",
+                        "on-secondary-fixed": "#0d1c2f",
+                        "primary-container": "#131b2e",
+                        "on-error": "#ffffff",
+                        "tertiary": "#000000",
+                        "on-surface": "#1b1b1d",
+                        "on-secondary-fixed-variant": "#3a485c",
+                        "inverse-on-surface": "#f3f0f2",
+                        "background": "#fcf8fa",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-bright": "#fcf8fa",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "on-tertiary-fixed": "#271901",
+                        "on-primary-fixed": "#131b2e",
+                        "outline-variant": "#c6c6cd",
+                        "secondary-container": "#d5e3fd",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#bec6e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "20px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "2xl": "48px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-xs": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                        "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<!-- Top AppBar (JSON Mapping: Navigation Suppression Rule applied for sub-page) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl h-16 flex items-center px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center justify-between w-full max-w-7xl mx-auto">
+<button class="flex items-center gap-2 text-on-surface-variant hover:opacity-70 transition-opacity active-scale">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label-sm text-label-sm">Back</span>
+</button>
+<div class="absolute left-1/2 -translate-x-1/2">
+<h1 class="font-headline-md text-headline-md-mobile md:text-headline-md text-primary text-center">Project Alpha</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant active-scale">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile md:px-margin-desktop min-h-screen">
+<div class="max-w-3xl mx-auto space-y-xl">
+<!-- Hero Header Section -->
+<section class="space-y-sm">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-xs text-label-xs uppercase tracking-wider">Priority: High</span>
+</div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface tracking-tight leading-tight">
+                    Refine Core Visual Hierarchy for Portfolio Project
+                </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                    Executing a high-fidelity audit of the spacing system and typographic rhythm to ensure optimal readability across all mobile viewports.
+                </p>
+</section>
+<!-- Key Metadata Bento Grid -->
+<section class="grid grid-cols-2 md:grid-cols-3 gap-md">
+<!-- Duration -->
+<div class="bg-white border border-outline-variant/30 rounded-xl p-md task-card-shadow">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[20px]">schedule</span>
+<span class="font-label-sm text-label-sm">Duration</span>
+</div>
+<div class="font-headline-md text-headline-md-mobile text-primary">90m</div>
+</div>
+<!-- Related Goal -->
+<div class="bg-white border border-outline-variant/30 rounded-xl p-md task-card-shadow">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[20px]">target</span>
+<span class="font-label-sm text-label-sm">Goal</span>
+</div>
+<div class="font-headline-md text-headline-md-mobile text-primary truncate">Portfolio Project</div>
+</div>
+<!-- Friction Index (Thematic) -->
+<div class="bg-white border border-outline-variant/30 rounded-xl p-md task-card-shadow col-span-2 md:col-span-1">
+<div class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<span class="font-label-sm text-label-sm">Friction</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="font-headline-md text-headline-md-mobile text-primary">24/100</div>
+<div class="flex gap-0.5">
+<div class="w-4 h-1.5 rounded-full bg-primary"></div>
+<div class="w-4 h-1.5 rounded-full bg-outline-variant"></div>
+<div class="w-4 h-1.5 rounded-full bg-outline-variant"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Section -->
+<section class="space-y-lg">
+<button class="w-full h-14 bg-primary text-white rounded-xl font-headline-md text-headline-md-mobile active-scale transition-transform flex items-center justify-center gap-3 shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    Start Focus Session
+                </button>
+<div class="grid grid-cols-3 gap-md">
+<button class="flex flex-col items-center justify-center gap-2 p-md bg-secondary-container/50 text-on-secondary-container rounded-xl hover:bg-secondary-container transition-colors active-scale">
+<span class="material-symbols-outlined">edit</span>
+<span class="font-label-sm text-label-sm">Edit</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-md bg-secondary-container/50 text-on-secondary-container rounded-xl hover:bg-secondary-container transition-colors active-scale">
+<span class="material-symbols-outlined">event_repeat</span>
+<span class="font-label-sm text-label-sm">Schedule</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-md bg-error-container/30 text-error rounded-xl hover:bg-error-container transition-colors active-scale">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-label-sm text-label-sm">Delete</span>
+</button>
+</div>
+</section>
+<!-- Contextual Insight (Design System Component) -->
+<section class="p-lg bg-surface-container-low rounded-xl border border-outline-variant/20 flex gap-4 items-start">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+<div class="space-y-1">
+<p class="font-headline-md text-[16px] text-primary">AI Insight</p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-snug">
+                        Based on your energy levels from yesterday, starting this session now gives you a 82% likelihood of completing the task without distraction.
+                    </p>
+</div>
+</section>
+<!-- Visual Context -->
+<section class="rounded-2xl overflow-hidden aspect-video relative group">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist workspace scene featuring a silver high-end laptop on a light oak desk. Soft natural morning light filters through a large window, creating a serene and productive atmosphere. Beside the laptop is a simple ceramic mug and a small green succulent in a white pot. The background is slightly out of focus, emphasizing a professional yet calm execution environment with a neutral palette of soft whites and warm wood tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHBqZ1r1tPzfqGsiA9hMoS6yQWYjqGRbQ_TCuUBNPGVMfWEWfZiTnIb6vKjxvGeLvyzlqonEoH7J7lVsdrOMnb1y9hcrk019VQ2Dljpn6Bxzzl6y1YVwb6cuXHlhO7B3z1mTLcMHeymtopo1e8EtB2ZJAIdl-Ebw6NP9hGG8kiSMf1fB2LFgJ0FK-P_ZW2aCXfB4guV6VviLcRGTaAwESavgpicA2qmXBbeRRxw9KA1KH6lNACTo203u_CyV1G9piLtrrpNWUba2Y"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-lg">
+<span class="text-white font-label-sm text-label-sm opacity-90">Workspace context: Portfolio Review</span>
+</div>
+</section>
+</div>
+</main>
+<!-- Interactive micro-script for the "Start Focus Session" effect -->
+<script>
+        document.querySelector('button.bg-primary').addEventListener('click', function() {
+            this.innerHTML = `
+                <span class="animate-spin material-symbols-outlined">progress_activity</span>
+                <span>Initializing Session...</span>
+            `;
+            setTimeout(() => {
+                this.innerHTML = `
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">pause</span>
+                    <span>Session in Progress</span>
+                `;
+                this.classList.replace('bg-primary', 'bg-tertiary-container');
+                this.classList.replace('text-white', 'text-on-tertiary-fixed');
+            }, 1200);
+        });
+    </script>
+</body></html>

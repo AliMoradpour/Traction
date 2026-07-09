@@ -1,0 +1,244 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<title>Welcome to Traction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#565e74",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#d5e3fd",
+                    "tertiary-fixed": "#fcdeb5",
+                    "secondary-fixed-dim": "#b9c7e0",
+                    "primary-fixed-dim": "#bec6e0",
+                    "surface-container": "#f0edef",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#574425",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#dcd9db",
+                    "secondary-container": "#d5e3fd",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#eae7e9",
+                    "surface-variant": "#e4e2e4",
+                    "primary-container": "#131b2e",
+                    "inverse-on-surface": "#f3f0f2",
+                    "surface": "#fcf8fa",
+                    "outline": "#76777d",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-tertiary-container": "#98805d",
+                    "on-surface-variant": "#45464d",
+                    "on-secondary-fixed-variant": "#3a485c",
+                    "on-primary-container": "#7c839b",
+                    "on-background": "#1b1b1d",
+                    "primary-fixed": "#dae2fd",
+                    "on-secondary-fixed": "#0d1c2f",
+                    "on-surface": "#1b1b1d",
+                    "inverse-primary": "#bec6e0",
+                    "tertiary-fixed-dim": "#dec29a",
+                    "tertiary": "#000000",
+                    "on-secondary-container": "#57657b",
+                    "tertiary-container": "#271901",
+                    "on-error-container": "#93000a",
+                    "background": "#fcf8fa",
+                    "on-tertiary-fixed": "#271901",
+                    "secondary": "#515f74",
+                    "outline-variant": "#c6c6cd",
+                    "surface-bright": "#fcf8fa",
+                    "surface-container-highest": "#e4e2e4",
+                    "inverse-surface": "#303032",
+                    "primary": "#000000",
+                    "surface-container-low": "#f6f3f5",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#131b2e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "lg": "24px",
+                    "md": "16px",
+                    "base": "4px",
+                    "xl": "32px",
+                    "margin-desktop": "40px",
+                    "2xl": "48px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-xs": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #fcf8fa; /* background color from config */
+            color: #1b1b1d; /* on-background from config */
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .conversational-bubble {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+        .progress-bar-fill {
+            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* Glass effect from Style Guidance */
+        .glass-header {
+            backdrop-filter: blur(20px);
+            background-color: rgba(252, 248, 250, 0.8);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-between overflow-hidden">
+<!-- Top Navigation / Progress Indicator -->
+<header class="fixed top-0 left-0 w-full z-50 glass-header px-margin-mobile md:px-margin-desktop h-16 flex items-center justify-center">
+<div class="w-full max-w-lg flex flex-col items-center gap-base">
+<div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="progress-bar-fill h-full bg-primary" style="width: 25%;"></div>
+</div>
+<div class="w-full flex justify-between items-center mt-2">
+<span class="font-label-xs text-label-xs text-on-surface-variant">STEP 1 OF 4</span>
+<button class="font-label-sm text-label-sm text-outline hover:text-primary transition-colors">Skip</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-xl px-margin-mobile flex flex-col justify-center gap-xl pt-24 pb-32">
+<!-- Conversational Intro Section -->
+<div class="space-y-xl">
+<!-- Avatar / Brand Mark -->
+<div class="conversational-bubble flex items-center gap-md">
+<div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl rounded-tl-none border border-outline-variant/20 shadow-sm">
+<p class="font-body-md text-body-md text-on-surface">Hello! I'm Traction.</p>
+</div>
+</div>
+<!-- The Mission Statement -->
+<div class="conversational-bubble delay-1">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary tracking-tight leading-tight">
+                    Traction helps you execute <span class="text-surface-tint">meaningful work</span> and reduce procrastination.
+                </h1>
+</div>
+<!-- Clarifying Message -->
+<div class="conversational-bubble delay-2 flex flex-col gap-md">
+<div class="bg-surface-container-low p-lg rounded-xl border border-outline-variant/30 shadow-sm">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                        In a world of constant noise, we prioritize clarity. I'll assist you in cutting through the clutter to focus on what actually moves the needle.
+                    </p>
+</div>
+</div>
+<!-- Visualization Element (Bento-style Minimal Decoration) -->
+<div class="conversational-bubble delay-3 grid grid-cols-2 gap-md">
+<div class="bg-surface-container-highest/30 rounded-xl p-md aspect-square flex flex-col justify-between border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-3xl">target</span>
+<p class="font-label-sm text-label-sm text-on-surface">Intentional Focus</p>
+</div>
+<div class="bg-primary text-white rounded-xl p-md aspect-square flex flex-col justify-between shadow-md">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<p class="font-label-sm text-label-sm">High Velocity</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full p-margin-mobile md:p-margin-desktop glass-header border-t border-outline-variant/10">
+<div class="max-w-xl mx-auto flex flex-col items-center gap-md">
+<button class="group relative w-full h-14 bg-primary text-white rounded-xl font-headline-md text-headline-md flex items-center justify-center gap-sm overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98]" onclick="handleNext()">
+<div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span>Next</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+<p class="font-label-xs text-label-xs text-outline text-center">
+                Press Enter to continue
+            </p>
+</div>
+</footer>
+<script>
+        function handleNext() {
+            // Animation for transition
+            const main = document.querySelector('main');
+            main.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            main.style.opacity = '0';
+            main.style.transform = 'translateY(-20px)';
+            
+            // In a real app, route to the next onboarding step
+            setTimeout(() => {
+                console.log('Navigating to step 2: Goal Definition');
+                // window.location.href = '/onboarding/step-2';
+            }, 500);
+        }
+
+        // Add "Enter" key listener
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleNext();
+            }
+        });
+
+        // Interactive micro-interaction for the bento cards
+        const cards = document.querySelectorAll('.conversational-bubble.delay-3 > div');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#45464d",
+                    "primary": "#000000",
+                    "surface-tint": "#565e74",
+                    "outline-variant": "#c6c6cd",
+                    "secondary": "#515f74",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#dae2fd",
+                    "secondary-container": "#d5e3fd",
+                    "surface-bright": "#fcf8fa",
+                    "on-secondary-container": "#57657b",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#574425",
+                    "on-background": "#1b1b1d",
+                    "on-secondary-fixed": "#0d1c2f",
+                    "tertiary-fixed": "#fcdeb5",
+                    "outline": "#76777d",
+                    "secondary-fixed-dim": "#b9c7e0",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#98805d",
+                    "surface-container-low": "#f6f3f5",
+                    "surface-container-highest": "#e4e2e4",
+                    "surface-container": "#f0edef",
+                    "surface-dim": "#dcd9db",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#271901",
+                    "surface-variant": "#e4e2e4",
+                    "inverse-on-surface": "#f3f0f2",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-container-high": "#eae7e9",
+                    "on-surface": "#1b1b1d",
+                    "background": "#fcf8fa",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "primary-container": "#131b2e",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#000000",
+                    "on-tertiary-fixed": "#271901",
+                    "surface": "#fcf8fa",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#3a485c",
+                    "tertiary-fixed-dim": "#dec29a",
+                    "on-primary-container": "#7c839b",
+                    "secondary-fixed": "#d5e3fd",
+                    "inverse-surface": "#303032",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#bec6e0",
+                    "accent": "#3B82F6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "margin-mobile": "20px",
+                    "margin-desktop": "40px",
+                    "xl": "32px",
+                    "2xl": "48px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-xs": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "body-lg": ["17px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-xs": ["11px", {"lineHeight": "13px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        
+        /* Custom scrollbar for clean UI */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .pill-checkbox:checked + label .check-circle {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+        .pill-checkbox:checked + label .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .pill-checkbox:checked + label span {
+            color: #76777d;
+            text-decoration: line-through;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- Top App Bar (Shared Component) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl transition-opacity duration-200">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="A professional close-up studio portrait of a young man with a friendly expression, wearing a minimalist black turtleneck against a neutral grey background. The lighting is soft and cinematic, following a high-end editorial photography style consistent with a modern productivity app interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2CjC9BoiVV_Se8KLnrk3T5jNhNfSALDUXlHmilf0YbaixltU7R7cq6ACsIpiyR5-olIo6oboZ0ofaZSgB01Ncpo-g2vxQJ3RJ1EDyk4Ona_Q_v4l_blL2SFpxWxDmdbHKhx9ccBsI_Y65Acjre1aDaVfZG9mf9yRDlU7Sh4iSNXpKykEcdSHUTvUOaFMeEW1hjw1dTno3UOH7_bPVvd7yPoRenMvJfZirRTHCU9-DAc0REKkBwt7kWhWtlEIzvbzxgMvWU17fWjI">
+</div>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">Good morning, Alex</h1>
+</div>
+<div class="text-primary font-semibold font-label-sm text-label-sm">
+                Friction: 24/100
+            </div>
+</div>
+</header>
+<!-- Background Task Execution Screen (Mock Content) -->
+<main class="pt-24 pb-32 px-margin-mobile max-w-2xl mx-auto">
+<div class="mb-lg">
+<span class="text-accent font-label-xs text-label-xs tracking-widest uppercase">Current Task</span>
+<h2 class="font-display-lg-mobile text-display-lg-mobile mt-xs">Write Marketing Copy</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-sm">Draft the promotional content for the Q4 product launch campaign.</p>
+</div>
+<div class="aspect-video w-full rounded-xl bg-surface-container-low mb-lg relative overflow-hidden flex items-center justify-center border border-outline-variant/30">
+
+<div class="relative z-10 text-center">
+<span class="material-symbols-outlined text-4xl text-on-surface-variant mb-2">edit_note</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Focus mode active</p>
+</div>
+</div>
+<div class="flex flex-col gap-md">
+<button class="w-full py-4 bg-primary text-on-primary rounded-xl font-body-lg font-semibold active:scale-[0.98] transition-transform">
+                Start Timer (45m)
+            </button>
+<button class="w-full py-4 bg-surface-container-high text-on-surface rounded-xl font-body-lg active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+                Too Difficult
+            </button>
+</div>
+</main>
+<!-- Modal Sheet Overlay (AI Simplification) -->
+<div class="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm transition-opacity" id="modalOverlay">
+<div class="absolute bottom-0 left-0 right-0 max-w-2xl mx-auto bg-white rounded-t-[32px] shadow-2xl animate-slide-up glass" style="max-height: 90vh;">
+<!-- Pull Handle -->
+<div class="w-12 h-1.5 bg-outline-variant/50 rounded-full mx-auto mt-4 mb-2"></div>
+<div class="px-margin-mobile pt-4 pb-12 overflow-y-auto">
+<div class="flex items-start justify-between mb-lg">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-accent text-[20px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="text-accent font-label-sm text-label-sm font-semibold">AI Assistant</span>
+</div>
+<h3 class="font-headline-md text-headline-md-mobile">Let's simplify this.</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">I've broken this down into small, achievable steps to get your momentum started.</p>
+</div>
+</div>
+<!-- Bento Checklist -->
+<div class="grid grid-cols-1 gap-md">
+<!-- Step 1 -->
+<div class="group relative flex items-center gap-md p-md bg-white border border-outline-variant/30 rounded-2xl hover:border-accent/50 transition-all duration-300">
+<input class="hidden pill-checkbox" id="step1" type="checkbox">
+<label class="flex items-center gap-md w-full cursor-pointer select-none" for="step1">
+<div class="check-circle flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant transition-all flex items-center justify-center">
+<span class="material-symbols-outlined check-icon text-[16px] text-white opacity-0 transform scale-50 transition-all">check</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<span class="font-body-lg font-medium">Research competitors</span>
+<span class="font-label-xs text-on-surface-variant">15m</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-0.5">Quickly scan 3-5 top rivals for headline styles.</p>
+</div>
+</label>
+</div>
+<!-- Step 2 -->
+<div class="group relative flex items-center gap-md p-md bg-white border border-outline-variant/30 rounded-2xl hover:border-accent/50 transition-all duration-300">
+<input class="hidden pill-checkbox" id="step2" type="checkbox">
+<label class="flex items-center gap-md w-full cursor-pointer select-none" for="step2">
+<div class="check-circle flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant transition-all flex items-center justify-center">
+<span class="material-symbols-outlined check-icon text-[16px] text-white opacity-0 transform scale-50 transition-all">check</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<span class="font-body-lg font-medium">Draft headlines</span>
+<span class="font-label-xs text-on-surface-variant">10m</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-0.5">Brainstorm 10 variations without overthinking.</p>
+</div>
+</label>
+</div>
+<!-- Step 3 -->
+<div class="group relative flex items-center gap-md p-md bg-white border border-outline-variant/30 rounded-2xl hover:border-accent/50 transition-all duration-300">
+<input class="hidden pill-checkbox" id="step3" type="checkbox">
+<label class="flex items-center gap-md w-full cursor-pointer select-none" for="step3">
+<div class="check-circle flex-shrink-0 w-6 h-6 rounded-full border-2 border-outline-variant transition-all flex items-center justify-center">
+<span class="material-symbols-outlined check-icon text-[16px] text-white opacity-0 transform scale-50 transition-all">check</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<span class="font-body-lg font-medium">Write first paragraph</span>
+<span class="font-label-xs text-on-surface-variant">20m</span>
+</div>
+<p class="text-sm text-on-surface-variant mt-0.5">Focus purely on the hook and core value prop.</p>
+</div>
+</label>
+</div>
+</div>
+<div class="mt-xl p-md rounded-2xl bg-surface-container-low border border-outline-variant/20 flex gap-md items-start">
+<span class="material-symbols-outlined text-accent" style="font-variation-settings: 'FILL' 0;">tips_and_updates</span>
+<div>
+<h4 class="font-label-sm font-semibold">Pro Tip</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Starting is the hardest part. Just finish the first 15m research sprint, and if you still feel stuck, we can pivot.</p>
+</div>
+</div>
+<div class="mt-xl flex flex-col gap-sm">
+<button class="w-full py-4 bg-accent text-white rounded-xl font-body-lg font-semibold shadow-lg shadow-accent/20 active:scale-[0.98] transition-transform">
+                        Accept Plan
+                    </button>
+<button class="w-full py-3 text-on-surface-variant font-label-sm text-label-sm text-center" id="closeModal">
+                        Keep current approach
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Shared Component) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-16 px-gutter bg-surface/80 backdrop-blur-xl border-t border-outline-variant/30 z-50">
+<a class="flex flex-col items-center justify-center text-primary font-semibold" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-label-xs text-label-xs">Today</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">target</span>
+<span class="font-label-xs text-label-xs">Goals</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-xs text-label-xs">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-xs text-label-xs">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interactions for the modal
+        const modal = document.getElementById('modalOverlay');
+        const closeBtn = document.getElementById('closeModal');
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.opacity = '0';
+            modal.style.pointerEvents = 'none';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        });
+
+        // Add haptic-style reaction to checkboxes
+        document.querySelectorAll('.pill-checkbox').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    // Small visual feedback logic could go here
+                }
+            });
+        });
+    </script>
+</body></html>
