@@ -4,13 +4,20 @@ import { AIService } from './ai.service';
 import { OpenRouterService } from './openrouter.service';
 import { ModelRegistryService } from './model-registry.service';
 import { PromptLoaderService } from './prompt-loader.service';
+import { AICacheService } from './ai-cache.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AIProvidersModule } from '../../providers/ai/ai-providers.module';
 
 @Module({
   imports: [PrismaModule, AIProvidersModule],
   controllers: [AIController],
-  providers: [AIService, OpenRouterService, ModelRegistryService, PromptLoaderService],
+  providers: [
+    AIService,
+    OpenRouterService,
+    ModelRegistryService,
+    PromptLoaderService,
+    AICacheService,
+  ],
   exports: [AIService],
 })
 export class AIModule {}

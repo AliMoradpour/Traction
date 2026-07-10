@@ -436,3 +436,34 @@ model RefreshToken {
   @@index([token])
   @@map("refresh_tokens")
 }
+
+model AICache {
+  id            String    @id @default(cuid())
+  userId        String
+  feature       String    // "daily-brief", "weekly-review", "goal-recovery"
+  content       String    // JSON cached content
+  model         String    // Model used
+  expiresAt     DateTime
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, feature])
+  @@index([userId, feature])
+  @@index([expiresAt])
+  @@map("ai_cache")
+}
+
+model AIUsage {
+  id            String    @id @default(cuid())
+  userId        String
+  feature       String    // "daily-brief", "weekly-review", "task-breakdown", etc.
+  model         String
+  tokensUsed    Int
+  
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, feature, createdAt])
+  @@index([createdAt])
+  @@map("ai_usage")
+}
