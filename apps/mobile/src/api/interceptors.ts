@@ -1,6 +1,11 @@
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
-interface ApiErrorResponse {
+const ACCESS_TOKEN_KEY = 'traction_access_token';
+const REFRESH_TOKEN_KEY = 'traction_refresh_token';
+
+export interface ApiErrorResponse {
   data: null;
   meta: Record<string, unknown>;
   error: {
@@ -10,55 +15,129 @@ interface ApiErrorResponse {
   };
 }
 
+export const tokenStorage = {
+  async getAccessToken(): Promise<string | null> {
+    try {
+      return await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  },
+
+  async setAccessToken(token: string): Promise<void> {
+    try {
+      await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
+    } catch {
+      console.error('Failed to store access token');
+    }
+  },
+
+  async getRefreshToken(): Promise<string | null> {
+    try {
+      return await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  },
+
+  async setRefreshToken(token: string): Promise<void> {
+    try {
+      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, token);
+    } catch {
+      console.error('Failed to store refresh token');
+    }
+  },
+
+  async clearTokens(): Promise<void> {
+    try {
+      await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+    } catch {
+      console.error('Failed to clear tokens');
+    }
+  },
+};
+
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}> = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 export function setupInterceptors(client: AxiosInstance) {
   client.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      // TODO: Attach access token from SecureStore
-      // const token = await SecureStore.getItemAsync('accessToken');
-      // if (token) {
-      //   config.headers.Authorization = `Bearer ${token}`;
-      // }
+    async (config: InternalAxiosRequestConfig) => {
+      const token = await tokenStorage.getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 
   client.interceptors.response.use(
-    (response: AxiosResponse) => {
-      return response;
-    },
+    (response: AxiosResponse) => response,
     async (error) => {
       const originalRequest = error.config;
 
-      // Handle 401 - attempt token refresh
       if (error.response?.status === 401 && !originalRequest._retry) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return client(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
+        }
+
         originalRequest._retry = true;
+        isRefreshing = true;
 
         try {
-          // TODO: Implement token refresh logic
-          // const refreshToken = await SecureStore.getItemAsync('refreshToken');
-          // const response = await client.post('/auth/refresh', { refreshToken });
-          // const { accessToken } = response.data.data;
-          // await SecureStore.setItemAsync('accessToken', accessToken);
-          // originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          // return client(originalRequest);
-          return Promise.reject(error);
+          const refreshToken = await tokenStorage.getRefreshToken();
+          if (!refreshToken) {
+            throw new Error('No refresh token');
+          }
+
+          const response = await client.post('/auth/refresh', { refreshToken });
+          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+
+          await tokenStorage.setAccessToken(accessToken);
+          if (newRefreshToken) {
+            await tokenStorage.setRefreshToken(newRefreshToken);
+          }
+
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          processQueue(null, accessToken);
+
+          return client(originalRequest);
         } catch (refreshError) {
-          // TODO: Clear auth state and redirect to login
+          processQueue(refreshError, null);
+          await tokenStorage.clearTokens();
           return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
         }
       }
 
-      // Normalize error response
       const apiError: ApiErrorResponse = error.response?.data || {
         data: null,
         meta: {},
-        error: {
-          code: 'UNKNOWN_ERROR',
-          message: 'An unexpected error occurred',
-        },
+        error: { code: 'UNKNOWN_ERROR', message: 'An unexpected error occurred' },
       };
 
       return Promise.reject(apiError);

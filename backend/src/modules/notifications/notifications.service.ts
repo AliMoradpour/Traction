@@ -65,4 +65,19 @@ export class NotificationsService {
 
     return { count };
   }
+
+  async getPreferences(userId: string): Promise<any> {
+    const profile = await this.prisma.userProfile.findUnique({
+      where: { userId },
+    });
+
+    return {
+      userId,
+      notificationDensity: profile?.notificationDensity || 'LOW',
+      focusReminders: true,
+      dailyBrief: true,
+      weeklyReview: true,
+      goalUpdates: true,
+    };
+  }
 }

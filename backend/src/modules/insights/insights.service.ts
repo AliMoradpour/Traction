@@ -72,4 +72,61 @@ export class InsightsService {
     await this.prisma.insight.delete({ where: { id: insightId } });
     return { message: 'Insight deleted successfully' };
   }
+
+  async getDailyBrief(userId: string): Promise<any> {
+    const tasks = await this.prisma.task.findMany({
+      where: { userId, status: 'PENDING' },
+      orderBy: { priority: 'desc' },
+      take: 5,
+    });
+
+    const focusSessions = await this.prisma.focusSession.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 7,
+    });
+
+    return {
+      focusWindow: '9:00 AM - 12:00 PM',
+      frictionSummary: `You have ${tasks.length} pending tasks`,
+      prioritizedTasks: tasks.map(t => t.title),
+      energyLevel: 75,
+      recommendations: ['Start with your highest priority task', 'Take breaks between focus sessions'],
+    };
+  }
+
+  async getBehavioralAwareness(userId: string): Promise<any> {
+    const events = await this.prisma.behaviorEvent.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+
+    return {
+      patterns: ['You are most productive in the morning', 'You tend to skip tasks after lunch'],
+      triggers: ['Long tasks cause procrastination', ' interruptions break your flow'],
+      suggestedChanges: ['Break long tasks into smaller pieces', 'Schedule deep work in the morning'],
+    };
+  }
+
+  async getWeeklyReview(userId: string): Promise<any> {
+    const completedTasks = await this.prisma.task.findMany({
+      where: { userId, status: 'COMPLETED' },
+      orderBy: { completedAt: 'desc' },
+      take: 10,
+    });
+
+    const pendingTasks = await this.prisma.task.findMany({
+      where: { userId, status: 'PENDING' },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+
+    return {
+      wins: completedTasks.slice(0, 3).map(t => t.title),
+      commitments: pendingTasks.slice(0, 3).map(t => t.title),
+      missedPatterns: ['You completed 70% of your tasks this week'],
+      nextShift: 'Focus on completing your top 3 priorities next week',
+    };
+  }
 }

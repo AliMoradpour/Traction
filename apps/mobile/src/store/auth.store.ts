@@ -1,38 +1,54 @@
 import { create } from 'zustand';
+import { tokenStorage } from '@/api/interceptors';
 
 interface User {
   id: string;
   email: string;
-  name: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  accessToken: string | null;
-  setAuth: (user: User, token: string) => void;
-  clearAuth: () => void;
-  updateUser: (user: Partial<User>) => void;
+  isLoading: boolean;
+  setAuth: (user: User, accessToken: string, refreshToken: string) => Promise<void>;
+  clearAuth: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
+  loadStoredAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   isAuthenticated: false,
   user: null,
-  accessToken: null,
-  setAuth: (user, token) =>
-    set({
-      isAuthenticated: true,
-      user,
-      accessToken: token,
-    }),
-  clearAuth: () =>
-    set({
-      isAuthenticated: false,
-      user: null,
-      accessToken: null,
-    }),
+  isLoading: true,
+
+  setAuth: async (user, accessToken, refreshToken) => {
+    await tokenStorage.setAccessToken(accessToken);
+    await tokenStorage.setRefreshToken(refreshToken);
+    set({ isAuthenticated: true, user, isLoading: false });
+  },
+
+  clearAuth: async () => {
+    await tokenStorage.clearTokens();
+    set({ isAuthenticated: false, user: null, isLoading: false });
+  },
+
   updateUser: (userData) =>
-    set((state) => ({
-      user: state.user ? { ...state.user, ...userData } : null,
-    })),
+    set((state) => ({ user: state.user ? { ...state.user, ...userData } : null })),
+
+  loadStoredAuth: async () => {
+    try {
+      const accessToken = await tokenStorage.getAccessToken();
+      const refreshToken = await tokenStorage.getRefreshToken();
+
+      if (accessToken && refreshToken) {
+        set({ isAuthenticated: true, isLoading: false });
+      } else {
+        set({ isLoading: false });
+      }
+    } catch {
+      set({ isLoading: false });
+    }
+  },
 }));

@@ -87,4 +87,37 @@ export class TasksController {
   ): Promise<TaskResponseDto[]> {
     return this.tasksService.getTasksByDate(userId, new Date(date));
   }
+
+  @Get(':id/steps')
+  @ApiOperation({ summary: 'Get task steps' })
+  @ApiParam({ name: 'id', description: 'Task ID' })
+  @ApiResponse({ status: 200, description: 'Task steps' })
+  async getSteps(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<any[]> {
+    return this.tasksService.getSteps(userId, id);
+  }
+
+  @Post(':id/simplify')
+  @ApiOperation({ summary: 'Simplify task with AI' })
+  @ApiParam({ name: 'id', description: 'Task ID' })
+  @ApiResponse({ status: 200, description: 'Simplified task steps' })
+  async simplify(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<any[]> {
+    return this.tasksService.simplify(userId, id);
+  }
+
+  @Get(':id/focus-sessions')
+  @ApiOperation({ summary: 'Get task focus sessions' })
+  @ApiParam({ name: 'id', description: 'Task ID' })
+  @ApiResponse({ status: 200, description: 'Task focus sessions' })
+  async getFocusSessions(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<any[]> {
+    return this.tasksService.getFocusSessions(userId, id);
+  }
 }

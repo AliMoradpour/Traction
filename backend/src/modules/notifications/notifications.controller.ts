@@ -31,6 +31,15 @@ export class NotificationsController {
     return this.notificationsService.getUnreadCount(userId);
   }
 
+  @Get('preferences')
+  @ApiOperation({ summary: 'Get notification preferences' })
+  @ApiResponse({ status: 200, description: 'Notification preferences' })
+  async getPreferences(
+    @CurrentUser('id') userId: string,
+  ): Promise<any> {
+    return this.notificationsService.getPreferences(userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get notification by id' })
   @ApiParam({ name: 'id', description: 'Notification ID' })

@@ -1,4 +1,5 @@
 import { apiClient, endpoints } from '@/api';
+import { tokenStorage } from '@/api/interceptors';
 
 export interface LoginRequest {
   email: string;
@@ -6,19 +7,26 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  name: string;
+  firstName: string;
+  lastName?: string;
   email: string;
   password: string;
 }
 
 export interface AuthResponse {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-  };
+  user: { id: string; email: string; firstName?: string; lastName?: string };
   accessToken: string;
   refreshToken: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export const authService = {
@@ -38,10 +46,14 @@ export const authService = {
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post(endpoints.auth.logout);
+    try {
+      await apiClient.post(endpoints.auth.logout);
+    } finally {
+      await tokenStorage.clearTokens();
+    }
   },
 
-  getMe: async () => {
+  getMe: async (): Promise<User> => {
     const response = await apiClient.get(endpoints.auth.me);
     return response.data.data;
   },

@@ -81,6 +81,28 @@ export class GoalsController {
     return this.goalsService.archive(userId, id);
   }
 
+  @Get(':id/feasibility')
+  @ApiOperation({ summary: 'Get goal feasibility analysis' })
+  @ApiParam({ name: 'id', description: 'Goal ID' })
+  @ApiResponse({ status: 200, description: 'Goal feasibility' })
+  async getFeasibility(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<any> {
+    return this.goalsService.getFeasibility(userId, id);
+  }
+
+  @Get(':id/projection')
+  @ApiOperation({ summary: 'Get goal health projection' })
+  @ApiParam({ name: 'id', description: 'Goal ID' })
+  @ApiResponse({ status: 200, description: 'Goal projection' })
+  async getProjection(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<any> {
+    return this.goalsService.getProjection(userId, id);
+  }
+
   // Milestones
   @Post(':id/milestones')
   @ApiOperation({ summary: 'Add milestone to goal' })

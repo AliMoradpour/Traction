@@ -82,6 +82,45 @@ export class GoalsService {
     return { message: 'Goal deleted successfully' };
   }
 
+  async getFeasibility(userId: string, goalId: string): Promise<any> {
+    const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
+    if (!goal) throw new NotFoundException('Goal not found');
+    if (goal.userId !== userId) throw new ForbiddenException('Access denied');
+
+    const daysRemaining = goal.targetDate
+      ? Math.ceil((goal.targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    return {
+      goalId: goal.id,
+      probability: goal.progress > 50 ? 0.8 : goal.progress > 25 ? 0.6 : 0.4,
+      timeline: daysRemaining ? `${daysRemaining} days remaining` : 'No deadline set',
+      readiness: goal.progress > 75 ? 'high' : goal.progress > 50 ? 'medium' : 'low',
+      recommendation: 'Continue working on this goal consistently.',
+    };
+  }
+
+  async getProjection(userId: string, goalId: string): Promise<any> {
+    const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
+    if (!goal) throw new NotFoundException('Goal not found');
+    if (goal.userId !== userId) throw new ForbiddenException('Access denied');
+
+    const daysRemaining = goal.targetDate
+      ? Math.ceil((goal.targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      : null;
+
+    return {
+      goalId: goal.id,
+      health: goal.health,
+      progress: goal.progress,
+      velocity: goal.velocity,
+      targetDate: goal.targetDate,
+      daysRemaining,
+      forecast: goal.progress > 50 ? 'On track' : 'Needs attention',
+      alternativeScenario: 'If you increase daily progress by 20%, you can complete this goal earlier.',
+    };
+  }
+
   // Milestones
   async createMilestone(userId: string, goalId: string, dto: CreateMilestoneDto): Promise<MilestoneResponseDto> {
     const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });

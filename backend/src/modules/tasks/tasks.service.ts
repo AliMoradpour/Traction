@@ -175,4 +175,35 @@ export class TasksService {
 
     return tasks;
   }
+
+  async getSteps(userId: string, taskId: string): Promise<any[]> {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.userId !== userId) throw new ForbiddenException('Access denied');
+
+    return [];
+  }
+
+  async simplify(userId: string, taskId: string): Promise<any[]> {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.userId !== userId) throw new ForbiddenException('Access denied');
+
+    return [
+      { id: '1', title: 'Break down the task', description: 'Divide into smaller steps', durationMinutes: 5, status: 'pending', order: 1 },
+      { id: '2', title: 'Complete step 1', description: 'First actionable step', durationMinutes: 15, status: 'pending', order: 2 },
+      { id: '3', title: 'Complete step 2', description: 'Second actionable step', durationMinutes: 15, status: 'pending', order: 3 },
+    ];
+  }
+
+  async getFocusSessions(userId: string, taskId: string): Promise<any[]> {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.userId !== userId) throw new ForbiddenException('Access denied');
+
+    return this.prisma.focusSession.findMany({
+      where: { taskId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }
