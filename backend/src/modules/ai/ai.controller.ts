@@ -1,6 +1,13 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 import { AIService } from './ai.service';
+import { DailyBriefService } from './daily-brief.service';
+import { TaskBreakdownService } from './task-breakdown.service';
+import { StuckAnalysisService, StuckFeeling } from './stuck-analysis.service';
+import { WeeklyReviewService } from './weekly-review.service';
+import { GoalRecoveryService } from './goal-recovery.service';
+import { AIRateLimitService } from './ai-rate-limit.service';
+import { AIObservabilityService } from './ai-observability.service';
 import { AIRecommendationResponseDto } from './dto/ai.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -10,7 +17,16 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class AIController {
-  constructor(private readonly aiService: AIService) {}
+  constructor(
+    private readonly aiService: AIService,
+    private readonly dailyBriefService: DailyBriefService,
+    private readonly taskBreakdownService: TaskBreakdownService,
+    private readonly stuckAnalysisService: StuckAnalysisService,
+    private readonly weeklyReviewService: WeeklyReviewService,
+    private readonly goalRecoveryService: GoalRecoveryService,
+    private readonly rateLimitService: AIRateLimitService,
+    private readonly observabilityService: AIObservabilityService,
+  ) {}
 
   @Get('recommendations')
   @ApiOperation({ summary: 'Get AI recommendations' })
@@ -52,37 +68,65 @@ export class AIController {
     return this.aiService.dismissRecommendation(userId, id);
   }
 
-  @Post('analyze-goal')
-  @ApiOperation({ summary: 'Analyze goal feasibility using AI' })
-  @ApiBody({ schema: { type: 'object', properties: { title: { type: 'string' }, deadline: { type: 'string' } } } })
-  @ApiResponse({ status: 200, description: 'Goal analysis' })
-  async analyzeGoalFeasibility(
-    @CurrentUser('id') userId: string,
-    @Body() body: { title: string; deadline?: string },
-  ): Promise<{ feasible: boolean; reason: string; suggestions: string[] } | null> {
-    return this.aiService.analyzeGoalFeasibility(body.title, body.deadline);
+  @Get('daily-brief')
+  @ApiOperation({ summary: 'Get daily brief' })
+  @ApiResponse({ status: 200, description: 'Daily brief generated' })
+  async getDailyBrief(@CurrentUser('id') userId: string) {
+    return this.dailyBriefService.getDailyBrief(userId);
   }
 
-  @Post('breakdown-task')
-  @ApiOperation({ summary: 'Break down task into steps using AI' })
-  @ApiBody({ schema: { type: 'object', properties: { title: { type: 'string' }, description: { type: 'string' } } } })
+  @Post('breakdown-task/:taskId')
+  @ApiOperation({ summary: 'Break down task into steps' })
+  @ApiParam({ name: 'taskId', description: 'Task ID' })
   @ApiResponse({ status: 200, description: 'Task breakdown' })
   async breakdownTask(
     @CurrentUser('id') userId: string,
-    @Body() body: { title: string; description?: string },
-  ): Promise<Array<{ title: string }> | null> {
-    return this.aiService.generateTaskBreakdown(body.title, body.description);
+    @Param('taskId') taskId: string,
+  ) {
+    return this.taskBreakdownService.breakdownTask(userId, taskId);
   }
 
-  @Post('simplify-task')
-  @ApiOperation({ summary: 'Simplify resistant task using AI' })
-  @ApiBody({ schema: { type: 'object', properties: { title: { type: 'string' }, resistanceLevel: { type: 'number' } } } })
-  @ApiResponse({ status: 200, description: 'Simplified task' })
-  async simplifyTask(
+  @Post('stuck-analysis')
+  @ApiOperation({ summary: 'Analyze why user is stuck' })
+  @ApiBody({ schema: { type: 'object', properties: { feeling: { type: 'string' }, taskId: { type: 'string' } } } })
+  @ApiResponse({ status: 200, description: 'Stuck analysis' })
+  async stuckAnalysis(
     @CurrentUser('id') userId: string,
-    @Body() body: { title: string; resistanceLevel: number },
-  ): Promise<{ simplifiedTitle: string; firstStep: string; motivation: string } | null> {
-    return this.aiService.simplifyTask(body.title, body.resistanceLevel);
+    @Body() body: { feeling: StuckFeeling; taskId?: string },
+  ) {
+    return this.stuckAnalysisService.analyzeStuck(userId, body.feeling, body.taskId);
+  }
+
+  @Get('weekly-review')
+  @ApiOperation({ summary: 'Get weekly review' })
+  @ApiResponse({ status: 200, description: 'Weekly review' })
+  async getWeeklyReview(@CurrentUser('id') userId: string) {
+    return this.weeklyReviewService.getWeeklyReview(userId);
+  }
+
+  @Post('goal-recovery/:goalId')
+  @ApiOperation({ summary: 'Analyze goal recovery' })
+  @ApiParam({ name: 'goalId', description: 'Goal ID' })
+  @ApiResponse({ status: 200, description: 'Goal recovery analysis' })
+  async goalRecovery(
+    @CurrentUser('id') userId: string,
+    @Param('goalId') goalId: string,
+  ) {
+    return this.goalRecoveryService.analyzeGoalRecovery(userId, goalId);
+  }
+
+  @Get('usage')
+  @ApiOperation({ summary: 'Get AI usage stats' })
+  @ApiResponse({ status: 200, description: 'Usage statistics' })
+  async getUsageStats(@CurrentUser('id') userId: string) {
+    return this.rateLimitService.getUsageStats(userId);
+  }
+
+  @Get('metrics')
+  @ApiOperation({ summary: 'Get AI metrics' })
+  @ApiResponse({ status: 200, description: 'AI metrics' })
+  async getMetrics() {
+    return this.observabilityService.getMetrics();
   }
 
   @Get('status')
