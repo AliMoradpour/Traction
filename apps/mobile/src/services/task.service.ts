@@ -87,13 +87,23 @@ export const taskService = {
   },
 
   steps: async (taskId: string): Promise<TaskStep[]> => {
-    const response = await apiClient.get(endpoints.tasks.steps(taskId));
-    return response.data.data;
+    try {
+      const response = await apiClient.get(endpoints.tasks.steps(taskId));
+      return response.data.data ?? [];
+    } catch (error) {
+      console.warn('Failed to fetch task steps:', error);
+      return [];
+    }
   },
 
   simplify: async (taskId: string): Promise<TaskStep[]> => {
-    const response = await apiClient.post(endpoints.tasks.simplify(taskId));
-    return response.data.data;
+    try {
+      const response = await apiClient.post(endpoints.tasks.simplify(taskId));
+      return response.data.data ?? [];
+    } catch (error) {
+      console.warn('Failed to simplify task:', error);
+      return [];
+    }
   },
 
   focusSessions: async (taskId: string): Promise<any[]> => {

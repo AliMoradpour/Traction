@@ -79,6 +79,8 @@ export function useTaskSteps(taskId: string) {
     queryKey: taskKeys.steps(taskId),
     queryFn: () => taskService.steps(taskId),
     enabled: !!taskId,
+    retry: false,
+    throwOnError: false,
   });
 }
 
@@ -90,6 +92,7 @@ export function useSimplifyTask() {
     onSuccess: (_, taskId) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.steps(taskId) });
     },
+    retry: false,
   });
 }
 

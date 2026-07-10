@@ -72,7 +72,12 @@ export const endpoints = {
   },
   ai: {
     recommendations: '/ai/recommendations',
+    generateRecommendation: '/ai/recommendations/generate',
     acceptRecommendation: (id: string) => `/ai/recommendations/${id}/accept`,
     dismissRecommendation: (id: string) => `/ai/recommendations/${id}/dismiss`,
+    analyzeGoal: '/ai/analyze-goal',
+    breakdownTask: '/ai/breakdown-task',
+    simplifyTask: '/ai/simplify-task',
+    status: '/ai/status',
   },
 } as const;

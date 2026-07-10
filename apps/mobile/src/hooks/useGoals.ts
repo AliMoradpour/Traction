@@ -82,6 +82,8 @@ export function useGoalFeasibility(id: string) {
     queryKey: goalKeys.feasibility(id),
     queryFn: () => goalService.feasibility(id),
     enabled: !!id,
+    retry: false,
+    throwOnError: false,
   });
 }
 
@@ -90,6 +92,8 @@ export function useGoalProjection(id: string) {
     queryKey: goalKeys.projection(id),
     queryFn: () => goalService.projection(id),
     enabled: !!id,
+    retry: false,
+    throwOnError: false,
   });
 }
 

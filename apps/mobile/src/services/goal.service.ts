@@ -113,14 +113,24 @@ export const goalService = {
     return response.data.data;
   },
 
-  feasibility: async (id: string): Promise<GoalFeasibility> => {
-    const response = await apiClient.get(endpoints.goals.feasibility(id));
-    return response.data.data;
+  feasibility: async (id: string): Promise<GoalFeasibility | null> => {
+    try {
+      const response = await apiClient.get(endpoints.goals.feasibility(id));
+      return response.data.data ?? null;
+    } catch (error) {
+      console.warn('Failed to fetch goal feasibility:', error);
+      return null;
+    }
   },
 
-  projection: async (id: string): Promise<GoalProjection> => {
-    const response = await apiClient.get(endpoints.goals.projection(id));
-    return response.data.data;
+  projection: async (id: string): Promise<GoalProjection | null> => {
+    try {
+      const response = await apiClient.get(endpoints.goals.projection(id));
+      return response.data.data ?? null;
+    } catch (error) {
+      console.warn('Failed to fetch goal projection:', error);
+      return null;
+    }
   },
 
   getMilestones: async (goalId: string): Promise<GoalMilestone[]> => {

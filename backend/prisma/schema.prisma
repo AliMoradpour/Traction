@@ -30,6 +30,7 @@ model User {
   behaviors     BehaviorEvent[]
   notifications Notification[]
   refreshTokens RefreshToken[]
+  aiRecommendations AIRecommendation[]
 
   @@map("users")
 }
@@ -290,6 +291,28 @@ enum PlanStatus {
   PENDING
   APPLIED
   REJECTED
+}
+
+model AIRecommendation {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  sourceType    String    // "ai" or "system"
+  sourceId      String    // Reference to source (e.g., task ID, goal ID)
+  kind          String    // "suggestion", "encouragement", "warning", "tip"
+  title         String
+  body          String
+  payload       String?   // JSON payload
+  
+  acceptedAt    DateTime?
+  dismissedAt   DateTime?
+  
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
+  @@index([userId, kind])
+  @@map("ai_recommendations")
 }
 
 model Insight {
