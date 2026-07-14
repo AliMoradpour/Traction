@@ -32,7 +32,7 @@ export class InsightResponseDto {
   userId: string;
 
   @ApiProperty()
-  goalId?: string;
+  goalId?: string | null;
 
   @ApiProperty({ enum: InsightType })
   type: InsightType;
@@ -44,13 +44,13 @@ export class InsightResponseDto {
   content: string;
 
   @ApiProperty()
-  data?: string;
+  data?: string | null;
 
   @ApiProperty()
-  generatedBy?: string;
+  generatedBy?: string | null;
 
   @ApiProperty()
-  confidence?: number;
+  confidence?: number | null;
 
   @ApiProperty()
   read: boolean;

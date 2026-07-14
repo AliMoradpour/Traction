@@ -10,7 +10,7 @@ export class CreateGoalDto {
   @ApiPropertyOptional({ example: 'Prepare and take IELTS exam' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiProperty({ enum: GoalType, example: GoalType.IELTS })
   @IsEnum(GoalType)
@@ -19,24 +19,24 @@ export class CreateGoalDto {
   @ApiPropertyOptional({ example: 'Education' })
   @IsString()
   @IsOptional()
-  category?: string;
+  category?: string | null;
 
   @ApiPropertyOptional({ example: '2026-12-31T23:59:59Z' })
   @IsDateString()
   @IsOptional()
-  targetDate?: string;
+  targetDate?: string | null;
 }
 
 export class UpdateGoalDto {
   @ApiPropertyOptional({ example: 'Updated goal title' })
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string | null;
 
   @ApiPropertyOptional({ example: 'Updated description' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({ enum: GoalType })
   @IsEnum(GoalType)
@@ -46,12 +46,12 @@ export class UpdateGoalDto {
   @ApiPropertyOptional({ example: 'Education' })
   @IsString()
   @IsOptional()
-  category?: string;
+  category?: string | null;
 
   @ApiPropertyOptional({ example: '2026-12-31T23:59:59Z' })
   @IsDateString()
   @IsOptional()
-  targetDate?: string;
+  targetDate?: string | null;
 
   @ApiPropertyOptional({ example: 45, minimum: 0, maximum: 100 })
   @IsInt()
@@ -73,7 +73,7 @@ export class UpdateGoalDto {
   @ApiPropertyOptional({ example: 'stable' })
   @IsString()
   @IsOptional()
-  velocity?: string;
+  velocity?: string | null;
 }
 
 export class GoalQueryDto {
@@ -90,7 +90,7 @@ export class GoalQueryDto {
   @ApiPropertyOptional({ example: 'Education' })
   @IsString()
   @IsOptional()
-  category?: string;
+  category?: string | null;
 }
 
 export class GoalResponseDto {
@@ -104,22 +104,22 @@ export class GoalResponseDto {
   title: string;
 
   @ApiProperty()
-  description?: string;
+  description?: string | null;
 
   @ApiProperty({ enum: GoalType })
   type: GoalType;
 
   @ApiProperty()
-  category?: string;
+  category?: string | null;
 
   @ApiProperty()
   startDate: Date;
 
   @ApiProperty()
-  targetDate?: Date;
+  targetDate?: Date | null;
 
   @ApiProperty()
-  completedAt?: Date;
+  completedAt?: Date | null;
 
   @ApiProperty()
   progress: number;
@@ -131,7 +131,7 @@ export class GoalResponseDto {
   health: GoalHealth;
 
   @ApiProperty()
-  velocity?: string;
+  velocity?: string | null;
 
   @ApiProperty()
   createdAt: Date;
@@ -148,29 +148,29 @@ export class CreateMilestoneDto {
   @ApiPropertyOptional({ example: 'Score 6.5+ on practice test' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({ example: '2026-08-15T23:59:59Z' })
   @IsDateString()
   @IsOptional()
-  targetDate?: string;
+  targetDate?: string | null;
 }
 
 export class UpdateMilestoneDto {
   @ApiPropertyOptional({ example: 'Updated milestone title' })
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string | null;
 
   @ApiPropertyOptional({ example: 'Updated description' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({ example: '2026-08-15T23:59:59Z' })
   @IsDateString()
   @IsOptional()
-  targetDate?: string;
+  targetDate?: string | null;
 
   @ApiPropertyOptional({ example: 50, minimum: 0, maximum: 100 })
   @IsInt()
@@ -196,13 +196,13 @@ export class MilestoneResponseDto {
   title: string;
 
   @ApiProperty()
-  description?: string;
+  description?: string | null;
 
   @ApiProperty()
-  targetDate?: Date;
+  targetDate?: Date | null;
 
   @ApiProperty()
-  completedAt?: Date;
+  completedAt?: Date | null;
 
   @ApiProperty()
   progress: number;
@@ -225,29 +225,29 @@ export class CreatePlanDto {
   @ApiPropertyOptional({ example: 'A structured plan to prepare for IELTS' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({ example: '["Step 1: Vocabulary", "Step 2: Grammar"]' })
   @IsString()
   @IsOptional()
-  steps?: string;
+  steps?: string | null;
 }
 
 export class UpdatePlanDto {
   @ApiPropertyOptional({ example: 'Updated plan title' })
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string | null;
 
   @ApiPropertyOptional({ example: 'Updated description' })
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({ example: '["Step 1: Updated"]' })
   @IsString()
   @IsOptional()
-  steps?: string;
+  steps?: string | null;
 
   @ApiPropertyOptional({ enum: PlanStatus })
   @IsEnum(PlanStatus)
@@ -266,16 +266,16 @@ export class PlanResponseDto {
   title: string;
 
   @ApiProperty()
-  description?: string;
+  description?: string | null;
 
   @ApiProperty()
-  steps?: string;
+  steps?: string | null;
 
   @ApiProperty()
-  recommendedAt?: Date;
+  recommendedAt?: Date | null;
 
   @ApiProperty()
-  appliedAt?: Date;
+  appliedAt?: Date | null;
 
   @ApiProperty({ enum: PlanStatus })
   status: PlanStatus;

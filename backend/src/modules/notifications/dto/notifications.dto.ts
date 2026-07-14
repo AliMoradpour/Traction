@@ -31,13 +31,13 @@ export class NotificationResponseDto {
   body: string;
 
   @ApiProperty()
-  data?: string;
+  data?: string | null;
 
   @ApiProperty()
   read: boolean;
 
   @ApiProperty()
-  sentAt?: Date;
+  sentAt?: Date | null;
 
   @ApiProperty()
   createdAt: Date;
