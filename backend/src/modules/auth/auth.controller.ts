@@ -54,6 +54,7 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @Post('password/forgot')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Reset link sent' })
@@ -62,6 +63,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @Post('password/reset')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password' })
   @ApiResponse({ status: 200, description: 'Password reset successful' })

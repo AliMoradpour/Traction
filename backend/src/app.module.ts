@@ -10,6 +10,7 @@ import { GoalHealthModule } from './modules/goal-health/goal-health.module';
 import { InsightsModule } from './modules/insights/insights.module';
 import { BehaviorModule } from './modules/behavior/behavior.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AIModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     InsightsModule,
     BehaviorModule,
     NotificationsModule,
+    AIModule,
   ],
 })
 export class AppModule {}
