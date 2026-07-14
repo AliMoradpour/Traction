@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Animated, Modal } from 'react-native
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 const RESISTANCE_REASONS = [
   'Task feels too large',
@@ -50,7 +50,7 @@ export default function FocusSessionScreen() {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setTimeout>;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);

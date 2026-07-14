@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useOnboardingStore } from '@/store/onboarding.store';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 const TOTAL_STEPS = 6;
 

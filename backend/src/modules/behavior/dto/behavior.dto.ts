@@ -10,27 +10,27 @@ export class TrackEventDto {
   @ApiPropertyOptional({ example: 'task-id-123' })
   @IsString()
   @IsOptional()
-  taskId?: string;
+  taskId?: string | null;
 
   @ApiPropertyOptional({ example: 'goal-id-123' })
   @IsString()
   @IsOptional()
-  goalId?: string;
+  goalId?: string | null;
 
   @ApiPropertyOptional({ example: 'focus-session-id-123' })
   @IsString()
   @IsOptional()
-  focusSessionId?: string;
+  focusSessionId?: string | null;
 
   @ApiPropertyOptional({ example: '{"reason": "task was too complex"}' })
   @IsString()
   @IsOptional()
-  metadata?: string;
+  metadata?: string | null;
 
   @ApiPropertyOptional({ example: 'I was distracted by notifications' })
   @IsString()
   @IsOptional()
-  value?: string;
+  value?: string | null;
 }
 
 export class BehaviorEventResponseDto {
@@ -41,22 +41,22 @@ export class BehaviorEventResponseDto {
   userId: string;
 
   @ApiProperty()
-  taskId?: string;
+  taskId?: string | null;
 
   @ApiProperty()
-  goalId?: string;
+  goalId?: string | null;
 
   @ApiProperty()
-  focusSessionId?: string;
+  focusSessionId?: string | null;
 
   @ApiProperty({ enum: BehaviorEventType })
   type: BehaviorEventType;
 
   @ApiProperty()
-  metadata?: string;
+  metadata?: string | null;
 
   @ApiProperty()
-  value?: string;
+  value?: string | null;
 
   @ApiProperty()
   createdAt: Date;
@@ -71,12 +71,12 @@ export class BehaviorQueryDto {
   @ApiPropertyOptional({ example: 'task-id-123' })
   @IsString()
   @IsOptional()
-  taskId?: string;
+  taskId?: string | null;
 
   @ApiPropertyOptional({ example: 'goal-id-123' })
   @IsString()
   @IsOptional()
-  goalId?: string;
+  goalId?: string | null;
 
   @ApiPropertyOptional({ example: '2026-07-01' })
   @IsDateString()

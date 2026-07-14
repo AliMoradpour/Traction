@@ -8,12 +8,6 @@ const config: ExpoConfig = {
   icon: './src/assets/logos/icon.png',
   scheme: 'traction',
   userInterfaceStyle: 'automatic',
-  newArchEnabled: true,
-  splash: {
-    image: './src/assets/logos/splash.png',
-    resizeMode: 'contain',
-    backgroundColor: '#0F172A',
-  },
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.traction.app',

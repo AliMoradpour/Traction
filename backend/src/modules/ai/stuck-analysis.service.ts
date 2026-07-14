@@ -50,6 +50,7 @@ export class StuckAnalysisService {
 
     const response = await this.openRouter.chat(
       [{ role: 'user', content: prompt }],
+      'anthropic/claude-3-haiku',
       { temperature: 0.6, maxTokens: 300 },
     );
 
@@ -58,7 +59,7 @@ export class StuckAnalysisService {
     }
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(response);
       return {
         likelyCause: parsed.likelyCause,
         nextAction: parsed.nextAction,
@@ -92,7 +93,7 @@ export class StuckAnalysisService {
     });
     
     recentSessions.forEach(s => {
-      activities.push(`Focus session: ${s.durationMinutes || 0} minutes (${s.status})`);
+      activities.push(`Focus session: ${s.duration || 0} minutes (${s.status})`);
     });
 
     return activities.join(', ') || 'No recent activity';
@@ -114,7 +115,7 @@ export class StuckAnalysisService {
         likelyCause: 'You may have too many tasks competing for your attention',
         nextAction: 'Pick just one task to focus on right now',
         simplifiedFirstStep: 'Open the task and read the first line',
-        motivation: 'You don't have to do everything at once',
+        motivation: "You don't have to do everything at once",
         timeEstimate: '2 minutes to start',
       },
       unclear: {
@@ -141,7 +142,7 @@ export class StuckAnalysisService {
       anxious: {
         likelyCause: 'Fear or worry may be blocking action',
         nextAction: 'Identify the specific worry, then take one small step',
-        simplifiedFirstStep: 'Write down what you're afraid of',
+        simplifiedFirstStep: "Write down what you're afraid of",
         motivation: 'Action reduces anxiety',
         timeEstimate: '5 minutes to start',
       },

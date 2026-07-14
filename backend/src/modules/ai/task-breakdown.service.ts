@@ -42,6 +42,7 @@ export class TaskBreakdownService {
 
     const response = await this.openRouter.chat(
       [{ role: 'user', content: prompt }],
+      'anthropic/claude-3-haiku',
       { temperature: 0.5, maxTokens: 500 },
     );
 
@@ -50,7 +51,7 @@ export class TaskBreakdownService {
     }
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(response);
       return parsed.map((step: any) => ({
         title: step.title,
         durationMinutes: step.durationMinutes || 15,

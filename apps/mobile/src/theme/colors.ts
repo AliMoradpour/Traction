@@ -93,6 +93,11 @@ export const lightColors = {
   disabled: palette.neutral[250],
   focusRing: withOpacity(palette.brand.accent, 0.22),
   scrim: withOpacity(palette.slate[900], 0.35),
+  primaryContainer: withOpacity(palette.brand.accent, 0.12),
+  onPrimaryContainer: palette.slate[900],
+  error: palette.semantic.danger,
+  errorMuted: palette.semantic.dangerSurface,
+  successMuted: palette.semantic.successSurface,
 } as const;
 
 export const darkColors = {
@@ -129,6 +134,11 @@ export const darkColors = {
   disabled: '#1F2937',
   focusRing: withOpacity(palette.brand.accent, 0.3),
   scrim: withOpacity('#000000', 0.55),
+  primaryContainer: palette.material.primaryContainer,
+  onPrimaryContainer: palette.material.onPrimaryContainer,
+  error: palette.semantic.danger,
+  errorMuted: withOpacity(palette.semantic.danger, 0.14),
+  successMuted: withOpacity(palette.semantic.success, 0.14),
 } as const;
 
 export const colorsByMode = {
@@ -136,7 +146,7 @@ export const colorsByMode = {
   dark: darkColors,
 } as const;
 
-export type TractionColors = typeof lightColors;
+export type TractionColors = typeof lightColors | typeof darkColors;
 
 export function getColors(mode: ThemeMode = 'light'): TractionColors {
   return colorsByMode[mode];

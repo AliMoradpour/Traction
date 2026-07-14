@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTractionTheme } from '@/theme';
 import { useAuthStore } from '@/store/auth.store';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { loginSchema, type LoginFormData } from '@/lib/validations';
 
 export default function LoginScreen() {
@@ -34,7 +34,7 @@ export default function LoginScreen() {
       // TODO: Call actual auth service
       // For now, simulate successful login
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      setAuth({ id: '1', email: data.email, name: 'User' }, 'mock-token');
+      setAuth({ id: '1', email: data.email, name: 'User' }, 'mock-token', 'mock-refresh-token');
       router.replace('/(app)/today');
     } catch (error) {
       console.error('Login failed:', error);

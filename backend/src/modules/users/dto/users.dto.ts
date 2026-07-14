@@ -6,17 +6,17 @@ export class UpdateProfileDto {
   @ApiPropertyOptional({ example: 'John' })
   @IsString()
   @IsOptional()
-  firstName?: string;
+  firstName?: string | null;
 
   @ApiPropertyOptional({ example: 'Doe' })
   @IsString()
   @IsOptional()
-  lastName?: string;
+  lastName?: string | null;
 
   @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg' })
   @IsString()
   @IsOptional()
-  avatar?: string;
+  avatar?: string | null;
 }
 
 export class UpdatePreferencesDto {
@@ -57,7 +57,7 @@ export class UpdatePreferencesDto {
   @ApiPropertyOptional({ example: 'mon,tue,wed,thu,fri' })
   @IsString()
   @IsOptional()
-  workDays?: string;
+  workDays?: string | null;
 
   @ApiPropertyOptional({ minimum: 0, maximum: 23 })
   @IsInt()
@@ -135,13 +135,13 @@ export class UserResponseDto {
   email: string;
 
   @ApiProperty()
-  firstName?: string;
+  firstName?: string | null;
 
   @ApiProperty()
-  lastName?: string;
+  lastName?: string | null;
 
   @ApiProperty()
-  avatar?: string;
+  avatar?: string | null;
 
   @ApiProperty()
   createdAt: Date;

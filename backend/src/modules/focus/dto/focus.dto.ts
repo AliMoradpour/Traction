@@ -17,16 +17,16 @@ export class FocusSessionResponseDto {
   userId: string;
 
   @ApiProperty()
-  taskId?: string;
+  taskId?: string | null;
 
   @ApiProperty()
   startedAt: Date;
 
   @ApiProperty()
-  endedAt?: Date;
+  endedAt?: Date | null;
 
   @ApiProperty()
-  duration?: number;
+  duration?: number | null;
 
   @ApiProperty({ enum: FocusStatus })
   status: FocusStatus;

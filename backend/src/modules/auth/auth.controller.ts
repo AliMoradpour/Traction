@@ -39,7 +39,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 200, description: 'Logout successful' })
-  async logout(@Request() req): Promise<{ message: string }> {
+  async logout(@Request() req: any): Promise<{ message: string }> {
     await this.authService.logout(req.user.id);
     return { message: 'Logout successful' };
   }
@@ -76,7 +76,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'User profile' })
-  async getMe(@Request() req) {
+  async getMe(@Request() req: any) {
     return this.authService.validateUser(req.user.id);
   }
 }

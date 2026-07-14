@@ -8,10 +8,10 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { Controller, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { useTractionTheme, type TractionTheme } from '../../theme';
 
-interface BaseInputProps extends TextInputProps {
+export interface BaseInputProps extends TextInputProps {
   label?: string;
   error?: string;
   helperText?: string;
@@ -21,9 +21,9 @@ interface BaseInputProps extends TextInputProps {
   inputContainerStyle?: StyleProp<ViewStyle>;
 }
 
-interface InputWithControlProps<T extends FieldValues> extends BaseInputProps {
-  control: Control<T>;
-  name: FieldPath<T>;
+interface InputWithControlProps extends BaseInputProps {
+  control: any;
+  name: string;
 }
 
 interface InputWithoutControlProps extends BaseInputProps {
@@ -31,10 +31,10 @@ interface InputWithoutControlProps extends BaseInputProps {
   name?: never;
 }
 
-type InputProps<T extends FieldValues = FieldValues> = InputWithControlProps<T> | InputWithoutControlProps;
+export type InputProps = InputWithControlProps | InputWithoutControlProps;
 
-function InputComponent<T extends FieldValues>(
-  props: InputProps<T>,
+function InputComponent(
+  props: InputProps,
   ref: React.Ref<TextInput>
 ) {
   const {
@@ -162,8 +162,11 @@ const InputInner = forwardRef<TextInput, BaseInputProps>(function InputInner(
   );
 });
 
-// Export a default version for backward compatibility
-export const Input = forwardRef<TextInput, BaseInputProps>(function Input(props, ref) {
+// Export for backward compatibility - accepts both with and without control/name
+export const Input = forwardRef(function Input(
+  props: InputProps,
+  ref: React.Ref<TextInput>
+) {
   return <InputInner {...props} ref={ref} />;
 });
 

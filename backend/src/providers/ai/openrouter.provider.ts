@@ -18,7 +18,7 @@ export class OpenRouterProvider implements AIProvider {
   private readonly fallbackModel: string;
 
   constructor(private configService: ConfigService) {
-    this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY');
+    this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY') || '';
     this.defaultModel = this.configService.get<string>('AI_MODEL_PRIMARY', 'anthropic/claude-3-haiku');
     this.fallbackModel = this.configService.get<string>('AI_MODEL_FALLBACK', 'anthropic/claude-3-haiku');
   }

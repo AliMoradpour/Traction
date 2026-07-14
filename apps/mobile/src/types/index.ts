@@ -35,5 +35,3 @@ export interface ApiError {
     details?: Record<string, unknown>;
   };
 }
-
-export type ThemeMode = 'light' | 'dark' | 'system';

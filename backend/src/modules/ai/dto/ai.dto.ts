@@ -22,14 +22,14 @@ export class AIRecommendationResponseDto {
   @ApiProperty()
   body: string;
 
-  @ApiProperty()
-  payload: string;
+  @ApiProperty({ required: false })
+  payload?: string | null;
 
-  @ApiProperty()
-  acceptedAt?: Date;
+  @ApiProperty({ required: false })
+  acceptedAt?: Date | null;
 
-  @ApiProperty()
-  dismissedAt?: Date;
+  @ApiProperty({ required: false })
+  dismissedAt?: Date | null;
 
   @ApiProperty()
   createdAt: Date;

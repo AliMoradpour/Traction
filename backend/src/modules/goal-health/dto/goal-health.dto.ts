@@ -13,17 +13,17 @@ export class GoalHealthResponseDto {
   progress: number;
 
   @ApiProperty()
-  velocity?: string;
+  velocity?: string | null;
 
   @ApiProperty()
-  targetDate?: Date;
+  targetDate?: Date | null;
 
   @ApiProperty()
-  daysRemaining?: number;
+  daysRemaining?: number | null;
 
   @ApiProperty()
-  estimatedCompletion?: string;
+  estimatedCompletion?: string | null;
 
   @ApiProperty()
-  recommendation?: string;
+  recommendation?: string | null;
 }
