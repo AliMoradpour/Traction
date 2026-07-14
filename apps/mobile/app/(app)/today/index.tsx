@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Animated } from 'react-n
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 const MOCK_TASKS = [
   {

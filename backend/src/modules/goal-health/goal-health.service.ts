@@ -56,7 +56,7 @@ export class GoalHealthService {
       ? Math.ceil((goal.targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
       : null;
 
-    let health = GoalHealth.ON_TRACK;
+    let health: GoalHealth = GoalHealth.ON_TRACK;
 
     if (daysRemaining !== null) {
       if (goal.progress >= 100) {

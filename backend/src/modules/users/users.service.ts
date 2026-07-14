@@ -66,9 +66,14 @@ export class UsersService {
       update: {},
     });
 
+    const updateData: any = { ...dto };
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null) delete updateData[key];
+    });
+
     const profile = await this.prisma.userProfile.update({
       where: { userId },
-      data: dto,
+      data: updateData,
     });
 
     return profile;

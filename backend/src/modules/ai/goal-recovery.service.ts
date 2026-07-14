@@ -45,7 +45,7 @@ export class GoalRecoveryService {
 
     const prompt = this.promptLoader.renderPrompt('goal-recovery', {
       goalTitle: goal.title,
-      deadline: goal.deadline?.toISOString() || 'No deadline',
+      deadline: goal.targetDate?.toISOString() || 'No deadline',
       currentProgress: currentProgress.toString(),
       expectedProgress: expectedProgress.toString(),
       daysRemaining: daysRemaining.toString(),
@@ -54,6 +54,7 @@ export class GoalRecoveryService {
 
     const response = await this.openRouter.chat(
       [{ role: 'user', content: prompt }],
+      'anthropic/claude-3-haiku',
       { temperature: 0.6, maxTokens: 500 },
     );
 
@@ -62,7 +63,7 @@ export class GoalRecoveryService {
     }
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(response);
       return {
         realityCheck: parsed.realityCheck,
         recoveryStrategy: parsed.recoveryStrategy || [],

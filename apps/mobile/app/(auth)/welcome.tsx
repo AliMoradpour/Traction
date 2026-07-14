@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
 
 export default function WelcomeScreen() {
   const theme = useTractionTheme();

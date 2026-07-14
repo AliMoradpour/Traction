@@ -49,12 +49,16 @@ export class GoalsService {
     if (!goal) throw new NotFoundException('Goal not found');
     if (goal.userId !== userId) throw new ForbiddenException('Access denied');
 
+    const updateData: any = { ...dto };
+    if (dto.targetDate) updateData.targetDate = new Date(dto.targetDate);
+    else if (dto.targetDate === null) delete updateData.targetDate;
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null) delete updateData[key];
+    });
+
     const updated = await this.prisma.goal.update({
       where: { id: goalId },
-      data: {
-        ...dto,
-        targetDate: dto.targetDate ? new Date(dto.targetDate) : undefined,
-      },
+      data: updateData,
     });
 
     return updated;
@@ -158,12 +162,16 @@ export class GoalsService {
     if (!milestone) throw new NotFoundException('Milestone not found');
     if (milestone.goalId !== goalId) throw new ForbiddenException('Milestone does not belong to this goal');
 
+    const updateData: any = { ...dto };
+    if (dto.targetDate) updateData.targetDate = new Date(dto.targetDate);
+    else if (dto.targetDate === null) delete updateData.targetDate;
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null) delete updateData[key];
+    });
+
     const updated = await this.prisma.goalMilestone.update({
       where: { id: milestoneId },
-      data: {
-        ...dto,
-        targetDate: dto.targetDate ? new Date(dto.targetDate) : undefined,
-      },
+      data: updateData,
     });
 
     return updated;

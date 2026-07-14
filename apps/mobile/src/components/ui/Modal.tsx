@@ -62,7 +62,7 @@ function createStyles(theme: TractionTheme) {
       justifyContent: 'flex-end',
     },
     scrim: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: theme.colors.scrim,
     },
     content: {

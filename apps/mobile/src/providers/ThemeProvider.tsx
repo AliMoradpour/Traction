@@ -42,7 +42,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     loadFonts();
   }, []);
 
-  const resolvedMode = mode === 'system' ? (systemColorScheme ?? 'light') : mode;
+  const resolvedMode: 'light' | 'dark' = mode === 'system'
+    ? (systemColorScheme === 'dark' ? 'dark' : 'light')
+    : mode;
   const colors = resolvedMode === 'dark' ? darkColors : lightColors;
 
   const toggleTheme = () => {

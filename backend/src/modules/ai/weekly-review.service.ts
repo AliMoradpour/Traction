@@ -117,12 +117,12 @@ export class WeeklyReviewService {
         reason: t.description,
       }))),
       focusSessions: JSON.stringify(focusSessions.map(s => ({
-        duration: s.durationMinutes,
+        duration: s.duration,
         status: s.status,
       }))),
       goalsProgress: JSON.stringify(goals.map(g => ({
         title: g.title,
-        deadline: g.deadline,
+        deadline: g.targetDate,
       }))),
       behaviorEvents: JSON.stringify(behaviorEvents.map(e => ({
         type: e.type,
@@ -132,6 +132,7 @@ export class WeeklyReviewService {
 
     const response = await this.openRouter.chat(
       [{ role: 'user', content: prompt }],
+      'anthropic/claude-3-haiku',
       { temperature: 0.7, maxTokens: 1000 },
     );
 
@@ -140,7 +141,7 @@ export class WeeklyReviewService {
     }
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(response);
       
       return {
         wins: parsed.wins || [],

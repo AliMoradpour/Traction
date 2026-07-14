@@ -85,9 +85,14 @@ export class TasksService {
       throw new ForbiddenException('Access denied');
     }
 
+    const updateData: any = { ...dto };
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null) delete updateData[key];
+    });
+
     const updatedTask = await this.prisma.task.update({
       where: { id: taskId },
-      data: dto,
+      data: updateData,
     });
 
     return updatedTask;

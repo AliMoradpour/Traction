@@ -81,7 +81,7 @@ export class DailyBriefService {
       }))),
       goals: JSON.stringify(goals.map(g => ({
         title: g.title,
-        deadline: g.deadline,
+        deadline: g.targetDate,
       }))),
       behaviorProfile: JSON.stringify(behaviorProfile),
       frictionScore: JSON.stringify(frictionScore),
@@ -89,6 +89,7 @@ export class DailyBriefService {
 
     const response = await this.openRouter.chat(
       [{ role: 'user', content: prompt }],
+      'anthropic/claude-3-haiku',
       { temperature: 0.7, maxTokens: 1000 },
     );
 
@@ -97,7 +98,7 @@ export class DailyBriefService {
     }
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(response);
       
       return {
         date: today,
