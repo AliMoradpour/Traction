@@ -1,30 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { insightService } from '@/services/insight.service';
-
-export const insightKeys = {
-  all: ['insights'] as const,
-  lists: () => [...insightKeys.all, 'list'] as const,
-  list: (params?: Record<string, any>) => [...insightKeys.lists(), params] as const,
-  details: () => [...insightKeys.all, 'detail'] as const,
-  detail: (id: string) => [...insightKeys.details(), id] as const,
-  dailyBrief: () => [...insightKeys.all, 'dailyBrief'] as const,
-  behavioralAwareness: () => [...insightKeys.all, 'behavioralAwareness'] as const,
-  weeklyReview: () => [...insightKeys.all, 'weeklyReview'] as const,
-};
+import { queryKeys } from '@/lib/queryKeys';
+import { cacheConfig } from '@/lib/cacheConfig';
 
 export function useInsights(params?: { type?: string; goalId?: string; read?: boolean; dismissed?: boolean }) {
   return useQuery({
-    queryKey: insightKeys.list(params),
+    queryKey: queryKeys.insights.list(params),
     queryFn: () => insightService.list(params),
-    staleTime: 2 * 60 * 1000,
+    ...cacheConfig.insights,
   });
 }
 
 export function useInsight(id: string) {
   return useQuery({
-    queryKey: insightKeys.detail(id),
+    queryKey: queryKeys.insights.detail(id),
     queryFn: () => insightService.detail(id),
     enabled: !!id,
+    ...cacheConfig.insights,
   });
 }
 
@@ -34,8 +26,8 @@ export function useMarkInsightAsRead() {
   return useMutation({
     mutationFn: (id: string) => insightService.markAsRead(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: insightKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: insightKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.lists() });
     },
   });
 }
@@ -46,8 +38,8 @@ export function useDismissInsight() {
   return useMutation({
     mutationFn: (id: string) => insightService.dismiss(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: insightKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: insightKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.lists() });
     },
   });
 }
@@ -58,7 +50,7 @@ export function useMarkAllInsightsAsRead() {
   return useMutation({
     mutationFn: () => insightService.markAllAsRead(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: insightKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.lists() });
     },
   });
 }
@@ -69,31 +61,31 @@ export function useDeleteInsight() {
   return useMutation({
     mutationFn: (id: string) => insightService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: insightKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.lists() });
     },
   });
 }
 
 export function useDailyBrief() {
   return useQuery({
-    queryKey: insightKeys.dailyBrief(),
+    queryKey: queryKeys.insights.dailyBrief(),
     queryFn: () => insightService.getDailyBrief(),
-    staleTime: 10 * 60 * 1000,
+    ...cacheConfig.insights,
   });
 }
 
 export function useBehavioralAwareness() {
   return useQuery({
-    queryKey: insightKeys.behavioralAwareness(),
+    queryKey: queryKeys.insights.behavioralAwareness(),
     queryFn: () => insightService.getBehavioralAwareness(),
-    staleTime: 10 * 60 * 1000,
+    ...cacheConfig.insights,
   });
 }
 
 export function useWeeklyReview() {
   return useQuery({
-    queryKey: insightKeys.weeklyReview(),
+    queryKey: queryKeys.insights.weeklyReview(),
     queryFn: () => insightService.getWeeklyReview(),
-    staleTime: 10 * 60 * 1000,
+    ...cacheConfig.insights,
   });
 }

@@ -6,3 +6,4 @@ export * from './useInsights';
 export * from './useFocus';
 export * from './useNotifications';
 export * from './useUser';
+export { useConnectivity, useOnlineStatus } from './useConnectivity';
