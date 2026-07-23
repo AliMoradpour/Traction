@@ -1,65 +1,68 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { authService, LoginRequest, RegisterRequest } from '@/services/auth.service';
+import { useRouter } from 'expo-router';
+import { authApi, type LoginRequest, type RegisterRequest, type AuthResponse } from '@/api/auth';
 import { useAuthStore } from '@/store/auth.store';
-
-export const authKeys = {
-  all: ['auth'] as const,
-  me: () => [...authKeys.all, 'me'] as const,
-};
+import { queryKeys } from '@/lib/queryClient';
 
 export function useLogin() {
+  const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
-    mutationFn: (data: LoginRequest) => authService.login(data),
-    onSuccess: (data) => {
+    mutationFn: (data: LoginRequest) => authApi.login(data),
+    onSuccess: (data: AuthResponse) => {
       setAuth(data.user, data.accessToken, data.refreshToken);
+      router.replace('/(app)/today');
     },
   });
 }
 
 export function useRegister() {
+  const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
-    mutationFn: (data: RegisterRequest) => authService.register(data),
-    onSuccess: (data) => {
+    mutationFn: (data: RegisterRequest) => authApi.register(data),
+    onSuccess: (data: AuthResponse) => {
       setAuth(data.user, data.accessToken, data.refreshToken);
+      router.replace('/(onboarding)/introduction');
     },
   });
 }
 
 export function useLogout() {
+  const router = useRouter();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => authService.logout(),
-    onSuccess: () => {
-      clearAuth();
+    mutationFn: () => authApi.logout(),
+    onSettled: async () => {
       queryClient.clear();
+      await clearAuth();
+      router.replace('/(auth)/login');
     },
+  });
+}
+
+export function useUser() {
+  return useQuery({
+    queryKey: queryKeys.auth.me(),
+    queryFn: () => authApi.getMe(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 }
 
 export function useForgotPassword() {
   return useMutation({
-    mutationFn: (email: string) => authService.forgotPassword(email),
+    mutationFn: (data: { email: string }) => authApi.forgotPassword(data),
   });
 }
 
 export function useResetPassword() {
   return useMutation({
-    mutationFn: ({ token, password }: { token: string; password: string }) =>
-      authService.resetPassword(token, password),
-  });
-}
-
-export function useCurrentUser() {
-  return useQuery({
-    queryKey: authKeys.me(),
-    queryFn: () => authService.getMe(),
-    staleTime: 5 * 60 * 1000,
-    retry: false,
+    mutationFn: (data: { token: string; newPassword: string }) =>
+      authApi.resetPassword(data),
   });
 }

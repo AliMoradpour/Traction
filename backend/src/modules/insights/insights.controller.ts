@@ -60,6 +60,15 @@ export class InsightsController {
     return this.insightsService.findOne(userId, id);
   }
 
+  @Patch('read-all')
+  @ApiOperation({ summary: 'Mark all insights as read' })
+  @ApiResponse({ status: 200, description: 'Count of updated insights' })
+  async markAllAsRead(
+    @CurrentUser('id') userId: string,
+  ): Promise<{ count: number }> {
+    return this.insightsService.markAllAsRead(userId);
+  }
+
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark insight as read' })
   @ApiParam({ name: 'id', description: 'Insight ID' })
@@ -80,15 +89,6 @@ export class InsightsController {
     @Param('id') id: string,
   ): Promise<InsightResponseDto> {
     return this.insightsService.dismiss(userId, id);
-  }
-
-  @Patch('read-all')
-  @ApiOperation({ summary: 'Mark all insights as read' })
-  @ApiResponse({ status: 200, description: 'Count of updated insights' })
-  async markAllAsRead(
-    @CurrentUser('id') userId: string,
-  ): Promise<{ count: number }> {
-    return this.insightsService.markAllAsRead(userId);
   }
 
   @Delete(':id')

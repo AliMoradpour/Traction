@@ -1,104 +1,69 @@
-# Backend Security Audit
-
-Date: 2026-07-10
-Status: Complete
+# Phase 8: Security Audit
 
 ## Authentication Security
 
-### Password Hashing
-✓ bcrypt with salt rounds = 12
-✓ Passwords never stored in plain text
-✓ Secure comparison using bcrypt.compare
-
-### JWT Tokens
-✓ Access token expiration: 15 minutes
-✓ Refresh token expiration: 7 days
-✓ Tokens signed with secure secret
-✓ Refresh token rotation implemented
-✓ Old refresh tokens revoked on use
-
-### Refresh Token Storage
-✓ Stored in database with expiration
-✓ Revoked flag for invalidation
-✓ Unique token constraint
-
-## Authorization
-
-### Guard Implementation
-✓ JwtAuthGuard on all protected routes
-✓ CurrentUser decorator for user context
-✓ User ownership verification on resources
-
-### Resource Access
-✓ Users can only access their own data
-✓ Recommendation ownership verified
-✓ Task ownership verified
-✓ Goal ownership verified
-
-## Input Validation
-
-### DTO Validation
-✓ class-validator decorators on all DTOs
-✓ @IsEmail() on email fields
-✓ @MinLength(8) on passwords
-✓ @IsString() on required fields
-✓ @IsOptional() on optional fields
-
-### Request Sanitization
-✓ Input validation at controller level
-✓ Type safety with TypeScript
-✓ Prisma parameterized queries (SQL injection prevention)
+| Aspect | Status | Details |
+|--------|--------|---------|
+| JWT Strategy | OK | Passport JWT with Bearer extraction |
+| JWT Secret | WEAK | Falls back to empty string if unset |
+| Access Token Expiry | OK | 15 minutes |
+| Refresh Token Expiry | OK | 7 days |
+| Token Rotation | OK | Old tokens revoked |
+| Password Hashing | OK | bcrypt, 12 salt rounds |
+| DB Validation | OK | JwtStrategy queries user on every request |
 
 ## Rate Limiting
 
-### Authentication Endpoints
-⚠️ No rate limiting on login attempts
-⚠️ No rate limiting on registration
-⚠️ No rate limiting on password reset
+| Area | Status |
+|------|--------|
+| Auth endpoints | NONE - brute force vulnerable |
+| Global throttle | NONE |
+| AI endpoints | Service exists but NOT enforced |
+| API-wide | NONE |
 
-### Recommendation
-Add rate limiting to prevent brute force attacks:
-- Login: 5 attempts per minute
-- Registration: 3 per hour
-- Password reset: 3 per hour
+## Input Validation
 
-## Security Headers
+| Aspect | Status |
+|--------|--------|
+| Global ValidationPipe | OK (whitelist + transform) |
+| DTO class-validator | OK on most endpoints |
+| Exception | ai.stuckAnalysis uses raw @Body() |
 
-### CORS Configuration
-✓ CORS_ORIGIN configured
-✓ Restricted to specific origin
+## Secrets Management
 
-### API Documentation
-✓ Swagger available in development
-✓ Should be disabled in production
+| Item | Status |
+|------|--------|
+| .env in .gitignore | OK |
+| .env committed | NO (properly gitignored) |
+| Hardcoded secrets in code | NONE |
+| API key in .env.example | Uses OPENAI_API_KEY (wrong - should be OPENROUTER_API_KEY) |
 
-## Findings
+## SQL/XSS Injection
 
-### Critical
-None
+| Risk | Status |
+|------|--------|
+| SQL Injection | NONE (Prisma ORM parameterized) |
+| XSS | NONE (React Native, no HTML) |
 
-### High
-None
+## CORS
 
-### Medium
-- No rate limiting on auth endpoints
+| Aspect | Status |
+|--------|--------|
+| Configured | OK |
+| Credentials | OK |
+| Production restriction | MUST SET CORS_ORIGIN |
 
-### Low
-- Swagger should be disabled in production
+## Security Gaps (Ranked by Severity)
 
-## Recommendations
-
-1. Add rate limiting middleware
-2. Disable Swagger in production
-3. Add CSRF protection for web
-4. Implement account lockout after failed attempts
-5. Add request logging for security audits
-
-## Status
-
-✓ Authentication secure
-✓ Authorization secure
-✓ Input validation secure
-✓ Token management secure
-⚠️ Rate limiting needed
-⚠️ Production Swagger should be disabled
+| # | Severity | Finding |
+|---|----------|---------|
+| 1 | HIGH | No rate limiting on auth endpoints |
+| 2 | HIGH | JWT secret falls back to empty string |
+| 3 | HIGH | resetPassword stub accepts any token |
+| 4 | MEDIUM | Rate limit service not enforced in AI controller |
+| 5 | MEDIUM | No helmet (HTTP security headers) |
+| 6 | MEDIUM | No account lockout after failed attempts |
+| 7 | MEDIUM | No audit logging for auth events |
+| 8 | LOW | Swagger not disabled in production |
+| 9 | LOW | No CSRF protection (acceptable for API) |
+| 10 | LOW | No IP-based blocking |

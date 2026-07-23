@@ -1,17 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userService, UserPreferences } from '@/services/user.service';
-
-export const userKeys = {
-  all: ['users'] as const,
-  profile: () => [...userKeys.all, 'profile'] as const,
-  preferences: () => [...userKeys.all, 'preferences'] as const,
-};
+import { queryKeys } from '@/lib/queryKeys';
+import { cacheConfig } from '@/lib/cacheConfig';
 
 export function useUserProfile() {
   return useQuery({
-    queryKey: userKeys.profile(),
+    queryKey: queryKeys.users.profile(),
     queryFn: () => userService.getProfile(),
-    staleTime: 5 * 60 * 1000,
+    ...cacheConfig.users,
   });
 }
 
@@ -22,16 +18,16 @@ export function useUpdateProfile() {
     mutationFn: (data: { firstName?: string; lastName?: string; avatar?: string }) =>
       userService.updateProfile(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.profile() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.profile() });
     },
   });
 }
 
 export function useUserPreferences() {
   return useQuery({
-    queryKey: userKeys.preferences(),
+    queryKey: queryKeys.users.preferences(),
     queryFn: () => userService.getPreferences(),
-    staleTime: 5 * 60 * 1000,
+    ...cacheConfig.users,
   });
 }
 
@@ -41,7 +37,7 @@ export function useUpdatePreferences() {
   return useMutation({
     mutationFn: (data: Partial<UserPreferences>) => userService.updatePreferences(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userKeys.preferences() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.preferences() });
     },
   });
 }

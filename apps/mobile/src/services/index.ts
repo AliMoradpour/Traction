@@ -1,4 +1,3 @@
-export { authService } from './auth.service';
 export { taskService } from './task.service';
 export { goalService } from './goal.service';
 export { insightService } from './insight.service';
@@ -7,13 +6,6 @@ export { focusService } from './focus.service';
 export { notificationService } from './notification.service';
 export { behaviorService } from './behavior.service';
 export { userService } from './user.service';
-
-export type {
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse,
-  User as AuthUser,
-} from './auth.service';
 
 export type {
   Task,

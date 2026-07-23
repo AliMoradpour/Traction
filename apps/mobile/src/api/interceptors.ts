@@ -1,6 +1,5 @@
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 
 const ACCESS_TOKEN_KEY = 'traction_access_token';
 const REFRESH_TOKEN_KEY = 'traction_refresh_token';
@@ -114,7 +113,7 @@ export function setupInterceptors(client: AxiosInstance) {
           }
 
           const response = await client.post('/auth/refresh', { refreshToken });
-          const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
 
           await tokenStorage.setAccessToken(accessToken);
           if (newRefreshToken) {

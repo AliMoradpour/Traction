@@ -1,14 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { focusService } from '@/services/focus.service';
-
-export const focusKeys = {
-  all: ['focus'] as const,
-  lists: () => [...focusKeys.all, 'list'] as const,
-  list: (params?: Record<string, any>) => [...focusKeys.lists(), params] as const,
-  details: () => [...focusKeys.all, 'detail'] as const,
-  detail: (id: string) => [...focusKeys.details(), id] as const,
-  active: () => [...focusKeys.all, 'active'] as const,
-};
+import { queryKeys } from '@/lib/queryKeys';
+import { cacheConfig } from '@/lib/cacheConfig';
 
 export function useStartFocusSession() {
   const queryClient = useQueryClient();
@@ -16,8 +9,8 @@ export function useStartFocusSession() {
   return useMutation({
     mutationFn: (taskId?: string) => focusService.start(taskId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: focusKeys.active() });
-      queryClient.invalidateQueries({ queryKey: focusKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.active() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.lists() });
     },
   });
 }
@@ -28,8 +21,8 @@ export function usePauseFocusSession() {
   return useMutation({
     mutationFn: (id: string) => focusService.pause(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: focusKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: focusKeys.active() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.active() });
     },
   });
 }
@@ -40,8 +33,8 @@ export function useResumeFocusSession() {
   return useMutation({
     mutationFn: (id: string) => focusService.resume(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: focusKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: focusKeys.active() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.active() });
     },
   });
 }
@@ -52,9 +45,9 @@ export function useCompleteFocusSession() {
   return useMutation({
     mutationFn: (id: string) => focusService.complete(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: focusKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: focusKeys.active() });
-      queryClient.invalidateQueries({ queryKey: focusKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.active() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.lists() });
     },
   });
 }
@@ -65,34 +58,34 @@ export function useCancelFocusSession() {
   return useMutation({
     mutationFn: (id: string) => focusService.cancel(id),
     onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: focusKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: focusKeys.active() });
-      queryClient.invalidateQueries({ queryKey: focusKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.detail(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.active() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.focus.lists() });
     },
   });
 }
 
 export function useActiveFocusSession() {
   return useQuery({
-    queryKey: focusKeys.active(),
+    queryKey: queryKeys.focus.active(),
     queryFn: () => focusService.getActive(),
-    staleTime: 30 * 1000,
-    refetchInterval: 30 * 1000,
+    ...cacheConfig.focus,
   });
 }
 
 export function useFocusSessions(params?: { status?: string; taskId?: string }) {
   return useQuery({
-    queryKey: focusKeys.list(params),
+    queryKey: queryKeys.focus.list(params),
     queryFn: () => focusService.list(params),
-    staleTime: 2 * 60 * 1000,
+    ...cacheConfig.focus,
   });
 }
 
 export function useFocusSession(id: string) {
   return useQuery({
-    queryKey: focusKeys.detail(id),
+    queryKey: queryKeys.focus.detail(id),
     queryFn: () => focusService.detail(id),
     enabled: !!id,
+    ...cacheConfig.focus,
   });
 }

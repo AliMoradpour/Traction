@@ -3,9 +3,10 @@ import { useAuthStore } from '@/store/auth.store';
 
 interface AuthContextValue {
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextValue>({ isLoading: true });
+const AuthContext = createContext<AuthContextValue>({ isLoading: true, isAuthenticated: false });
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -13,14 +14,10 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const isLoading = useAuthStore((state) => state.isLoading);
-  const loadStoredAuth = useAuthStore((state) => state.loadStoredAuth);
-
-  useEffect(() => {
-    loadStoredAuth();
-  }, []);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <AuthContext.Provider value={{ isLoading }}>
+    <AuthContext.Provider value={{ isLoading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

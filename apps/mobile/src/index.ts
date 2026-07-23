@@ -1,9 +1,9 @@
-export * from './api';
+export { apiClient, endpoints, tokenStorage, authApi } from './api';
+export type { ApiErrorResponse, AuthResponse, LoginRequest, RegisterRequest } from './api';
 export * from './components';
 export * from './hooks';
 export * from './lib';
 export * from './providers';
-export * from './services';
 export * from './store';
 export * from './theme';
 export * from './types';

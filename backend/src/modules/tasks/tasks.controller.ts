@@ -32,6 +32,17 @@ export class TasksController {
     return this.tasksService.findAll(userId, query);
   }
 
+  @Get('date/:date')
+  @ApiOperation({ summary: 'Get tasks by date' })
+  @ApiParam({ name: 'date', description: 'Date in YYYY-MM-DD format' })
+  @ApiResponse({ status: 200, description: 'Tasks for date', type: [TaskResponseDto] })
+  async findByDate(
+    @CurrentUser('id') userId: string,
+    @Param('date') date: string,
+  ): Promise<TaskResponseDto[]> {
+    return this.tasksService.getTasksByDate(userId, new Date(date));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get task by id' })
   @ApiParam({ name: 'id', description: 'Task ID' })
@@ -75,17 +86,6 @@ export class TasksController {
     @Param('id') id: string,
   ): Promise<{ message: string }> {
     return this.tasksService.remove(userId, id);
-  }
-
-  @Get('date/:date')
-  @ApiOperation({ summary: 'Get tasks by date' })
-  @ApiParam({ name: 'date', description: 'Date in YYYY-MM-DD format' })
-  @ApiResponse({ status: 200, description: 'Tasks for date', type: [TaskResponseDto] })
-  async findByDate(
-    @CurrentUser('id') userId: string,
-    @Param('date') date: string,
-  ): Promise<TaskResponseDto[]> {
-    return this.tasksService.getTasksByDate(userId, new Date(date));
   }
 
   @Get(':id/steps')
