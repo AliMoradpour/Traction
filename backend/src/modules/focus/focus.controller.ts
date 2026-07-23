@@ -22,6 +22,36 @@ export class FocusController {
     return this.focusService.start(userId, dto);
   }
 
+  @Get('active')
+  @ApiOperation({ summary: 'Get active focus session' })
+  @ApiResponse({ status: 200, description: 'Active session or null', type: FocusSessionResponseDto })
+  async getActive(
+    @CurrentUser('id') userId: string,
+  ): Promise<FocusSessionResponseDto | null> {
+    return this.focusService.getActive(userId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all focus sessions' })
+  @ApiResponse({ status: 200, description: 'List of focus sessions', type: [FocusSessionResponseDto] })
+  async findAll(
+    @CurrentUser('id') userId: string,
+    @Query() query: FocusQueryDto,
+  ): Promise<FocusSessionResponseDto[]> {
+    return this.focusService.findAll(userId, query);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get focus session by id' })
+  @ApiParam({ name: 'id', description: 'Focus session ID' })
+  @ApiResponse({ status: 200, description: 'Session details', type: FocusSessionResponseDto })
+  async findOne(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ): Promise<FocusSessionResponseDto> {
+    return this.focusService.findOne(userId, id);
+  }
+
   @Post(':id/pause')
   @ApiOperation({ summary: 'Pause a focus session' })
   @ApiParam({ name: 'id', description: 'Focus session ID' })
@@ -64,35 +94,5 @@ export class FocusController {
     @Param('id') id: string,
   ): Promise<FocusSessionResponseDto> {
     return this.focusService.cancel(userId, id);
-  }
-
-  @Get('active')
-  @ApiOperation({ summary: 'Get active focus session' })
-  @ApiResponse({ status: 200, description: 'Active session or null', type: FocusSessionResponseDto })
-  async getActive(
-    @CurrentUser('id') userId: string,
-  ): Promise<FocusSessionResponseDto | null> {
-    return this.focusService.getActive(userId);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Get all focus sessions' })
-  @ApiResponse({ status: 200, description: 'List of focus sessions', type: [FocusSessionResponseDto] })
-  async findAll(
-    @CurrentUser('id') userId: string,
-    @Query() query: FocusQueryDto,
-  ): Promise<FocusSessionResponseDto[]> {
-    return this.focusService.findAll(userId, query);
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get focus session by id' })
-  @ApiParam({ name: 'id', description: 'Focus session ID' })
-  @ApiResponse({ status: 200, description: 'Session details', type: FocusSessionResponseDto })
-  async findOne(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<FocusSessionResponseDto> {
-    return this.focusService.findOne(userId, id);
   }
 }

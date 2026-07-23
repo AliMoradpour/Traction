@@ -51,6 +51,15 @@ export class NotificationsController {
     return this.notificationsService.findOne(userId, id);
   }
 
+  @Patch('read-all')
+  @ApiOperation({ summary: 'Mark all notifications as read' })
+  @ApiResponse({ status: 200, description: 'Count of updated notifications' })
+  async markAllAsRead(
+    @CurrentUser('id') userId: string,
+  ): Promise<{ count: number }> {
+    return this.notificationsService.markAllAsRead(userId);
+  }
+
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiParam({ name: 'id', description: 'Notification ID' })
@@ -60,15 +69,6 @@ export class NotificationsController {
     @Param('id') id: string,
   ): Promise<NotificationResponseDto> {
     return this.notificationsService.markAsRead(userId, id);
-  }
-
-  @Patch('read-all')
-  @ApiOperation({ summary: 'Mark all notifications as read' })
-  @ApiResponse({ status: 200, description: 'Count of updated notifications' })
-  async markAllAsRead(
-    @CurrentUser('id') userId: string,
-  ): Promise<{ count: number }> {
-    return this.notificationsService.markAllAsRead(userId);
   }
 
   @Delete(':id')

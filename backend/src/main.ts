@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
@@ -8,6 +9,9 @@ async function bootstrap() {
 
   // Global prefix
   app.setGlobalPrefix('api');
+
+  // Global rate limiting
+  app.enableShutdownHooks();
 
   // Validation pipe
   app.useGlobalPipes(
@@ -41,7 +45,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  
+
   if (process.env.NODE_ENV !== 'production') {
     console.log(`Application is running on: http://localhost:${port}`);
     console.log(`Swagger documentation: http://localhost:${port}/api/docs`);
