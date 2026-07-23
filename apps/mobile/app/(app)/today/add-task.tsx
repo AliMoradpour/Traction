@@ -1,12 +1,28 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
+import { useCreateTask } from '@/hooks/useTasks';
 
 const CATEGORIES = ['Design', 'Dev', 'Ops', 'Admin', 'Personal', 'Learning'];
-const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
+const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
+  { label: 'Low', value: 'LOW' },
+  { label: 'Medium', value: 'MEDIUM' },
+  { label: 'High', value: 'HIGH' },
+  { label: 'Urgent', value: 'URGENT' },
+];
+
+function parseDuration(input: string): number | undefined {
+  const trimmed = input.trim().toLowerCase();
+  if (!trimmed) return undefined;
+  const match = trimmed.match(/^(\d+)(m|h)?$/);
+  if (!match) return undefined;
+  const num = parseInt(match[1], 10);
+  if (match[2] === 'h') return num * 60;
+  return num;
+}
 
 export default function AddTaskScreen() {
   const theme = useTractionTheme();
@@ -14,13 +30,38 @@ export default function AddTaskScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
-  const [priority, setPriority] = useState('Medium');
+  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
   const [duration, setDuration] = useState('');
+  const createTask = useCreateTask();
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
-    // TODO: Add task to store
-    router.back();
+    if (!title.trim()) {
+      Alert.alert('Validation', 'Task name is required');
+      return;
+    }
+
+    createTask.mutate(
+      {
+        title: title.trim(),
+        description: description.trim() || undefined,
+        category: category || undefined,
+        priority,
+        duration: parseDuration(duration),
+      },
+      {
+        onSuccess: () => {
+          setTitle('');
+          setDescription('');
+          setCategory('');
+          setPriority('MEDIUM');
+          setDuration('');
+          router.back();
+        },
+        onError: (error: any) => {
+          Alert.alert('Error', error?.message || 'Failed to create task');
+        },
+      }
+    );
   };
 
   return (
@@ -91,23 +132,23 @@ export default function AddTaskScreen() {
           <View style={styles.chipGroup}>
             {PRIORITIES.map((p) => (
               <Pressable
-                key={p}
+                key={p.value}
                 style={[
                   styles.chip,
                   {
-                    backgroundColor: priority === p ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: priority === p ? theme.colors.primary : theme.colors.border,
+                    backgroundColor: priority === p.value ? theme.colors.primary : theme.colors.surfaceElevated,
+                    borderColor: priority === p.value ? theme.colors.primary : theme.colors.border,
                   },
                 ]}
-                onPress={() => setPriority(p)}
+                onPress={() => setPriority(p.value)}
               >
                 <Text
                   style={[
                     styles.chipText,
-                    { color: priority === p ? '#FFFFFF' : theme.colors.text },
+                    { color: priority === p.value ? '#FFFFFF' : theme.colors.text },
                   ]}
                 >
-                  {p}
+                  {p.label}
                 </Text>
               </Pressable>
             ))}
@@ -128,8 +169,13 @@ export default function AddTaskScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button variant="primary" onPress={handleSubmit} disabled={!title.trim()}>
-          Add Task
+        <Button
+          variant="primary"
+          onPress={handleSubmit}
+          disabled={!title.trim() || createTask.isPending}
+          loading={createTask.isPending}
+        >
+          {createTask.isPending ? 'Creating...' : 'Add Task'}
         </Button>
       </View>
     </SafeAreaView>

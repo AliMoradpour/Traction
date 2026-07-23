@@ -1,29 +1,157 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
+import { useTask, useUpdateTask, useDeleteTask, useCompleteTask } from '@/hooks/useTasks';
 
-const PRIORITIES = ['Low', 'Medium', 'High', 'Urgent'];
+const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
+  { label: 'Low', value: 'LOW' },
+  { label: 'Medium', value: 'MEDIUM' },
+  { label: 'High', value: 'HIGH' },
+  { label: 'Urgent', value: 'URGENT' },
+];
+
+function formatDuration(minutes?: number): string {
+  if (!minutes) return '';
+  if (minutes < 60) return `${minutes}`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+function parseDuration(input: string): number | undefined {
+  const trimmed = input.trim().toLowerCase();
+  if (!trimmed) return undefined;
+
+  const hMatch = trimmed.match(/^(\d+)h\s*(\d*)m?$/);
+  if (hMatch) {
+    const h = parseInt(hMatch[1], 10);
+    const m = hMatch[2] ? parseInt(hMatch[2], 10) : 0;
+    return h * 60 + m;
+  }
+
+  const mMatch = trimmed.match(/^(\d+)m?$/);
+  if (mMatch) return parseInt(mMatch[1], 10);
+
+  return undefined;
+}
 
 export default function TaskDetailsScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const [title, setTitle] = useState('Review feedback from Design Team');
-  const [description, setDescription] = useState('Review and address all comments from the latest design review session.');
-  const [priority, setPriority] = useState('High');
-  const [duration, setDuration] = useState('20m');
+  const { taskId } = useLocalSearchParams<{ taskId: string }>();
+
+  const { data: task, isLoading, isError } = useTask(taskId || '');
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+  const completeTask = useCompleteTask();
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
+  const [duration, setDuration] = useState('');
+  const [category, setCategory] = useState('');
+  const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    if (task && !initialized) {
+      setTitle(task.title || '');
+      setDescription(task.description || '');
+      setPriority(task.priority || 'MEDIUM');
+      setDuration(task.duration ? formatDuration(task.duration) : '');
+      setCategory(task.category || '');
+      setInitialized(true);
+    }
+  }, [task, initialized]);
 
   const handleSave = () => {
-    // TODO: Update task in store
-    router.back();
+    if (!taskId) return;
+    if (!title.trim()) {
+      Alert.alert('Validation', 'Task name is required');
+      return;
+    }
+
+    updateTask.mutate(
+      {
+        id: taskId,
+        data: {
+          title: title.trim(),
+          description: description.trim() || undefined,
+          priority,
+          duration: parseDuration(duration),
+          category: category.trim() || undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          router.back();
+        },
+        onError: (error: any) => {
+          Alert.alert('Error', error?.message || 'Failed to save task');
+        },
+      }
+    );
   };
 
   const handleDelete = () => {
-    // TODO: Delete task from store
-    router.back();
+    if (!taskId) return;
+    Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          deleteTask.mutate(taskId, {
+            onSuccess: () => {
+              router.back();
+            },
+            onError: (error: any) => {
+              Alert.alert('Error', error?.message || 'Failed to delete task');
+            },
+          });
+        },
+      },
+    ]);
   };
+
+  const handleToggleComplete = () => {
+    if (!taskId || !task) return;
+    if (task.status === 'COMPLETED') return;
+    completeTask.mutate(taskId);
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !task) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()}>
+            <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Task Details</Text>
+          <View style={{ width: 60 }} />
+        </View>
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.error || theme.colors.danger }]}>
+            Task not found
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const isCompleted = task.status === 'COMPLETED';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -33,7 +161,7 @@ export default function TaskDetailsScreen() {
         </Pressable>
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Task Details</Text>
         <Pressable onPress={handleDelete}>
-          <Text style={[styles.deleteButton, { color: theme.colors.error }]}>Delete</Text>
+          <Text style={[styles.deleteButton, { color: theme.colors.error || theme.colors.danger }]}>Delete</Text>
         </Pressable>
       </View>
 
@@ -46,6 +174,7 @@ export default function TaskDetailsScreen() {
             onChangeText={setTitle}
             placeholder="Task name"
             placeholderTextColor={theme.colors.textSubtle}
+            editable={!isCompleted}
           />
         </View>
 
@@ -59,6 +188,7 @@ export default function TaskDetailsScreen() {
             placeholderTextColor={theme.colors.textSubtle}
             multiline
             numberOfLines={3}
+            editable={!isCompleted}
           />
         </View>
 
@@ -67,27 +197,39 @@ export default function TaskDetailsScreen() {
           <View style={styles.chipGroup}>
             {PRIORITIES.map((p) => (
               <Pressable
-                key={p}
+                key={p.value}
                 style={[
                   styles.chip,
                   {
-                    backgroundColor: priority === p ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: priority === p ? theme.colors.primary : theme.colors.border,
+                    backgroundColor: priority === p.value ? theme.colors.primary : theme.colors.surfaceElevated,
+                    borderColor: priority === p.value ? theme.colors.primary : theme.colors.border,
                   },
                 ]}
-                onPress={() => setPriority(p)}
+                onPress={() => !isCompleted && setPriority(p.value)}
               >
                 <Text
                   style={[
                     styles.chipText,
-                    { color: priority === p ? '#FFFFFF' : theme.colors.text },
+                    { color: priority === p.value ? '#FFFFFF' : theme.colors.text },
                   ]}
                 >
-                  {p}
+                  {p.label}
                 </Text>
               </Pressable>
             ))}
           </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>CATEGORY</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
+            value={category}
+            onChangeText={setCategory}
+            placeholder="e.g. Design, Dev, Ops"
+            placeholderTextColor={theme.colors.textSubtle}
+            editable={!isCompleted}
+          />
         </View>
 
         <View style={styles.field}>
@@ -98,28 +240,41 @@ export default function TaskDetailsScreen() {
             onChangeText={setDuration}
             placeholder="e.g. 30m, 1h"
             placeholderTextColor={theme.colors.textSubtle}
+            editable={!isCompleted}
           />
         </View>
 
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>RESISTANCE METER</Text>
-          <View style={[styles.resistanceCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <View style={styles.resistanceHeader}>
-              <Text style={[styles.resistanceLabel, { color: theme.colors.text }]}>Friction Score</Text>
-              <Text style={[styles.resistanceValue, { color: theme.colors.warning }]}>25</Text>
-            </View>
-            <View style={[styles.resistanceTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <View style={[styles.resistanceFill, { backgroundColor: theme.colors.warning, width: '25%' }]} />
+        {task.friction != null && (
+          <View style={styles.field}>
+            <Text style={[styles.label, { color: theme.colors.textMuted }]}>RESISTANCE METER</Text>
+            <View style={[styles.resistanceCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+              <View style={styles.resistanceHeader}>
+                <Text style={[styles.resistanceLabel, { color: theme.colors.text }]}>Friction Score</Text>
+                <Text style={[styles.resistanceValue, { color: theme.colors.warning }]}>{task.friction}</Text>
+              </View>
+              <View style={[styles.resistanceTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
+                <View style={[styles.resistanceFill, { backgroundColor: theme.colors.warning, width: `${Math.min(task.friction, 100)}%` }]} />
+              </View>
             </View>
           </View>
-        </View>
+        )}
+
+        {!isCompleted && (
+          <View style={styles.field}>
+            <Button variant="secondary" onPress={handleToggleComplete} loading={completeTask.isPending}>
+              Mark as Completed
+            </Button>
+          </View>
+        )}
       </ScrollView>
 
-      <View style={styles.footer}>
-        <Button variant="primary" onPress={handleSave}>
-          Save Changes
-        </Button>
-      </View>
+      {!isCompleted && (
+        <View style={styles.footer}>
+          <Button variant="primary" onPress={handleSave} loading={updateTask.isPending} disabled={updateTask.isPending}>
+            {updateTask.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -219,5 +374,14 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: 20,
     paddingBottom: 24,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
   },
 });

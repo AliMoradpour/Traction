@@ -1,35 +1,38 @@
-import { useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated } from 'react-native';
+import { useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
+import { useTasks, useCompleteTask } from '@/hooks/useTasks';
+import { Task } from '@/services/task.service';
 
-const MOCK_TASKS = [
-  {
-    id: '1',
-    title: 'Review feedback from Design Team',
-    duration: '20m',
-    category: 'Design',
-  },
-  {
-    id: '2',
-    title: 'Prepare Weekly Sync Slides',
-    duration: '45m',
-    category: 'Ops',
-  },
-  {
-    id: '3',
-    title: 'Reply to Slack mentions',
-    duration: '15m',
-    category: 'Admin',
-  },
-];
+function formatDuration(minutes?: number): string {
+  if (!minutes) return '';
+  if (minutes < 60) return `${minutes}m`;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+function getPriorityColor(theme: any, priority: Task['priority']): string {
+  switch (priority) {
+    case 'URGENT': return theme.colors.error || theme.colors.danger;
+    case 'HIGH': return theme.colors.warning || theme.colors.accent;
+    case 'MEDIUM': return theme.colors.primary;
+    case 'LOW': return theme.colors.textMuted;
+    default: return theme.colors.textMuted;
+  }
+}
 
 export default function TodayScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const today = new Date().toISOString().split('T')[0];
+  const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: today });
+  const completeTask = useCompleteTask();
 
   Animated.timing(fadeAnim, {
     toValue: 1,
@@ -42,12 +45,23 @@ export default function TodayScreen() {
   };
 
   const handleTaskPress = (taskId: string) => {
-    router.push(`/tasks/${taskId}`);
+    router.push({ pathname: '/today/task-details', params: { taskId } });
   };
 
   const handleAddTask = () => {
-    // TODO: Open add task modal
+    router.push('/today/add-task');
   };
+
+  const handleCompleteTask = useCallback(
+    (taskId: string) => {
+      completeTask.mutate(taskId);
+    },
+    [completeTask]
+  );
+
+  const todayDate = new Date();
+  const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' });
+  const monthDay = todayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -58,82 +72,103 @@ export default function TodayScreen() {
           </View>
           <View>
             <Text style={[styles.greeting, { color: theme.colors.text }]}>Good morning, Alex</Text>
-            <Text style={[styles.date, { color: theme.colors.textMuted }]}>Monday, Oct 23</Text>
-          </View>
-        </View>
-        <View style={styles.frictionContainer}>
-          <Text style={[styles.frictionLabel, { color: theme.colors.text }]}>Friction: 24/100</Text>
-          <View style={[styles.frictionTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-            <View style={[styles.frictionFill, { backgroundColor: theme.colors.primary, width: '24%' }]} />
+            <Text style={[styles.date, { color: theme.colors.textMuted }]}>{dayName}, {monthDay}</Text>
           </View>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>CURRENT FOCUS</Text>
-          <View style={[styles.focusCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <View style={[styles.focusAccent, { backgroundColor: theme.colors.primary }]} />
-            <View style={styles.focusContent}>
-              <View style={styles.focusMeta}>
-                <View style={[styles.priorityBadge, { backgroundColor: theme.colors.accentMuted }]}>
-                  <Text style={[styles.priorityText, { color: theme.colors.accent }]}>High Priority</Text>
-                </View>
-                <Text style={[styles.duration, { color: theme.colors.textMuted }]}>⏱ 90m</Text>
-              </View>
-              <Text style={[styles.focusTitle, { color: theme.colors.text }]}>
-                Deep Work: Project Alpha
-              </Text>
-              <Text style={[styles.focusDescription, { color: theme.colors.textMuted }]}>
-                Focus on the core architecture and finalizing the documentation for the stakeholder review.
-              </Text>
-            </View>
-            <Button variant="primary" onPress={handleStartSession} style={styles.startButton}>
-              ▶ START SESSION
-            </Button>
-          </View>
-        </Animated.View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>NEXT TASKS</Text>
-            <Pressable>
-              <Text style={[styles.viewAll, { color: theme.colors.primary }]}>View all ›</Text>
-            </Pressable>
-          </View>
-          <View style={styles.taskList}>
-            {MOCK_TASKS.map((task) => (
-              <Pressable
-                key={task.id}
-                style={[styles.taskCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => handleTaskPress(task.id)}
-              >
-                <View style={[styles.checkbox, { borderColor: theme.colors.border }]} />
-                <View style={styles.taskContent}>
-                  <Text style={[styles.taskTitle, { color: theme.colors.text }]}>{task.title}</Text>
-                  <View style={styles.taskMeta}>
-                    <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-                      ⏱ {task.duration}
-                    </Text>
-                    <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-                      📁 {task.category}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={[styles.moreIcon, { color: theme.colors.textSubtle }]}>⋮</Text>
-              </Pressable>
-            ))}
-          </View>
+      {isLoading ? (
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading tasks...</Text>
         </View>
-
-        <View style={[styles.insightCard, { backgroundColor: theme.colors.accentMuted }]}>
-          <Text style={styles.insightIcon}>✨</Text>
-          <Text style={[styles.insightText, { color: theme.colors.accentText }]}>
-            Based on your focus patterns, you are most productive between 9:00 AM and 11:30 AM. You
-            have one clear window for Project Alpha left today.
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.error || theme.colors.danger }]}>
+            Failed to load tasks
           </Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
-      </ScrollView>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.content}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={theme.colors.primary} />}
+        >
+          <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
+            </View>
+
+            {tasks && tasks.length > 0 ? (
+              <View style={styles.taskList}>
+                {tasks.map((task) => {
+                  const isCompleted = task.status === 'COMPLETED';
+                  return (
+                    <Pressable
+                      key={task.id}
+                      style={[
+                        styles.taskCard,
+                        { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
+                        isCompleted && styles.taskCardCompleted,
+                      ]}
+                      onPress={() => handleTaskPress(task.id)}
+                    >
+                      <Pressable
+                        style={[
+                          styles.checkbox,
+                          { borderColor: getPriorityColor(theme, task.priority) },
+                          isCompleted && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
+                        ]}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          if (!isCompleted) handleCompleteTask(task.id);
+                        }}
+                      >
+                        {isCompleted && <Text style={styles.checkmark}>✓</Text>}
+                      </Pressable>
+                      <View style={styles.taskContent}>
+                        <Text
+                          style={[
+                            styles.taskTitle,
+                            { color: theme.colors.text },
+                            isCompleted && { textDecorationLine: 'line-through', color: theme.colors.textMuted },
+                          ]}
+                        >
+                          {task.title}
+                        </Text>
+                        <View style={styles.taskMeta}>
+                          {task.duration ? (
+                            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
+                              ⏱ {formatDuration(task.duration)}
+                            </Text>
+                          ) : null}
+                          {task.category ? (
+                            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
+                              📁 {task.category}
+                            </Text>
+                          ) : null}
+                          <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(theme, task.priority) }]} />
+                        </View>
+                      </View>
+                      <Text style={[styles.moreIcon, { color: theme.colors.textSubtle }]}>⋮</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : (
+              <View style={[styles.emptyState, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+                <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>📋</Text>
+                <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No tasks for today</Text>
+                <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
+                  Tap + to add your first task
+                </Text>
+              </View>
+            )}
+          </Animated.View>
+        </ScrollView>
+      )}
 
       <Pressable style={[styles.fab, { backgroundColor: theme.colors.primary }]} onPress={handleAddTask}>
         <Text style={styles.fabIcon}>+</Text>
@@ -180,24 +215,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
-  frictionContainer: {
-    alignItems: 'flex-end',
-  },
-  frictionLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  frictionTrack: {
-    width: 80,
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  frictionFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
   content: {
     paddingHorizontal: 20,
     paddingBottom: 100,
@@ -216,64 +233,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.05,
-    marginBottom: 12,
-  },
-  viewAll: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  focusCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  focusAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-  },
-  focusContent: {
-    padding: 16,
-    paddingRight: 16,
-    paddingLeft: 20,
-  },
-  focusMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  priorityText: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  duration: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  focusTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
-    letterSpacing: -0.01,
-  },
-  focusDescription: {
-    fontSize: 15,
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  startButton: {
-    marginHorizontal: 16,
-    marginBottom: 16,
   },
   taskList: {
     gap: 8,
@@ -286,11 +245,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 12,
   },
+  taskCardCompleted: {
+    opacity: 0.6,
+  },
   checkbox: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkmark: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
   taskContent: {
     flex: 1,
@@ -302,29 +271,38 @@ const styles = StyleSheet.create({
   },
   taskMeta: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
   },
   taskMetaText: {
     fontSize: 11,
     fontWeight: '500',
   },
+  priorityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
   moreIcon: {
     fontSize: 20,
   },
-  insightCard: {
-    flexDirection: 'row',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    alignItems: 'flex-start',
+  emptyState: {
+    padding: 32,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    gap: 8,
   },
-  insightIcon: {
-    fontSize: 20,
+  emptyIcon: {
+    fontSize: 32,
   },
-  insightText: {
-    flex: 1,
-    fontSize: 15,
-    lineHeight: 20,
+  emptyTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  emptyText: {
+    fontSize: 14,
+    textAlign: 'center',
   },
   fab: {
     position: 'absolute',
@@ -344,5 +322,19 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#FFFFFF',
     fontWeight: '300',
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
