@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { useCreateTask } from '@/hooks/useTasks';
+import { useGoals } from '@/hooks/useGoals';
 
 const CATEGORIES = ['Design', 'Dev', 'Ops', 'Admin', 'Personal', 'Learning'];
 const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
@@ -27,12 +28,15 @@ function parseDuration(input: string): number | undefined {
 export default function AddTaskScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const { goalId: preselectedGoalId } = useLocalSearchParams<{ goalId?: string }>();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
   const [duration, setDuration] = useState('');
+  const [goalId, setGoalId] = useState<string | undefined>(preselectedGoalId);
   const createTask = useCreateTask();
+  const { data: goals } = useGoals({ status: 'ACTIVE' });
 
   const handleSubmit = () => {
     if (!title.trim()) {
@@ -47,6 +51,7 @@ export default function AddTaskScreen() {
         category: category || undefined,
         priority,
         duration: parseDuration(duration),
+        goalId: goalId || undefined,
       },
       {
         onSuccess: () => {
@@ -55,6 +60,7 @@ export default function AddTaskScreen() {
           setCategory('');
           setPriority('MEDIUM');
           setDuration('');
+          setGoalId(preselectedGoalId);
           router.back();
         },
         onError: (error: any) => {
@@ -125,6 +131,53 @@ export default function AddTaskScreen() {
               </Pressable>
             ))}
           </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>LINK TO GOAL</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipGroup}>
+            <Pressable
+              style={[
+                styles.chip,
+                {
+                  backgroundColor: !goalId ? theme.colors.primary : theme.colors.surfaceElevated,
+                  borderColor: !goalId ? theme.colors.primary : theme.colors.border,
+                },
+              ]}
+              onPress={() => setGoalId(undefined)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  { color: !goalId ? '#FFFFFF' : theme.colors.text },
+                ]}
+              >
+                None
+              </Text>
+            </Pressable>
+            {goals?.map((goal) => (
+              <Pressable
+                key={goal.id}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: goalId === goal.id ? theme.colors.primary : theme.colors.surfaceElevated,
+                    borderColor: goalId === goal.id ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                onPress={() => setGoalId(goal.id)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    { color: goalId === goal.id ? '#FFFFFF' : theme.colors.text },
+                  ]}
+                >
+                  {goal.title}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
 
         <View style={styles.field}>

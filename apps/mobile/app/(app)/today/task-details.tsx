@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { useTask, useUpdateTask, useDeleteTask, useCompleteTask } from '@/hooks/useTasks';
+import { useGoals } from '@/hooks/useGoals';
 
 const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
   { label: 'Low', value: 'LOW' },
@@ -53,7 +54,9 @@ export default function TaskDetailsScreen() {
   const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
   const [duration, setDuration] = useState('');
   const [category, setCategory] = useState('');
+  const [goalId, setGoalId] = useState<string | undefined>();
   const [initialized, setInitialized] = useState(false);
+  const { data: goals } = useGoals({ status: 'ACTIVE' });
 
   useEffect(() => {
     if (task && !initialized) {
@@ -62,6 +65,7 @@ export default function TaskDetailsScreen() {
       setPriority(task.priority || 'MEDIUM');
       setDuration(task.duration ? formatDuration(task.duration) : '');
       setCategory(task.category || '');
+      setGoalId(task.goalId);
       setInitialized(true);
     }
   }, [task, initialized]);
@@ -82,6 +86,7 @@ export default function TaskDetailsScreen() {
           priority,
           duration: parseDuration(duration),
           category: category.trim() || undefined,
+          goalId: goalId || undefined,
         },
       },
       {
@@ -242,6 +247,53 @@ export default function TaskDetailsScreen() {
             placeholderTextColor={theme.colors.textSubtle}
             editable={!isCompleted}
           />
+        </View>
+
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>LINK TO GOAL</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipGroup}>
+            <Pressable
+              style={[
+                styles.chip,
+                {
+                  backgroundColor: !goalId ? theme.colors.primary : theme.colors.surfaceElevated,
+                  borderColor: !goalId ? theme.colors.primary : theme.colors.border,
+                },
+              ]}
+              onPress={() => !isCompleted && setGoalId(undefined)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  { color: !goalId ? '#FFFFFF' : theme.colors.text },
+                ]}
+              >
+                None
+              </Text>
+            </Pressable>
+            {goals?.map((goal) => (
+              <Pressable
+                key={goal.id}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: goalId === goal.id ? theme.colors.primary : theme.colors.surfaceElevated,
+                    borderColor: goalId === goal.id ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                onPress={() => !isCompleted && setGoalId(goal.id)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    { color: goalId === goal.id ? '#FFFFFF' : theme.colors.text },
+                  ]}
+                >
+                  {goal.title}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
 
         {task.friction != null && (

@@ -25,8 +25,12 @@ export function useCreateTask() {
 
   return useMutation({
     mutationFn: (data: CreateTaskRequest) => taskService.create(data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
+      if (variables.goalId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.goals.detail(variables.goalId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.goals.milestones(variables.goalId) });
+      }
     },
   });
 }
@@ -60,9 +64,13 @@ export function useCompleteTask() {
 
   return useMutation({
     mutationFn: (id: string) => taskService.complete(id),
-    onSuccess: (_, id) => {
+    onSuccess: (task, id) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.lists() });
+      if (task?.goalId) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.goals.detail(task.goalId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.goals.milestones(task.goalId) });
+      }
     },
   });
 }

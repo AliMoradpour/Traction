@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useGoal, useDeleteGoal, useArchiveGoal, useGoalMilestones } from '@/hooks/useGoals';
+import { useTasks, useCompleteTask } from '@/hooks/useTasks';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 
@@ -64,8 +65,11 @@ export default function GoalDetailScreen() {
   const deleteGoal = useDeleteGoal();
   const archiveGoal = useArchiveGoal();
   const { data: milestones } = useGoalMilestones(goalId || '');
+  const { data: linkedTasks } = useTasks({ goalId: goalId || undefined });
+  const completeTask = useCompleteTask();
 
   const [showMilestones, setShowMilestones] = useState(false);
+  const [showLinkedTasks, setShowLinkedTasks] = useState(false);
 
   const handleDelete = () => {
     if (!goalId) return;
@@ -290,7 +294,72 @@ export default function GoalDetailScreen() {
           </View>
         ) : null}
 
+        {linkedTasks && linkedTasks.length > 0 ? (
+          <Pressable
+            style={[styles.section, styles.milestoneToggle]}
+            onPress={() => setShowLinkedTasks(!showLinkedTasks)}
+          >
+            <View style={styles.milestoneHeader}>
+              <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>LINKED TASKS</Text>
+              <Text style={[styles.milestoneCount, { color: theme.colors.primary }]}>
+                {linkedTasks.filter((t) => t.status === 'COMPLETED').length}/{linkedTasks.length} completed
+              </Text>
+            </View>
+            <Text style={[styles.expandIcon, { color: theme.colors.textMuted }]}>
+              {showLinkedTasks ? '▲' : '▼'}
+            </Text>
+          </Pressable>
+        ) : null}
+
+        {showLinkedTasks && linkedTasks ? (
+          <View style={styles.milestonesList}>
+            {linkedTasks.map((task) => {
+              const isCompleted = task.status === 'COMPLETED';
+              return (
+                <Pressable
+                  key={task.id}
+                  style={[
+                    styles.milestoneCard,
+                    { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => router.push(`/(app)/today/task-details?taskId=${task.id}`)}
+                >
+                  <View style={styles.milestoneTop}>
+                    <Pressable
+                      onPress={() => {
+                        if (!isCompleted) {
+                          completeTask.mutate(task.id);
+                        }
+                      }}
+                      style={[styles.checkbox, { borderColor: isCompleted ? theme.colors.success : theme.colors.border }]}
+                    >
+                      {isCompleted && <View style={[styles.checkboxChecked, { backgroundColor: theme.colors.success }]} />}
+                    </Pressable>
+                    <Text
+                      style={[
+                        styles.milestoneTitle,
+                        { color: theme.colors.text },
+                        isCompleted && styles.milestoneTitleCompleted,
+                      ]}
+                    >
+                      {task.title}
+                    </Text>
+                    <Text style={[styles.milestoneProgress, { color: theme.colors.textMuted }]}>
+                      {task.priority}
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : null}
+
         <View style={styles.actionsSection}>
+          <Button
+            variant="primary"
+            onPress={() => router.push(`/(app)/today/add-task?goalId=${goalId}` as any)}
+            title="Add Linked Task"
+          />
           <Button
             variant="secondary"
             onPress={() => router.push(`/(app)/goals/${goalId}/milestones` as any)}
@@ -530,6 +599,19 @@ const styles = StyleSheet.create({
   },
   milestoneDate: {
     fontSize: 12,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    width: 12,
+    height: 12,
+    borderRadius: 2,
   },
   actionsSection: {
     marginTop: 20,
