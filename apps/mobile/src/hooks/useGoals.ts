@@ -175,3 +175,25 @@ export function useRecalculateHealth() {
     },
   });
 }
+
+export function useUpdatePlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ goalId, planId, data }: { goalId: string; planId: string; data: any }) =>
+      goalService.updatePlan(goalId, planId, data),
+    onSuccess: (_, { goalId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.plans(goalId) });
+    },
+  });
+}
+
+export function useDeletePlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ goalId, planId }: { goalId: string; planId: string }) =>
+      goalService.deletePlan(goalId, planId),
+    onSuccess: (_, { goalId }) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.plans(goalId) });
+    },
+  });
+}

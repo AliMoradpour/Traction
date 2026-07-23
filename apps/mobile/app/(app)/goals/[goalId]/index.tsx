@@ -301,6 +301,16 @@ export default function GoalDetailScreen() {
             onPress={() => router.push(`/(app)/goals/${goalId}/projection` as any)}
             title="View Projection"
           />
+          <Button
+            variant="secondary"
+            onPress={() => router.push(`/(app)/goals/${goalId}/analytics` as any)}
+            title="Analytics"
+          />
+          <Button
+            variant="secondary"
+            onPress={() => router.push(`/(app)/goals/${goalId}/recovery` as any)}
+            title="Recovery"
+          />
           <Button variant="secondary" onPress={handleArchive} title="Archive Goal" />
           <Button variant="danger" onPress={handleDelete} title="Delete Goal" />
         </View>

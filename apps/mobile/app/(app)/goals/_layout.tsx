@@ -11,6 +11,8 @@ export default function GoalsLayout() {
       <Stack.Screen name="[goalId]/edit" />
       <Stack.Screen name="[goalId]/milestones" />
       <Stack.Screen name="[goalId]/projection" />
+      <Stack.Screen name="[goalId]/analytics" />
+      <Stack.Screen name="[goalId]/recovery" />
     </Stack>
   );
 }
