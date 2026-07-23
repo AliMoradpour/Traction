@@ -33,7 +33,7 @@ export const aiService = {
   getRecommendations: async (): Promise<AIRecommendation[]> => {
     try {
       const response = await apiClient.get(endpoints.ai.recommendations);
-      return response.data.data ?? [];
+      return response.data ?? [];
     } catch (error) {
       console.warn('Failed to fetch AI recommendations:', error);
       return [];
@@ -43,7 +43,7 @@ export const aiService = {
   generateRecommendation: async (): Promise<AIRecommendation | null> => {
     try {
       const response = await apiClient.post(endpoints.ai.generateRecommendation);
-      return response.data.data ?? null;
+      return response.data ?? null;
     } catch (error) {
       console.warn('Failed to generate AI recommendation:', error);
       return null;
@@ -52,7 +52,7 @@ export const aiService = {
 
   acceptRecommendation: async (id: string): Promise<void> => {
     try {
-      await apiClient.post(`${endpoints.ai.recommendations}/${id}/accept`);
+      await apiClient.post(endpoints.ai.acceptRecommendation(id));
     } catch (error) {
       console.warn('Failed to accept AI recommendation:', error);
     }
@@ -60,38 +60,58 @@ export const aiService = {
 
   dismissRecommendation: async (id: string): Promise<void> => {
     try {
-      await apiClient.post(`${endpoints.ai.recommendations}/${id}/dismiss`);
+      await apiClient.post(endpoints.ai.dismissRecommendation(id));
     } catch (error) {
       console.warn('Failed to dismiss AI recommendation:', error);
     }
   },
 
-  analyzeGoalFeasibility: async (title: string, deadline?: string): Promise<GoalFeasibility | null> => {
+  getDailyBrief: async (): Promise<any> => {
     try {
-      const response = await apiClient.post(endpoints.ai.analyzeGoal, { title, deadline });
-      return response.data.data ?? null;
+      const response = await apiClient.get(endpoints.ai.dailyBrief);
+      return response.data ?? null;
     } catch (error) {
-      console.warn('Failed to analyze goal feasibility:', error);
+      console.warn('Failed to get daily brief:', error);
       return null;
     }
   },
 
-  breakdownTask: async (title: string, description?: string): Promise<TaskBreakdown[] | null> => {
+  breakdownTask: async (taskId: string): Promise<TaskBreakdown[] | null> => {
     try {
-      const response = await apiClient.post(endpoints.ai.breakdownTask, { title, description });
-      return response.data.data ?? null;
+      const response = await apiClient.post(endpoints.ai.breakdownTask(taskId));
+      return response.data ?? null;
     } catch (error) {
       console.warn('Failed to breakdown task:', error);
       return null;
     }
   },
 
-  simplifyTask: async (title: string, resistanceLevel: number): Promise<SimplifiedTask | null> => {
+  stuckAnalysis: async (feeling: string, taskId?: string): Promise<any> => {
     try {
-      const response = await apiClient.post(endpoints.ai.simplifyTask, { title, resistanceLevel });
-      return response.data.data ?? null;
+      const response = await apiClient.post(endpoints.ai.stuckAnalysis, { feeling, taskId });
+      return response.data ?? null;
     } catch (error) {
-      console.warn('Failed to simplify task:', error);
+      console.warn('Failed to analyze stuck feeling:', error);
+      return null;
+    }
+  },
+
+  getWeeklyReview: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get(endpoints.ai.weeklyReview);
+      return response.data ?? null;
+    } catch (error) {
+      console.warn('Failed to get weekly review:', error);
+      return null;
+    }
+  },
+
+  getGoalRecovery: async (goalId: string): Promise<any> => {
+    try {
+      const response = await apiClient.post(endpoints.ai.goalRecovery(goalId));
+      return response.data ?? null;
+    } catch (error) {
+      console.warn('Failed to get goal recovery:', error);
       return null;
     }
   },
@@ -99,7 +119,7 @@ export const aiService = {
   getStatus: async (): Promise<{ configured: boolean }> => {
     try {
       const response = await apiClient.get(endpoints.ai.status);
-      return response.data.data ?? { configured: false };
+      return response.data ?? { configured: false };
     } catch (error) {
       console.warn('Failed to get AI status:', error);
       return { configured: false };

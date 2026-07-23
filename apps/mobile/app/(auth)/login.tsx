@@ -1,20 +1,19 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTractionTheme } from '@/theme';
-import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { loginSchema, type LoginFormData } from '@/lib/validations';
+import { useLogin } from '@/hooks/useAuth';
 
 export default function LoginScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const [isLoading, setIsLoading] = useState(false);
+  const loginMutation = useLogin();
 
   const {
     control,
@@ -28,19 +27,13 @@ export default function LoginScreen() {
     },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    try {
-      // TODO: Call actual auth service
-      // For now, simulate successful login
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setAuth({ id: '1', email: data.email, name: 'User' }, 'mock-token', 'mock-refresh-token');
-      router.replace('/(app)/today');
-    } catch (error) {
-      console.error('Login failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data, {
+      onError: (error: any) => {
+        const message = error?.error?.message || error?.message || 'Login failed';
+        Alert.alert('Login Failed', message);
+      },
+    });
   };
 
   return (
@@ -88,28 +81,12 @@ export default function LoginScreen() {
             variant="primary"
             size="lg"
             onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
+            loading={loginMutation.isPending}
+            disabled={loginMutation.isPending}
             style={styles.loginButton}
           >
             Sign In
           </Button>
-
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-            <Text style={[styles.dividerText, { color: theme.colors.textSubtle }]}>
-              or continue with
-            </Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-          </View>
-
-          <View style={styles.socialButtons}>
-            <Button variant="secondary" size="lg" style={styles.socialButton}>
-              Apple
-            </Button>
-            <Button variant="secondary" size="lg" style={styles.socialButton}>
-              Google
-            </Button>
-          </View>
 
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
@@ -162,31 +139,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   loginButton: {
-    marginBottom: 24,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    gap: 12,
     marginBottom: 32,
-  },
-  socialButton: {
-    flex: 1,
   },
   footer: {
     flexDirection: 'row',

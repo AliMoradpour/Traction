@@ -4,9 +4,8 @@ import { tokenStorage } from '@/api/interceptors';
 interface User {
   id: string;
   email: string;
-  name?: string;
-  firstName?: string;
-  lastName?: string;
+  firstName?: string | null;
+  lastName?: string | null;
 }
 
 interface AuthState {
@@ -17,6 +16,7 @@ interface AuthState {
   clearAuth: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   loadStoredAuth: () => Promise<void>;
+  setUser: (user: User) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -37,6 +37,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   updateUser: (userData) =>
     set((state) => ({ user: state.user ? { ...state.user, ...userData } : null })),
+
+  setUser: (user) => set({ user }),
 
   loadStoredAuth: async () => {
     try {

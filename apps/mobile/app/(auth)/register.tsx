@@ -1,20 +1,18 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTractionTheme } from '@/theme';
-import { useAuthStore } from '@/store/auth.store';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { registerSchema, type RegisterFormData } from '@/lib/validations';
+import { useRegister } from '@/hooks/useAuth';
 
 export default function RegisterScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const [isLoading, setIsLoading] = useState(false);
+  const registerMutation = useRegister();
 
   const {
     control,
@@ -30,19 +28,24 @@ export default function RegisterScreen() {
     },
   });
 
-  const onSubmit = async (data: RegisterFormData) => {
-    setIsLoading(true);
-    try {
-      // TODO: Call actual auth service
-      // For now, simulate successful registration
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setAuth({ id: '1', email: data.email, name: data.name }, 'mock-token', 'mock-refresh-token');
-      router.replace('/(onboarding)/introduction');
-    } catch (error) {
-      console.error('Registration failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const onSubmit = (data: RegisterFormData) => {
+    const [firstName, ...rest] = data.name.split(' ');
+    const lastName = rest.join(' ') || undefined;
+
+    registerMutation.mutate(
+      {
+        email: data.email,
+        password: data.password,
+        firstName,
+        lastName,
+      },
+      {
+        onError: (error: any) => {
+          const message = error?.error?.message || error?.message || 'Registration failed';
+          Alert.alert('Registration Failed', message);
+        },
+      }
+    );
   };
 
   return (
@@ -102,28 +105,12 @@ export default function RegisterScreen() {
             variant="primary"
             size="lg"
             onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
+            loading={registerMutation.isPending}
+            disabled={registerMutation.isPending}
             style={styles.registerButton}
           >
             Create Account
           </Button>
-
-          <View style={styles.divider}>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-            <Text style={[styles.dividerText, { color: theme.colors.textSubtle }]}>
-              or continue with
-            </Text>
-            <View style={[styles.dividerLine, { backgroundColor: theme.colors.border }]} />
-          </View>
-
-          <View style={styles.socialButtons}>
-            <Button variant="secondary" size="lg" style={styles.socialButton}>
-              Apple
-            </Button>
-            <Button variant="secondary" size="lg" style={styles.socialButton}>
-              Google
-            </Button>
-          </View>
 
           <View style={styles.footer}>
             <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
@@ -170,31 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   registerButton: {
-    marginBottom: 24,
-  },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    gap: 12,
     marginBottom: 32,
-  },
-  socialButton: {
-    flex: 1,
   },
   footer: {
     flexDirection: 'row',
