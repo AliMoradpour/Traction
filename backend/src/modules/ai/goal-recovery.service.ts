@@ -4,6 +4,7 @@ import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
+import { AISafetyService } from './ai-safety.service';
 
 export interface GoalRecovery {
   realityCheck: string;
@@ -24,6 +25,7 @@ export class GoalRecoveryService {
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
     private rateLimitService: AIRateLimitService,
+    private safetyService: AISafetyService,
   ) {}
 
   async analyzeGoalRecovery(
@@ -59,19 +61,21 @@ export class GoalRecoveryService {
       return this.getFallbackGoalRecovery(currentProgress, expectedProgress, daysRemaining);
     }
 
+    const model = this.modelRegistry.getModelForFeature('goal-recovery');
     const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.6, maxTokens: 500 },
+      { model, temperature: 0.6, maxTokens: 500 },
     );
 
     if (!response) {
       return this.getFallbackGoalRecovery(currentProgress, expectedProgress, daysRemaining);
     }
 
+    const validatedContent = this.safetyService.validateResponse(response.content, 'goal-recovery');
     await this.rateLimitService.recordUsage(userId, 'goal-recovery', response.model, response.usage.totalTokens);
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(validatedContent);
       return {
         realityCheck: parsed.realityCheck,
         recoveryStrategy: parsed.recoveryStrategy || [],

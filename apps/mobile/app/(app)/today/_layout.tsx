@@ -8,6 +8,7 @@ export default function TodayLayout() {
       <Stack.Screen name="reflection" />
       <Stack.Screen name="add-task" />
       <Stack.Screen name="task-details" />
+      <Stack.Screen name="planner" />
     </Stack>
   );
 }

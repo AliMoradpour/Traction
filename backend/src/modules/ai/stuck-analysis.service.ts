@@ -4,6 +4,7 @@ import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
+import { AISafetyService } from './ai-safety.service';
 
 export type StuckFeeling = 'overwhelmed' | 'unclear' | 'tired' | 'distracted' | 'anxious';
 
@@ -25,6 +26,7 @@ export class StuckAnalysisService {
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
     private rateLimitService: AIRateLimitService,
+    private safetyService: AISafetyService,
   ) {}
 
   async analyzeStuck(
@@ -55,19 +57,21 @@ export class StuckAnalysisService {
       return this.getFallbackAnalysis(feeling);
     }
 
+    const model = this.modelRegistry.getModelForFeature('stuck-analysis');
     const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.6, maxTokens: 300 },
+      { model, temperature: 0.6, maxTokens: 300 },
     );
 
     if (!response) {
       return this.getFallbackAnalysis(feeling);
     }
 
+    const validatedContent = this.safetyService.validateResponse(response.content, 'stuck-analysis');
     await this.rateLimitService.recordUsage(userId, 'stuck-analysis', response.model, response.usage.totalTokens);
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(validatedContent);
       return {
         likelyCause: parsed.likelyCause,
         nextAction: parsed.nextAction,

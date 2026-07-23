@@ -7,6 +7,7 @@ import { PromptLoaderService } from './prompt-loader.service';
 import { AICacheService } from './ai-cache.service';
 import { ModelRegistryService } from './model-registry.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
+import { AISafetyService } from './ai-safety.service';
 
 export interface DailyBrief {
   date: string;
@@ -31,6 +32,7 @@ export class DailyBriefService {
     private cacheService: AICacheService,
     private modelRegistry: ModelRegistryService,
     private rateLimitService: AIRateLimitService,
+    private safetyService: AISafetyService,
   ) {}
 
   async getDailyBrief(userId: string): Promise<DailyBrief | null> {
@@ -94,19 +96,21 @@ export class DailyBriefService {
       return this.getFallbackDailyBrief(tasks, goals);
     }
 
+    const model = this.modelRegistry.getModelForFeature('daily-brief');
     const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.7, maxTokens: 1000 },
+      { model, temperature: 0.7, maxTokens: 1000 },
     );
 
     if (!response) {
       return this.getFallbackDailyBrief(tasks, goals);
     }
 
+    const validatedContent = this.safetyService.validateResponse(response.content, 'daily-brief');
     await this.rateLimitService.recordUsage(userId, 'daily-brief', response.model, response.usage.totalTokens);
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(validatedContent);
       
       return {
         date: today,

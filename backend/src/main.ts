@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { AICacheService } from './modules/ai/ai-cache.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,6 +46,19 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
+
+  // Schedule cache cleanup every hour
+  const cacheService = app.get(AICacheService);
+  setInterval(async () => {
+    try {
+      const cleaned = await cacheService.cleanupExpired();
+      if (cleaned > 0) {
+        console.log(`AI cache cleanup: removed ${cleaned} expired entries`);
+      }
+    } catch (error) {
+      console.error('AI cache cleanup failed:', error);
+    }
+  }, 3600000); // Every hour
 
   if (process.env.NODE_ENV !== 'production') {
     console.log(`Application is running on: http://localhost:${port}`);

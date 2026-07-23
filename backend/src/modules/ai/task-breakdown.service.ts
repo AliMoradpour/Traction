@@ -4,6 +4,7 @@ import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
+import { AISafetyService } from './ai-safety.service';
 
 export interface TaskBreakdownStep {
   title: string;
@@ -21,6 +22,7 @@ export class TaskBreakdownService {
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
     private rateLimitService: AIRateLimitService,
+    private safetyService: AISafetyService,
   ) {}
 
   async breakdownTask(
@@ -47,19 +49,21 @@ export class TaskBreakdownService {
       return this.getFallbackBreakdown(task);
     }
 
+    const model = this.modelRegistry.getModelForFeature('task-breakdown');
     const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.5, maxTokens: 500 },
+      { model, temperature: 0.5, maxTokens: 500 },
     );
 
     if (!response) {
       return this.getFallbackBreakdown(task);
     }
 
+    const validatedContent = this.safetyService.validateResponse(response.content, 'task-breakdown');
     await this.rateLimitService.recordUsage(userId, 'task-breakdown', response.model, response.usage.totalTokens);
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(validatedContent);
       return parsed.map((step: any) => ({
         title: step.title,
         durationMinutes: step.durationMinutes || 15,

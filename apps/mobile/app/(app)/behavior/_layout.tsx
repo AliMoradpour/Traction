@@ -29,6 +29,7 @@ export default function BehaviorLayout() {
       <Stack.Screen name="indicators" />
       <Stack.Screen name="burnout" />
       <Stack.Screen name="procrastination" />
+      <Stack.Screen name="coaching" />
     </Stack>
   );
 }

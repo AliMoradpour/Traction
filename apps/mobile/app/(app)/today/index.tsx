@@ -103,6 +103,12 @@ export default function TodayScreen() {
           <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
+              <Pressable
+                style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
+                onPress={() => router.push('/(app)/today/planner' as any)}
+              >
+                <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
+              </Pressable>
             </View>
 
             {tasks && tasks.length > 0 ? (
@@ -247,6 +253,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.05,
+  },
+  aiPlanButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  aiPlanButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   taskList: {
     gap: 8,

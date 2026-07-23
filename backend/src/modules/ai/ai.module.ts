@@ -14,6 +14,7 @@ import { WeeklyReviewService } from './weekly-review.service';
 import { GoalRecoveryService } from './goal-recovery.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
 import { AIObservabilityService } from './ai-observability.service';
+import { AISafetyService } from './ai-safety.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AIProvidersModule } from '../../providers/ai/ai-providers.module';
 
@@ -35,6 +36,7 @@ import { AIProvidersModule } from '../../providers/ai/ai-providers.module';
     GoalRecoveryService,
     AIRateLimitService,
     AIObservabilityService,
+    AISafetyService,
   ],
   exports: [
     AIService,
@@ -47,6 +49,7 @@ import { AIProvidersModule } from '../../providers/ai/ai-providers.module';
     GoalRecoveryService,
     AIRateLimitService,
     AIObservabilityService,
+    AISafetyService,
   ],
 })
 export class AIModule {}

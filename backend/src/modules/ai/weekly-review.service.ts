@@ -5,6 +5,7 @@ import { PromptLoaderService } from './prompt-loader.service';
 import { AICacheService } from './ai-cache.service';
 import { ModelRegistryService } from './model-registry.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
+import { AISafetyService } from './ai-safety.service';
 
 export interface WeeklyReview {
   wins: string[];
@@ -29,6 +30,7 @@ export class WeeklyReviewService {
     private cacheService: AICacheService,
     private modelRegistry: ModelRegistryService,
     private rateLimitService: AIRateLimitService,
+    private safetyService: AISafetyService,
   ) {}
 
   async getWeeklyReview(userId: string): Promise<WeeklyReview | null> {
@@ -137,19 +139,21 @@ export class WeeklyReviewService {
       return this.getFallbackWeeklyReview(completedTasks, skippedTasks, weekStart, weekEnd);
     }
 
+    const model = this.modelRegistry.getModelForFeature('weekly-review');
     const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      { temperature: 0.7, maxTokens: 1000 },
+      { model, temperature: 0.7, maxTokens: 1000 },
     );
 
     if (!response) {
       return this.getFallbackWeeklyReview(completedTasks, skippedTasks, weekStart, weekEnd);
     }
 
+    const validatedContent = this.safetyService.validateResponse(response.content, 'weekly-review');
     await this.rateLimitService.recordUsage(userId, 'weekly-review', response.model, response.usage.totalTokens);
 
     try {
-      const parsed = JSON.parse(response.content);
+      const parsed = JSON.parse(validatedContent);
       
       return {
         wins: parsed.wins || [],

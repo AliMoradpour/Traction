@@ -250,6 +250,16 @@ export default function BehaviorDashboardScreen() {
               </View>
             </Pressable>
 
+            {/* Coaching Button */}
+            <Pressable
+              style={[styles.navCard, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }]}
+              onPress={() => router.push('/(app)/behavior/coaching' as Href)}
+            >
+              <Text style={styles.navIcon}>🧠</Text>
+              <Text style={[styles.navTitle, { color: '#FFFFFF' }]}>Get Coaching</Text>
+              <Text style={[styles.navArrow, { color: '#FFFFFF' }]}>›</Text>
+            </Pressable>
+
             {/* Navigation Cards */}
             <View style={styles.navGrid}>
               <Pressable
