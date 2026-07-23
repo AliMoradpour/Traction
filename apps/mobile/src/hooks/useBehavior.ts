@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { cacheConfig } from '@/lib/cacheConfig';
@@ -54,6 +55,11 @@ export function useBehaviorTimeline(days = 30) {
   });
 
   const isLoading = tasksQuery.isLoading || focusQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    focusQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, focusQuery, eventsQuery]);
   const tasks = tasksQuery.data ?? [];
   const focusSessions = focusQuery.data ?? [];
   const events = eventsQuery.data ?? [];
@@ -79,7 +85,7 @@ export function useBehaviorTimeline(days = 30) {
     weeklyBreakdown,
   };
 
-  return { data: timeline, isLoading };
+  return { data: timeline, isLoading, refetch };
 }
 
 export function useDailyMetrics(date?: string) {
@@ -104,6 +110,11 @@ export function useDailyMetrics(date?: string) {
   });
 
   const isLoading = tasksQuery.isLoading || focusQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    focusQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, focusQuery, eventsQuery]);
 
   const metrics: DailyMetrics = calculateDailyMetrics(
     targetDate,
@@ -112,7 +123,7 @@ export function useDailyMetrics(date?: string) {
     focusQuery.data ?? []
   );
 
-  return { data: metrics, isLoading };
+  return { data: metrics, isLoading, refetch };
 }
 
 export function useWeeklyMetrics(weekStart?: string) {
@@ -137,6 +148,11 @@ export function useWeeklyMetrics(weekStart?: string) {
   });
 
   const isLoading = tasksQuery.isLoading || focusQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    focusQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, focusQuery, eventsQuery]);
 
   const metrics: WeeklyMetrics = calculateWeeklyMetrics(
     targetWeek,
@@ -145,7 +161,7 @@ export function useWeeklyMetrics(weekStart?: string) {
     focusQuery.data ?? []
   );
 
-  return { data: metrics, isLoading };
+  return { data: metrics, isLoading, refetch };
 }
 
 export function useBehaviorIndicators(days = 30) {
@@ -168,6 +184,11 @@ export function useBehaviorIndicators(days = 30) {
   });
 
   const isLoading = tasksQuery.isLoading || focusQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    focusQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, focusQuery, eventsQuery]);
 
   const indicators: BehaviorIndicators = calculateBehaviorIndicators(
     tasksQuery.data ?? [],
@@ -176,7 +197,7 @@ export function useBehaviorIndicators(days = 30) {
     days
   );
 
-  return { data: indicators, isLoading };
+  return { data: indicators, isLoading, refetch };
 }
 
 export function useBurnoutRisk() {
@@ -199,6 +220,11 @@ export function useBurnoutRisk() {
   });
 
   const isLoading = tasksQuery.isLoading || focusQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    focusQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, focusQuery, eventsQuery]);
 
   const risk: BurnoutRisk = calculateBurnoutRisk(
     tasksQuery.data ?? [],
@@ -206,7 +232,7 @@ export function useBurnoutRisk() {
     focusQuery.data ?? []
   );
 
-  return { data: risk, isLoading };
+  return { data: risk, isLoading, refetch };
 }
 
 export function useProcrastinationProfile() {
@@ -223,13 +249,17 @@ export function useProcrastinationProfile() {
   });
 
   const isLoading = tasksQuery.isLoading || eventsQuery.isLoading;
+  const refetch = useCallback(() => {
+    tasksQuery.refetch();
+    eventsQuery.refetch();
+  }, [tasksQuery, eventsQuery]);
 
   const profile: ProcrastinationProfile = calculateProcrastinationProfile(
     tasksQuery.data ?? [],
     eventsQuery.data ?? []
   );
 
-  return { data: profile, isLoading };
+  return { data: profile, isLoading, refetch };
 }
 
 export function useTrackBehavior() {

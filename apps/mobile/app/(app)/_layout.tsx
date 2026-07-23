@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+import { Text } from 'react-native';
 import { useTractionTheme } from '@/theme';
 import { TodayIcon, GoalsIcon, InsightsIcon, ProfileIcon } from '@/components/icons';
 
@@ -40,6 +41,13 @@ export default function AppLayout() {
         options={{
           title: 'Insights',
           tabBarIcon: ({ color, size }) => <InsightsIcon color={color as string} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="behavior"
+        options={{
+          title: 'Behavior',
+          tabBarIcon: ({ color, size }) => <Text style={{ fontSize: size, color }}>🧠</Text>,
         }}
       />
       <Tabs.Screen
