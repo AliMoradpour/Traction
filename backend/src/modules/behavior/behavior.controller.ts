@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { BehaviorService } from './behavior.service';
-import { TrackEventDto, BehaviorEventResponseDto, BehaviorQueryDto } from './dto/behavior.dto';
+import { TrackEventDto, BehaviorEventResponseDto, BehaviorQueryDto, DailyMetricsQueryDto, WeeklyMetricsQueryDto, IndicatorsQueryDto } from './dto/behavior.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -39,6 +39,54 @@ export class BehaviorController {
     @CurrentUser('id') userId: string,
   ): Promise<any> {
     return this.behaviorService.getStats(userId);
+  }
+
+  @Get('metrics/daily')
+  @ApiOperation({ summary: 'Get daily behavior metrics' })
+  @ApiResponse({ status: 200, description: 'Daily metrics' })
+  async getDailyMetrics(
+    @CurrentUser('id') userId: string,
+    @Query() query: DailyMetricsQueryDto,
+  ): Promise<any> {
+    return this.behaviorService.getDailyMetrics(userId, query.date);
+  }
+
+  @Get('metrics/weekly')
+  @ApiOperation({ summary: 'Get weekly behavior metrics' })
+  @ApiResponse({ status: 200, description: 'Weekly metrics' })
+  async getWeeklyMetrics(
+    @CurrentUser('id') userId: string,
+    @Query() query: WeeklyMetricsQueryDto,
+  ): Promise<any> {
+    return this.behaviorService.getWeeklyMetrics(userId, query.weekStart);
+  }
+
+  @Get('metrics/indicators')
+  @ApiOperation({ summary: 'Get behavior indicators' })
+  @ApiResponse({ status: 200, description: 'Behavior indicators (6 scores)' })
+  async getIndicators(
+    @CurrentUser('id') userId: string,
+    @Query() query: IndicatorsQueryDto,
+  ): Promise<any> {
+    return this.behaviorService.getIndicators(userId, query.days);
+  }
+
+  @Get('metrics/burnout')
+  @ApiOperation({ summary: 'Get burnout risk assessment' })
+  @ApiResponse({ status: 200, description: 'Burnout risk level and signals' })
+  async getBurnoutRisk(
+    @CurrentUser('id') userId: string,
+  ): Promise<any> {
+    return this.behaviorService.getBurnoutRisk(userId);
+  }
+
+  @Get('metrics/procrastination')
+  @ApiOperation({ summary: 'Get procrastination profile' })
+  @ApiResponse({ status: 200, description: 'Procrastination patterns and score' })
+  async getProcrastinationProfile(
+    @CurrentUser('id') userId: string,
+  ): Promise<any> {
+    return this.behaviorService.getProcrastinationProfile(userId);
   }
 
   @Get(':id')

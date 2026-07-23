@@ -69,6 +69,11 @@ export const endpoints = {
     list: '/behavior',
     stats: '/behavior/stats',
     detail: (id: string) => '/behavior/' + id,
+    dailyMetrics: (date?: string) => '/behavior/metrics/daily' + (date ? '?date=' + date : ''),
+    weeklyMetrics: (weekStart?: string) => '/behavior/metrics/weekly' + (weekStart ? '?weekStart=' + weekStart : ''),
+    indicators: (days?: number) => '/behavior/metrics/indicators' + (days ? '?days=' + days : ''),
+    burnout: '/behavior/metrics/burnout',
+    procrastination: '/behavior/metrics/procrastination',
   },
   ai: {
     recommendations: '/ai/recommendations',
