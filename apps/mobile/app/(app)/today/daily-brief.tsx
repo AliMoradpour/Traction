@@ -1,39 +1,60 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import { Button } from '@/components/ui/Button';
-
-const MOCK_TASKS = [
-  { id: '1', title: 'Review feedback from Design Team', friction: 25, duration: '20m', energy: 'medium' },
-  { id: '2', title: 'Prepare Weekly Sync Slides', friction: 40, duration: '45m', energy: 'high' },
-  { id: '3', title: 'Reply to Slack mentions', friction: 10, duration: '15m', energy: 'low' },
-  { id: '4', title: 'Update project documentation', friction: 30, duration: '30m', energy: 'medium' },
-];
-
-const MOCK_FOCUS_HISTORY = [
-  { day: 'Mon', score: 60 },
-  { day: 'Tue', score: 45 },
-  { day: 'Wed', score: 75 },
-  { day: 'Thu', score: 55 },
-  { day: 'Fri', score: 80 },
-];
-
-const ENERGY_INSIGHT = {
-  peak: '9:00 AM - 11:30 AM',
-  low: '2:00 PM - 3:30 PM',
-  tip: 'Schedule your most demanding tasks during your peak energy window.',
-};
+import { useDailyBrief } from '@/hooks/useAI';
 
 export default function DailyBriefScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const { data: brief, isLoading, error } = useDailyBrief();
 
-  const getFrictionColor = (friction: number) => {
-    if (friction < 20) return theme.colors.success;
-    if (friction < 40) return theme.colors.warning;
+  const focusWindow = brief?.focusWindow ?? '';
+  const frictionSummary = brief?.frictionSummary ?? '';
+  const prioritizedTasks = brief?.prioritizedTasks ?? [];
+  const energyLevel = brief?.energyLevel ?? 0;
+  const recommendations = brief?.recommendations ?? [];
+
+  const getEnergyColor = (level: number) => {
+    if (level >= 7) return theme.colors.success;
+    if (level >= 4) return theme.colors.warning;
     return theme.colors.error;
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()}>
+            <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Daily Brief</Text>
+          <View style={{ width: 50 }} />
+        </View>
+        <View style={styles.loadingState}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Generating your brief...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()}>
+            <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
+          </Pressable>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Daily Brief</Text>
+          <View style={{ width: 50 }} />
+        </View>
+        <View style={styles.loadingState}>
+          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Failed to load daily brief.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -48,85 +69,71 @@ export default function DailyBriefScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Today's Overview</Text>
-          <Text style={[styles.date, { color: theme.colors.textMuted }]}>Monday, October 23</Text>
         </View>
 
-        <View style={[styles.energyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <View style={styles.energyHeader}>
-            <Text style={styles.energyIcon}>⚡</Text>
-            <Text style={[styles.energyTitle, { color: theme.colors.text }]}>Energy Insights</Text>
-          </View>
-          <View style={styles.energyRow}>
-            <View style={styles.energyItem}>
-              <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Peak</Text>
-              <Text style={[styles.energyValue, { color: theme.colors.success }]}>{ENERGY_INSIGHT.peak}</Text>
+        {focusWindow ? (
+          <View style={[styles.energyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            <View style={styles.energyHeader}>
+              <Text style={styles.energyIcon}>⚡</Text>
+              <Text style={[styles.energyTitle, { color: theme.colors.text }]}>Focus Window</Text>
             </View>
-            <View style={styles.energyItem}>
-              <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Low</Text>
-              <Text style={[styles.energyValue, { color: theme.colors.warning }]}>{ENERGY_INSIGHT.low}</Text>
-            </View>
+            <Text style={[styles.focusWindowText, { color: theme.colors.text }]}>{focusWindow}</Text>
+            {energyLevel > 0 && (
+              <View style={styles.energyRow}>
+                <View style={styles.energyItem}>
+                  <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Energy Level</Text>
+                  <Text style={[styles.energyValue, { color: getEnergyColor(energyLevel) }]}>
+                    {energyLevel}/10
+                  </Text>
+                </View>
+              </View>
+            )}
+            {frictionSummary ? (
+              <Text style={[styles.energyTip, { color: theme.colors.textMuted }]}>{frictionSummary}</Text>
+            ) : null}
           </View>
-          <Text style={[styles.energyTip, { color: theme.colors.textMuted }]}>💡 {ENERGY_INSIGHT.tip}</Text>
-        </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Focus History (5 days)</Text>
-          <View style={[styles.chartCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <View style={styles.chart}>
-              {MOCK_FOCUS_HISTORY.map((day, index) => (
-                <View key={index} style={styles.chartBar}>
-                  <View
-                    style={[
-                      styles.bar,
-                      {
-                        backgroundColor: theme.colors.primary,
-                        height: `${day.score}%`,
-                      },
-                    ]}
-                  />
-                  <Text style={[styles.chartLabel, { color: theme.colors.textMuted }]}>{day.day}</Text>
+        {prioritizedTasks.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Prioritized Tasks</Text>
+            <View style={styles.taskList}>
+              {prioritizedTasks.map((task: string, index: number) => (
+                <View
+                  key={index}
+                  style={[styles.taskCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                >
+                  <View style={styles.taskHeader}>
+                    <Text style={[styles.taskNumber, { color: theme.colors.primary }]}>{index + 1}</Text>
+                    <Text style={[styles.taskTitle, { color: theme.colors.text }]}>{task}</Text>
+                  </View>
                 </View>
               ))}
             </View>
           </View>
-        </View>
+        )}
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Tasks Sorted by Friction</Text>
-          <View style={styles.taskList}>
-            {MOCK_TASKS.sort((a, b) => a.friction - b.friction).map((task) => (
-              <Pressable
-                key={task.id}
-                style={[styles.taskCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push(`/tasks/${task.id}`)}
-              >
-                <View style={styles.taskHeader}>
-                  <Text style={[styles.taskTitle, { color: theme.colors.text }]}>{task.title}</Text>
-                  <View style={[styles.frictionBadge, { backgroundColor: getFrictionColor(task.friction) + '20' }]}>
-                    <Text style={[styles.frictionText, { color: getFrictionColor(task.friction) }]}>
-                      {task.friction}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.taskMeta}>
-                  <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>⏱ {task.duration}</Text>
-                  <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>⚡ {task.energy}</Text>
-                </View>
-              </Pressable>
-            ))}
+        {recommendations.length > 0 && (
+          <View style={[styles.aiInsightCard, { backgroundColor: theme.colors.accentMuted }]}>
+            <Text style={styles.aiIcon}>✨</Text>
+            <View style={styles.aiContent}>
+              <Text style={[styles.aiTitle, { color: theme.colors.accentText }]}>AI Recommendations</Text>
+              {recommendations.map((rec: string, index: number) => (
+                <Text key={index} style={[styles.aiText, { color: theme.colors.accentText }]}>
+                  • {rec}
+                </Text>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
 
-        <View style={[styles.aiInsightCard, { backgroundColor: theme.colors.accentMuted }]}>
-          <Text style={styles.aiIcon}>✨</Text>
-          <View style={styles.aiContent}>
-            <Text style={[styles.aiTitle, { color: theme.colors.accentText }]}>AI Suggestion</Text>
-            <Text style={[styles.aiText, { color: theme.colors.accentText }]}>
-              You've completed 80% of your high-friction tasks early this week. Consider tackling the
-              remaining friction-heavy items today while your momentum is strong.
+        {!focusWindow && prioritizedTasks.length === 0 && recommendations.length === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
+              No daily brief available yet. Complete more tasks to generate your personalized brief.
             </Text>
           </View>
-        </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -156,6 +163,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
+  loadingState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
+  },
   section: {
     marginBottom: 24,
   },
@@ -163,10 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     marginBottom: 4,
-  },
-  date: {
-    fontSize: 13,
-    fontWeight: '500',
   },
   energyCard: {
     padding: 16,
@@ -186,6 +198,11 @@ const styles = StyleSheet.create({
   energyTitle: {
     fontSize: 17,
     fontWeight: '600',
+  },
+  focusWindowText: {
+    fontSize: 17,
+    fontWeight: '500',
+    marginBottom: 12,
   },
   energyRow: {
     flexDirection: 'row',
@@ -211,32 +228,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontStyle: 'italic',
   },
-  chartCard: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  chart: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    height: 120,
-  },
-  chartBar: {
-    alignItems: 'center',
-    flex: 1,
-    height: '100%',
-    justifyContent: 'flex-end',
-  },
-  bar: {
-    width: 24,
-    borderRadius: 4,
-  },
-  chartLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    marginTop: 8,
-  },
   taskList: {
     gap: 8,
   },
@@ -247,31 +238,18 @@ const styles = StyleSheet.create({
   },
   taskHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    gap: 12,
+  },
+  taskNumber: {
+    fontSize: 15,
+    fontWeight: '700',
+    width: 24,
   },
   taskTitle: {
     fontSize: 15,
     fontWeight: '500',
     flex: 1,
-  },
-  frictionBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  frictionText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  taskMeta: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  metaText: {
-    fontSize: 11,
-    fontWeight: '500',
   },
   aiInsightCard: {
     flexDirection: 'row',
@@ -289,10 +267,19 @@ const styles = StyleSheet.create({
   aiTitle: {
     fontSize: 15,
     fontWeight: '600',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   aiText: {
     fontSize: 14,
+    lineHeight: 20,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  emptyText: {
+    fontSize: 14,
+    textAlign: 'center',
     lineHeight: 20,
   },
 });

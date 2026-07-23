@@ -8,3 +8,13 @@ export * from './useNotifications';
 export * from './useUser';
 export { useConnectivity, useOnlineStatus } from './useConnectivity';
 export * from './useBehavior';
+export {
+  useAIRecommendations,
+  useAIStatus,
+  useGenerateRecommendation,
+  useAcceptRecommendation,
+  useDismissRecommendation,
+  useBreakdownTask,
+  useStuckAnalysis,
+  useGoalRecovery,
+} from './useAI';

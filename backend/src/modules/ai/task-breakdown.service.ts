@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OpenRouterService } from './openrouter.service';
+import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
+import { AIRateLimitService } from './ai-rate-limit.service';
 
 export interface TaskBreakdownStep {
   title: string;
@@ -16,9 +17,10 @@ export class TaskBreakdownService {
 
   constructor(
     private prisma: PrismaService,
-    private openRouter: OpenRouterService,
+    private provider: OpenRouterProvider,
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
+    private rateLimitService: AIRateLimitService,
   ) {}
 
   async breakdownTask(
@@ -40,9 +42,13 @@ export class TaskBreakdownService {
       availableTime: task.duration ? `${task.duration} minutes` : 'Not specified',
     });
 
-    const response = await this.openRouter.chat(
+    const rateLimitResult = await this.rateLimitService.checkRateLimit(userId, 'task-breakdown');
+    if (!rateLimitResult.allowed) {
+      return this.getFallbackBreakdown(task);
+    }
+
+    const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      'anthropic/claude-3-haiku',
       { temperature: 0.5, maxTokens: 500 },
     );
 
@@ -50,8 +56,10 @@ export class TaskBreakdownService {
       return this.getFallbackBreakdown(task);
     }
 
+    await this.rateLimitService.recordUsage(userId, 'task-breakdown', response.model, response.usage.totalTokens);
+
     try {
-      const parsed = JSON.parse(response);
+      const parsed = JSON.parse(response.content);
       return parsed.map((step: any) => ({
         title: step.title,
         durationMinutes: step.durationMinutes || 15,

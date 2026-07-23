@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OpenRouterService } from './openrouter.service';
+import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
+import { AIRateLimitService } from './ai-rate-limit.service';
 
 export interface GoalRecovery {
   realityCheck: string;
@@ -19,9 +20,10 @@ export class GoalRecoveryService {
 
   constructor(
     private prisma: PrismaService,
-    private openRouter: OpenRouterService,
+    private provider: OpenRouterProvider,
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
+    private rateLimitService: AIRateLimitService,
   ) {}
 
   async analyzeGoalRecovery(
@@ -52,9 +54,13 @@ export class GoalRecoveryService {
       daysSinceLastProgress: daysSinceLastProgress.toString(),
     });
 
-    const response = await this.openRouter.chat(
+    const rateLimitResult = await this.rateLimitService.checkRateLimit(userId, 'goal-recovery');
+    if (!rateLimitResult.allowed) {
+      return this.getFallbackGoalRecovery(currentProgress, expectedProgress, daysRemaining);
+    }
+
+    const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      'anthropic/claude-3-haiku',
       { temperature: 0.6, maxTokens: 500 },
     );
 
@@ -62,8 +68,10 @@ export class GoalRecoveryService {
       return this.getFallbackGoalRecovery(currentProgress, expectedProgress, daysRemaining);
     }
 
+    await this.rateLimitService.recordUsage(userId, 'goal-recovery', response.model, response.usage.totalTokens);
+
     try {
-      const parsed = JSON.parse(response);
+      const parsed = JSON.parse(response.content);
       return {
         realityCheck: parsed.realityCheck,
         recoveryStrategy: parsed.recoveryStrategy || [],

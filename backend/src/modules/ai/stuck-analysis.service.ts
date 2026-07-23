@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OpenRouterService } from './openrouter.service';
+import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { PromptLoaderService } from './prompt-loader.service';
 import { ModelRegistryService } from './model-registry.service';
+import { AIRateLimitService } from './ai-rate-limit.service';
 
 export type StuckFeeling = 'overwhelmed' | 'unclear' | 'tired' | 'distracted' | 'anxious';
 
@@ -20,9 +21,10 @@ export class StuckAnalysisService {
 
   constructor(
     private prisma: PrismaService,
-    private openRouter: OpenRouterService,
+    private provider: OpenRouterProvider,
     private promptLoader: PromptLoaderService,
     private modelRegistry: ModelRegistryService,
+    private rateLimitService: AIRateLimitService,
   ) {}
 
   async analyzeStuck(
@@ -48,9 +50,13 @@ export class StuckAnalysisService {
       timeOfDay,
     });
 
-    const response = await this.openRouter.chat(
+    const rateLimitResult = await this.rateLimitService.checkRateLimit(userId, 'stuck-analysis');
+    if (!rateLimitResult.allowed) {
+      return this.getFallbackAnalysis(feeling);
+    }
+
+    const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      'anthropic/claude-3-haiku',
       { temperature: 0.6, maxTokens: 300 },
     );
 
@@ -58,8 +64,10 @@ export class StuckAnalysisService {
       return this.getFallbackAnalysis(feeling);
     }
 
+    await this.rateLimitService.recordUsage(userId, 'stuck-analysis', response.model, response.usage.totalTokens);
+
     try {
-      const parsed = JSON.parse(response);
+      const parsed = JSON.parse(response.content);
       return {
         likelyCause: parsed.likelyCause,
         nextAction: parsed.nextAction,

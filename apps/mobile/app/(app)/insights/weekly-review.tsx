@@ -1,38 +1,58 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
-
-const MOCK_WINS = [
-  'Closed the quarterly projection ahead of schedule.',
-  'Maintained a 4-day deep work streak before 10 AM.',
-];
-
-const MOCK_PATTERNS = [
-  { type: 'Timing Insight', text: 'Most missed tasks occurred after 6 PM.' },
-  { type: 'Contextual Drift', text: 'Administrative tasks take 40% longer when started on Mondays.' },
-];
-
-const MOCK_CHART_DATA = [20, 35, 30, 25, 85, 95, 15];
+import { useWeeklyReview } from '@/hooks/useAI';
 
 export default function WeeklyReviewScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const { data: review, isLoading, error } = useWeeklyReview();
 
-  const handleApplyToCalendar = () => {
-    // TODO: Apply AI recommendation to calendar
-  };
+  const wins = review?.wins ?? [];
+  const commitments = review?.commitments ?? [];
+  const patterns = review?.missedPatterns ?? [];
+  const nextShift = review?.nextShift ?? '';
+
+  const successRate = commitments.length > 0
+    ? Math.round((wins.length / (wins.length + patterns.length)) * 100) || 0
+    : 0;
+
+  const handleApplyToCalendar = () => {};
 
   const handleClose = () => {
     router.back();
   };
 
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.loadingState}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Generating weekly review...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.loadingState}>
+          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Failed to load weekly review.</Text>
+          <Button variant="primary" onPress={handleClose} style={{ marginTop: 16 }}>
+            Go Back
+          </Button>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.headerSection}>
-          <Text style={[styles.dateRange, { color: theme.colors.primary }]}>MARCH 11 – MARCH 17</Text>
           <Text style={[styles.title, { color: theme.colors.text }]}>Weekly Review</Text>
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
             Reflecting on your behavioral patterns helps align your actions with your long-term goals.
@@ -45,14 +65,18 @@ export default function WeeklyReviewScreen() {
               <Text style={styles.cardIcon}>🏆</Text>
               <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Significant Wins</Text>
             </View>
-            <View style={styles.winsList}>
-              {MOCK_WINS.map((win, index) => (
-                <View key={index} style={styles.winItem}>
-                  <View style={[styles.winDot, { backgroundColor: theme.colors.primary }]} />
-                  <Text style={[styles.winText, { color: theme.colors.textMuted }]}>{win}</Text>
-                </View>
-              ))}
-            </View>
+            {wins.length === 0 ? (
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No wins recorded this week.</Text>
+            ) : (
+              <View style={styles.winsList}>
+                {wins.map((win: string, index: number) => (
+                  <View key={index} style={styles.winItem}>
+                    <View style={[styles.winDot, { backgroundColor: theme.colors.primary }]} />
+                    <Text style={[styles.winText, { color: theme.colors.textMuted }]}>{win}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
 
           <View style={[styles.commitmentsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
@@ -61,16 +85,24 @@ export default function WeeklyReviewScreen() {
                 <Text style={styles.cardIcon}>📋</Text>
                 <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Commitments</Text>
               </View>
-              <View style={[styles.successBadge, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <Text style={[styles.successText, { color: theme.colors.textMuted }]}>74% Success</Text>
-              </View>
+              {commitments.length > 0 && (
+                <View style={[styles.successBadge, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <Text style={[styles.successText, { color: theme.colors.textMuted }]}>{successRate}% Success</Text>
+                </View>
+              )}
             </View>
-            <Text style={[styles.commitmentsSummary, { color: theme.colors.textMuted }]}>
-              This week you completed 14 of 19 planned tasks.
-            </Text>
-            <View style={[styles.progressTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <View style={[styles.progressFill, { backgroundColor: theme.colors.primary, width: '74%' }]} />
-            </View>
+            {commitments.length === 0 ? (
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No commitments this week.</Text>
+            ) : (
+              <>
+                <Text style={[styles.commitmentsSummary, { color: theme.colors.textMuted }]}>
+                  This week you completed {wins.length} of {wins.length + patterns.length} planned tasks.
+                </Text>
+                <View style={[styles.progressTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
+                  <View style={[styles.progressFill, { backgroundColor: theme.colors.primary, width: `${successRate}%` }]} />
+                </View>
+              </>
+            )}
           </View>
 
           <View style={[styles.patternsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
@@ -78,46 +110,34 @@ export default function WeeklyReviewScreen() {
               <Text style={styles.cardIcon}>🧠</Text>
               <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Behavior Patterns</Text>
             </View>
-            <View style={styles.patternsContent}>
+            {patterns.length === 0 ? (
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No patterns detected yet.</Text>
+            ) : (
               <View style={styles.patternsList}>
-                {MOCK_PATTERNS.map((pattern, index) => (
+                {patterns.map((pattern: string, index: number) => (
                   <View key={index} style={[styles.patternItem, { borderLeftColor: index === 0 ? theme.colors.primary : theme.colors.border }]}>
-                    <Text style={[styles.patternType, { color: theme.colors.primary }]}>{pattern.type}</Text>
-                    <Text style={[styles.patternText, { color: theme.colors.text }]}>{pattern.text}</Text>
+                    <Text style={[styles.patternText, { color: theme.colors.text }]}>{pattern}</Text>
                   </View>
                 ))}
               </View>
-              <View style={styles.chart}>
-                {MOCK_CHART_DATA.map((value, index) => (
-                  <View key={index} style={styles.chartBar}>
-                    <View
-                      style={[
-                        styles.bar,
-                        {
-                          backgroundColor: index >= 4 ? theme.colors.primary : theme.colors.surfaceMuted,
-                          height: `${value}%`,
-                        },
-                      ]}
-                    />
-                  </View>
-                ))}
-              </View>
-            </View>
+            )}
           </View>
 
-          <View style={[styles.aiCard, { backgroundColor: theme.colors.primaryContainer }]}>
-            <View style={styles.aiHeader}>
-              <Text style={styles.aiIcon}>✨</Text>
-              <Text style={[styles.aiLabel, { color: theme.colors.onPrimaryContainer }]}>AI SYNTHESIS</Text>
+          {nextShift ? (
+            <View style={[styles.aiCard, { backgroundColor: theme.colors.primaryContainer }]}>
+              <View style={styles.aiHeader}>
+                <Text style={styles.aiIcon}>✨</Text>
+                <Text style={[styles.aiLabel, { color: theme.colors.onPrimaryContainer }]}>AI SYNTHESIS</Text>
+              </View>
+              <Text style={[styles.aiTitle, { color: theme.colors.onPrimaryContainer }]}>Optimal Shift</Text>
+              <Text style={[styles.aiContent, { color: theme.colors.onPrimaryContainer }]}>
+                {nextShift}
+              </Text>
+              <Button variant="secondary" onPress={handleApplyToCalendar} style={styles.applyButton}>
+                Apply to Calendar
+              </Button>
             </View>
-            <Text style={[styles.aiTitle, { color: theme.colors.onPrimaryContainer }]}>Optimal Shift</Text>
-            <Text style={[styles.aiContent, { color: theme.colors.onPrimaryContainer }]}>
-              Based on your cognitive energy patterns, schedule difficult work before lunch to increase task completion by 32%.
-            </Text>
-            <Button variant="secondary" onPress={handleApplyToCalendar} style={styles.applyButton}>
-              Apply to Calendar
-            </Button>
-          </View>
+          ) : null}
         </View>
 
         <View style={styles.completeSection}>
@@ -146,14 +166,18 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 40,
   },
+  loadingState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
+  },
   headerSection: {
     marginBottom: 24,
-  },
-  dateRange: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.1,
-    marginBottom: 8,
   },
   title: {
     fontSize: 28,
@@ -171,7 +195,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    minHeight: 160,
+    minHeight: 120,
   },
   commitmentsCard: {
     padding: 16,
@@ -214,6 +238,10 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
+  emptyText: {
+    fontSize: 14,
+    fontStyle: 'italic',
+  },
   winsList: {
     gap: 12,
   },
@@ -246,9 +274,6 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 4,
   },
-  patternsContent: {
-    gap: 16,
-  },
   patternsList: {
     gap: 12,
   },
@@ -258,33 +283,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.02)',
     borderLeftWidth: 4,
   },
-  patternType: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-    marginBottom: 4,
-  },
   patternText: {
     fontSize: 15,
     lineHeight: 20,
-  },
-  chart: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    height: 120,
-    paddingTop: 16,
-  },
-  chartBar: {
-    flex: 1,
-    height: '100%',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  bar: {
-    width: '80%',
-    borderRadius: 4,
   },
   aiHeader: {
     flexDirection: 'row',

@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { OpenRouterService } from './openrouter.service';
+import { OpenRouterProvider } from '@/providers/ai/openrouter.provider';
 import { BehaviorEngineService } from './behavior-engine.service';
 import { FrictionEngineService } from './friction-engine.service';
 import { PromptLoaderService } from './prompt-loader.service';
 import { AICacheService } from './ai-cache.service';
 import { ModelRegistryService } from './model-registry.service';
+import { AIRateLimitService } from './ai-rate-limit.service';
 
 export interface DailyBrief {
   date: string;
@@ -23,12 +24,13 @@ export class DailyBriefService {
 
   constructor(
     private prisma: PrismaService,
-    private openRouter: OpenRouterService,
+    private provider: OpenRouterProvider,
     private behaviorEngine: BehaviorEngineService,
     private frictionEngine: FrictionEngineService,
     private promptLoader: PromptLoaderService,
     private cacheService: AICacheService,
     private modelRegistry: ModelRegistryService,
+    private rateLimitService: AIRateLimitService,
   ) {}
 
   async getDailyBrief(userId: string): Promise<DailyBrief | null> {
@@ -87,9 +89,13 @@ export class DailyBriefService {
       frictionScore: JSON.stringify(frictionScore),
     });
 
-    const response = await this.openRouter.chat(
+    const rateLimitResult = await this.rateLimitService.checkRateLimit(userId, 'daily-brief');
+    if (!rateLimitResult.allowed) {
+      return this.getFallbackDailyBrief(tasks, goals);
+    }
+
+    const response = await this.provider.chat(
       [{ role: 'user', content: prompt }],
-      'anthropic/claude-3-haiku',
       { temperature: 0.7, maxTokens: 1000 },
     );
 
@@ -97,8 +103,10 @@ export class DailyBriefService {
       return this.getFallbackDailyBrief(tasks, goals);
     }
 
+    await this.rateLimitService.recordUsage(userId, 'daily-brief', response.model, response.usage.totalTokens);
+
     try {
-      const parsed = JSON.parse(response);
+      const parsed = JSON.parse(response.content);
       
       return {
         date: today,
