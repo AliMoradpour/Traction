@@ -1,5 +1,9 @@
 import { apiClient, endpoints } from '@/api';
 
+export type GoalType = 'IELTS' | 'PROGRAMMING' | 'FITNESS' | 'SAVINGS' | 'CUSTOM';
+export type GoalStatus = 'ACTIVE' | 'COMPLETED' | 'ARCHIVED' | 'PAUSED';
+export type GoalHealth = 'ON_TRACK' | 'SLIGHTLY_BEHIND' | 'BEHIND_SCHEDULE' | 'RECOVERY_NEEDED' | 'AT_RISK';
+
 export interface Goal {
   id: string;
   userId: string;

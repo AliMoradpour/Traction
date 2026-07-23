@@ -1,67 +1,73 @@
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
+import { useGoals } from '@/hooks/useGoals';
+import type { Goal, GoalHealth, GoalType } from '@/services/goal.service';
+import { LoadingSpinner } from '@/components/feedback/LoadingStates';
 
-const MOCK_GOALS = [
-  {
-    id: '1',
-    title: 'IELTS Prep',
-    status: 'on-track',
-    statusText: 'On Track - 17 weeks remaining',
-    dueDate: 'Due Dec 15, 2024',
-    progress: 65,
-    velocity: 'Stable',
-    aiSuggestion: 'AI suggests focusing on Writing Section next.',
-  },
-  {
-    id: '2',
-    title: 'Learn Rust',
-    status: 'at-risk',
-    statusText: 'At Risk - 5 days inactive',
-    dueDate: 'Due Jan 20, 2025',
-    progress: 12,
-    velocity: 'Down 40%',
-    aiSuggestion: 'Recovery needed to meet January deadline.',
-  },
-  {
-    id: '3',
-    title: 'Marathon Training',
-    status: 'on-track',
-    statusText: 'On Track - Peak Week',
-    dueDate: 'Due Nov 02, 2024',
-    progress: 88,
-    velocity: 'Increasing',
-    aiSuggestion: null,
-  },
-  {
-    id: '4',
-    title: 'Design Portfolio',
-    status: 'behind',
-    statusText: 'Behind Schedule - 11 days behind',
-    dueDate: 'Due Dec 01, 2024',
-    progress: 42,
-    velocity: 'Recovery Needed',
-    aiSuggestion: null,
-  },
-];
-
-const getStatusColor = (status: string, theme: any) => {
-  switch (status) {
-    case 'on-track':
-      return { bg: theme.colors.successMuted, text: theme.colors.success, dot: theme.colors.success };
-    case 'at-risk':
-      return { bg: theme.colors.warningMuted, text: theme.colors.warning, dot: theme.colors.warning };
-    case 'behind':
-      return { bg: theme.colors.errorMuted, text: theme.colors.error, dot: theme.colors.error };
-    default:
-      return { bg: theme.colors.surfaceMuted, text: theme.colors.textMuted, dot: theme.colors.textMuted };
-  }
+const TYPE_COLORS: Record<GoalType, string> = {
+  IELTS: '#8B5CF6',
+  PROGRAMMING: '#3B82F6',
+  FITNESS: '#10B981',
+  SAVINGS: '#F59E0B',
+  CUSTOM: '#6B7280',
 };
+
+const HEALTH_COLORS: Record<GoalHealth, string> = {
+  ON_TRACK: '#10B981',
+  SLIGHTLY_BEHIND: '#F59E0B',
+  BEHIND_SCHEDULE: '#F97316',
+  RECOVERY_NEEDED: '#EF4444',
+  AT_RISK: '#EF4444',
+};
+
+const HEALTH_LABELS: Record<GoalHealth, string> = {
+  ON_TRACK: 'On Track',
+  SLIGHTLY_BEHIND: 'Slightly Behind',
+  BEHIND_SCHEDULE: 'Behind Schedule',
+  RECOVERY_NEEDED: 'Recovery Needed',
+  AT_RISK: 'At Risk',
+};
+
+function getDaysRemaining(targetDate?: string): number | null {
+  if (!targetDate) return null;
+  const diff = new Date(targetDate).getTime() - Date.now();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
 
 export default function GoalsScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const { data: goals, isLoading, isError, refetch, isRefetching } = useGoals();
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <LoadingSpinner message="Loading goals..." />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.centered}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load goals.
+          </Text>
+          <Pressable
+            style={[styles.retryBtn, { backgroundColor: theme.colors.primary }]}
+            onPress={() => refetch()}
+          >
+            <Text style={styles.retryBtnText}>Retry</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const activeGoals = goals ?? [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -70,93 +76,103 @@ export default function GoalsScreen() {
           <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Goals</Text>
         </View>
         <View style={styles.headerActions}>
-          <Pressable style={[styles.iconButton, { backgroundColor: theme.colors.surfaceElevated }]}>
-            <Text style={[styles.iconText, { color: theme.colors.text }]}>🔍</Text>
-          </Pressable>
           <Pressable
             style={[styles.iconButton, { backgroundColor: theme.colors.surfaceElevated }]}
-            onPress={() => router.push('/(app)/goals/select')}
+            onPress={() => router.push('/(app)/goals/create')}
           >
             <Text style={[styles.iconText, { color: theme.colors.text }]}>+</Text>
           </Pressable>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+      >
         <View style={styles.summarySection}>
           <Text style={[styles.summaryLabel, { color: theme.colors.primary }]}>ACTIVE FOCUS</Text>
           <Text style={[styles.summaryTitle, { color: theme.colors.text }]}>
-            You have {MOCK_GOALS.length} goals in progress.
+            You have {activeGoals.length} goal{activeGoals.length !== 1 ? 's' : ''} in progress.
           </Text>
         </View>
 
-        <View style={styles.goalsList}>
-          {MOCK_GOALS.map((goal) => {
-            const statusColors = getStatusColor(goal.status, theme);
-            return (
-              <Pressable
-                key={goal.id}
-                style={[styles.goalCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push(`/(app)/goals/${goal.id}`)}
-              >
-                <View style={styles.goalHeader}>
-                  <Text style={[styles.goalTitle, { color: theme.colors.text }]}>{goal.title}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: statusColors.bg }]}>
-                    <View style={[styles.statusDot, { backgroundColor: statusColors.dot }]} />
-                    <Text style={[styles.statusText, { color: statusColors.text }]}>{goal.statusText}</Text>
-                  </View>
-                </View>
+        {activeGoals.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>🎯</Text>
+            <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No goals yet</Text>
+            <Text style={[styles.emptySubtitle, { color: theme.colors.textMuted }]}>
+              Create your first goal to get started.
+            </Text>
+            <Pressable
+              style={[styles.createBtn, { backgroundColor: theme.colors.primary }]}
+              onPress={() => router.push('/(app)/goals/create')}
+            >
+              <Text style={styles.createBtnText}>Create Goal</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.goalsList}>
+            {activeGoals.map((goal) => {
+              const typeColor = TYPE_COLORS[goal.type] ?? TYPE_COLORS.CUSTOM;
+              const healthColor = HEALTH_COLORS[goal.health] ?? HEALTH_COLORS.ON_TRACK;
+              const healthLabel = HEALTH_LABELS[goal.health] ?? goal.health;
+              const daysRemaining = getDaysRemaining(goal.targetDate);
 
-                <View style={styles.goalMeta}>
-                  <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>📅 {goal.dueDate}</Text>
-                </View>
-
-                <View style={styles.progressSection}>
-                  <View style={[styles.progressTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-                    <View
-                      style={[
-                        styles.progressFill,
-                        {
-                          backgroundColor: statusColors.dot,
-                          width: `${goal.progress}%`,
-                        },
-                      ]}
-                    />
-                  </View>
-                  <View style={styles.progressMeta}>
-                    <Text style={[styles.progressLabel, { color: theme.colors.textMuted }]}>
-                      Velocity: {goal.velocity}
+              return (
+                <Pressable
+                  key={goal.id}
+                  style={[
+                    styles.goalCard,
+                    { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
+                  ]}
+                  onPress={() => router.push(`/(app)/goals/${goal.id}`)}
+                >
+                  <View style={styles.goalHeader}>
+                    <Text style={[styles.goalTitle, { color: theme.colors.text }]} numberOfLines={1}>
+                      {goal.title}
                     </Text>
+                    <View style={[styles.typeBadge, { backgroundColor: typeColor }]}>
+                      <Text style={styles.typeBadgeText}>{goal.type}</Text>
+                    </View>
+                  </View>
+
+                  <View style={[styles.healthRow, { backgroundColor: `${healthColor}18` }]}>
+                    <View style={[styles.healthDot, { backgroundColor: healthColor }]} />
+                    <Text style={[styles.healthText, { color: healthColor }]}>{healthLabel}</Text>
+                  </View>
+
+                  <View style={styles.progressSection}>
+                    <View style={[styles.progressTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
+                      <View
+                        style={[
+                          styles.progressFill,
+                          { backgroundColor: typeColor, width: `${goal.progress}%` },
+                        ]}
+                      />
+                    </View>
                     <Text style={[styles.progressPercent, { color: theme.colors.textMuted }]}>
-                      {goal.progress}% complete
+                      {goal.progress}%
                     </Text>
                   </View>
-                </View>
 
-                {goal.aiSuggestion && (
-                  <View style={[styles.aiSuggestion, { borderTopColor: theme.colors.border }]}>
-                    <Text style={styles.aiIcon}>✨</Text>
-                    <Text style={[styles.aiText, { color: theme.colors.textMuted }]}>{goal.aiSuggestion}</Text>
-                  </View>
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
+                  {goal.targetDate && (
+                    <Text style={[styles.metaText, { color: theme.colors.textMuted }]}>
+                      {daysRemaining !== null && daysRemaining >= 0
+                        ? `${daysRemaining} days remaining`
+                        : `Due ${goal.targetDate}`}
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
 
         <Pressable
-          style={[styles.addMilestoneCard, { backgroundColor: theme.colors.primary }]}
-          onPress={() => router.push('/(app)/goals/select')}
+          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+          onPress={() => router.push('/(app)/goals/create')}
         >
-          <View style={styles.addMilestoneContent}>
-            <Text style={[styles.addMilestoneTitle, { color: '#FFFFFF' }]}>New Milestone?</Text>
-            <Text style={[styles.addMilestoneSubtitle, { color: 'rgba(255,255,255,0.8)' }]}>
-              Add a sub-goal to maintain momentum.
-            </Text>
-          </View>
-          <View style={[styles.addButton, { backgroundColor: '#FFFFFF' }]}>
-            <Text style={[styles.addButtonText, { color: theme.colors.primary }]}>+ Add</Text>
-          </View>
+          <Text style={styles.fabText}>+ New Goal</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
@@ -166,6 +182,12 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
@@ -191,7 +213,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconText: {
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: '600',
   },
   content: {
     paddingHorizontal: 20,
@@ -228,96 +251,112 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     flex: 1,
+    marginRight: 8,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  typeBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
-    gap: 6,
   },
-  statusDot: {
+  typeBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  healthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 6,
+    marginBottom: 12,
+    alignSelf: 'flex-start',
+  },
+  healthDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
   },
-  statusText: {
-    fontSize: 11,
+  healthText: {
+    fontSize: 12,
     fontWeight: '600',
   },
-  goalMeta: {
-    marginBottom: 12,
-  },
-  metaText: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
   progressSection: {
-    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   progressTrack: {
+    flex: 1,
     height: 8,
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginRight: 10,
   },
   progressFill: {
     height: '100%',
     borderRadius: 4,
   },
-  progressMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  progressLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
   progressPercent: {
-    fontSize: 11,
+    fontSize: 12,
+    fontWeight: '500',
+    minWidth: 36,
+    textAlign: 'right',
+  },
+  metaText: {
+    fontSize: 13,
     fontWeight: '500',
   },
-  aiSuggestion: {
-    flexDirection: 'row',
+  emptyState: {
     alignItems: 'center',
-    gap: 8,
-    paddingTop: 12,
-    borderTopWidth: 1,
+    paddingVertical: 60,
   },
-  aiIcon: {
-    fontSize: 16,
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 16,
   },
-  aiText: {
-    flex: 1,
-    fontSize: 13,
-    lineHeight: 18,
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
   },
-  addMilestoneCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
+  emptySubtitle: {
+    fontSize: 14,
+    marginBottom: 24,
+  },
+  createBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderRadius: 12,
-    marginTop: 16,
   },
-  addMilestoneContent: {
-    flex: 1,
-    gap: 4,
-  },
-  addMilestoneTitle: {
-    fontSize: 16,
+  createBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: '600',
   },
-  addMilestoneSubtitle: {
-    fontSize: 13,
+  fab: {
+    marginTop: 20,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
   },
-  addButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
   },
-  addButtonText: {
+  errorText: {
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  retryBtn: {
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  retryBtnText: {
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
