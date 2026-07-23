@@ -7,3 +7,4 @@ export * from './useFocus';
 export * from './useNotifications';
 export * from './useUser';
 export { useConnectivity, useOnlineStatus } from './useConnectivity';
+export * from './useBehavior';

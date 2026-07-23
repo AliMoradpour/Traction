@@ -1,9 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Modal } from 'react-native';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, Modal, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
+import { useTask } from '@/hooks/useTasks';
+import {
+  useStartFocusSession,
+  useCompleteFocusSession,
+  usePauseFocusSession,
+  useResumeFocusSession,
+  useCancelFocusSession,
+  useActiveFocusSession,
+} from '@/hooks/useFocus';
+import { behaviorService } from '@/services';
 
 const RESISTANCE_REASONS = [
   'Task feels too large',
@@ -21,23 +31,26 @@ const RESISTANCE_RECOMMENDATIONS: Record<string, string> = {
   'Not interested': "Connect this to your 'Why'. Completing this unlocks your evening freedom.",
 };
 
-const AI_INSIGHTS = [
-  'Focus levels are high. Completing this now will clear 15% of your weekly cognitive load.',
-  'You tend to be most productive during this time. Keep the momentum going!',
-  'Breaking this into smaller steps could reduce friction by 40%.',
-];
-
 export default function FocusSessionScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const theme = useTractionTheme();
   const router = useRouter();
-  
+
+  const { data: task } = useTask(taskId ?? '');
+  const { data: activeSession } = useActiveFocusSession();
+  const startSession = useStartFocusSession();
+  const completeSession = useCompleteFocusSession();
+  const pauseSession = usePauseFocusSession();
+  const resumeSession = useResumeFocusSession();
+  const cancelSession = useCancelFocusSession();
+
   const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [showResistanceModal, setShowResistanceModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
-  const [aiInsight, setAiInsight] = useState(AI_INSIGHTS[0]);
-  
+  const [aiInsight, setAiInsight] = useState('');
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -48,6 +61,24 @@ export default function FocusSessionScreen() {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  useEffect(() => {
+    if (activeSession && activeSession.taskId === taskId) {
+      setSessionId(activeSession.id);
+      setIsActive(activeSession.status === 'ACTIVE');
+    }
+  }, [activeSession, taskId]);
+
+  const handleStartSession = useCallback(async () => {
+    try {
+      const session = await startSession.mutateAsync(taskId);
+      setSessionId(session.id);
+      setIsActive(true);
+      behaviorService.track({ type: 'FOCUS_STARTED', taskId, focusSessionId: session.id });
+    } catch (error) {
+      Alert.alert('Error', 'Failed to start focus session');
+    }
+  }, [startSession, taskId]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setTimeout>;
@@ -89,16 +120,60 @@ export default function FocusSessionScreen() {
     return (total - timeLeft) / total;
   };
 
-  const handleComplete = () => {
-    setIsActive(false);
-    // Show success overlay
+  const handleComplete = async () => {
+    if (!sessionId) return;
+    try {
+      setIsActive(false);
+      await completeSession.mutateAsync(sessionId);
+      behaviorService.track({ type: 'FOCUS_COMPLETED', taskId, focusSessionId: sessionId });
+      Alert.alert('Session Complete', 'Great work! You completed the focus session.', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to complete focus session');
+    }
+  };
+
+  const handlePause = async () => {
+    if (!sessionId) return;
+    try {
+      setIsActive(false);
+      await pauseSession.mutateAsync(sessionId);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to pause focus session');
+    }
+  };
+
+  const handleResume = async () => {
+    if (!sessionId) return;
+    try {
+      setIsActive(true);
+      await resumeSession.mutateAsync(sessionId);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to resume focus session');
+    }
+  };
+
+  const handleCancelSession = async () => {
+    if (!sessionId) return;
+    try {
+      setIsActive(false);
+      await cancelSession.mutateAsync(sessionId);
+      behaviorService.track({ type: 'FOCUS_ABANDONED', taskId, focusSessionId: sessionId });
+      router.back();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to cancel focus session');
+    }
   };
 
   const handleResistance = (reason: string) => {
     setSelectedReason(reason);
     setShowResistanceModal(false);
-    setAiInsight(RESISTANCE_RECOMMENDATIONS[reason] || AI_INSIGHTS[0]);
+    setAiInsight(RESISTANCE_RECOMMENDATIONS[reason] || '');
+    behaviorService.track({ type: 'WHY_AM_I_STUCK', taskId, metadata: reason, focusSessionId: sessionId ?? undefined });
   };
+
+  const taskTitle = task?.title ?? 'Loading...';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -114,69 +189,97 @@ export default function FocusSessionScreen() {
       </View>
 
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        <View style={styles.objectiveSection}>
-          <Text style={[styles.objectiveLabel, { color: theme.colors.textMuted }]}>CURRENT OBJECTIVE</Text>
-          <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>Design System Polish</Text>
-        </View>
+        {!sessionId ? (
+          <>
+            <View style={styles.objectiveSection}>
+              <Text style={[styles.objectiveLabel, { color: theme.colors.textMuted }]}>CURRENT OBJECTIVE</Text>
+              <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
+            </View>
 
-        <View style={styles.timerContainer}>
-          <View style={[styles.timerRing, { borderColor: theme.colors.surfaceMuted }]}>
-            <View
-              style={[
-                styles.timerProgress,
-                {
-                  borderColor: theme.colors.primary,
-                  transform: [{ rotate: `${getProgress() * 360 - 90}deg` }],
-                },
-              ]}
-            />
-          </View>
-          <Animated.View style={[styles.timerInner, { transform: [{ scale: pulseAnim }] }]}>
-            <Text style={[styles.timerText, { color: theme.colors.text }]}>{formatTime(timeLeft)}</Text>
-            <Text style={[styles.timerLabel, { color: theme.colors.textMuted }]}>MINUTES LEFT</Text>
-          </Animated.View>
-        </View>
+            <Button
+              variant="primary"
+              onPress={handleStartSession}
+              style={styles.startButton}
+              disabled={startSession.isPending}
+            >
+              {startSession.isPending ? 'Starting...' : '▶ START FOCUS SESSION'}
+            </Button>
+          </>
+        ) : (
+          <>
+            <View style={styles.objectiveSection}>
+              <Text style={[styles.objectiveLabel, { color: theme.colors.textMuted }]}>CURRENT OBJECTIVE</Text>
+              <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
+            </View>
 
-        {!selectedReason && (
-          <Pressable
-            style={[styles.resistanceTrigger, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-            onPress={() => setShowResistanceModal(true)}
-          >
-            <Text style={[styles.resistanceTriggerText, { color: theme.colors.text }]}>Why am I stuck?</Text>
-          </Pressable>
+            <View style={styles.timerContainer}>
+              <View style={[styles.timerRing, { borderColor: theme.colors.surfaceMuted }]}>
+                <View
+                  style={[
+                    styles.timerProgress,
+                    {
+                      borderColor: theme.colors.primary,
+                      transform: [{ rotate: `${getProgress() * 360 - 90}deg` }],
+                    },
+                  ]}
+                />
+              </View>
+              <Animated.View style={[styles.timerInner, { transform: [{ scale: pulseAnim }] }]}>
+                <Text style={[styles.timerText, { color: theme.colors.text }]}>{formatTime(timeLeft)}</Text>
+                <Text style={[styles.timerLabel, { color: theme.colors.textMuted }]}>MINUTES LEFT</Text>
+              </Animated.View>
+            </View>
+
+            {!selectedReason && (
+              <Pressable
+                style={[styles.resistanceTrigger, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                onPress={() => setShowResistanceModal(true)}
+              >
+                <Text style={[styles.resistanceTriggerText, { color: theme.colors.text }]}>Why am I stuck?</Text>
+              </Pressable>
+            )}
+
+            {aiInsight ? (
+              <View style={[styles.aiCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+                <View style={styles.aiHeader}>
+                  <Text style={styles.aiIcon}>✨</Text>
+                  <Text style={[styles.aiTitle, { color: theme.colors.text }]}>
+                    {selectedReason ? 'Intervention Recommendation' : 'AI Assistant'}
+                  </Text>
+                </View>
+                <Text style={[styles.aiContent, { color: theme.colors.textMuted }]}>{aiInsight}</Text>
+              </View>
+            ) : null}
+
+            <View style={styles.actions}>
+              <Button
+                variant="primary"
+                onPress={handleComplete}
+                style={styles.completeButton}
+                disabled={completeSession.isPending}
+              >
+                {completeSession.isPending ? 'Completing...' : '✓ COMPLETE'}
+              </Button>
+              <View style={styles.secondaryActions}>
+                <Pressable
+                  style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                  onPress={isActive ? handlePause : handleResume}
+                  disabled={pauseSession.isPending || resumeSession.isPending}
+                >
+                  <Text style={[styles.secondaryButtonText, { color: theme.colors.text }]}>
+                    {isActive ? '⏸ Pause' : '▶ Resume'}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                  onPress={() => setShowResistanceModal(true)}
+                >
+                  <Text style={[styles.secondaryButtonText, { color: theme.colors.error }]}>⚠ Too Difficult</Text>
+                </Pressable>
+              </View>
+            </View>
+          </>
         )}
-
-        <View style={[styles.aiCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <View style={styles.aiHeader}>
-            <Text style={styles.aiIcon}>✨</Text>
-            <Text style={[styles.aiTitle, { color: theme.colors.text }]}>
-              {selectedReason ? 'Intervention Recommendation' : 'AI Assistant'}
-            </Text>
-          </View>
-          <Text style={[styles.aiContent, { color: theme.colors.textMuted }]}>{aiInsight}</Text>
-        </View>
-
-        <View style={styles.actions}>
-          <Button variant="primary" onPress={handleComplete} style={styles.completeButton}>
-            ✓ COMPLETE
-          </Button>
-          <View style={styles.secondaryActions}>
-            <Pressable
-              style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => setIsActive(!isActive)}
-            >
-              <Text style={[styles.secondaryButtonText, { color: theme.colors.text }]}>
-                {isActive ? '⏸ Pause' : '▶ Resume'}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => setShowResistanceModal(true)}
-            >
-              <Text style={[styles.secondaryButtonText, { color: theme.colors.error }]}>⚠ Too Difficult</Text>
-            </Pressable>
-          </View>
-        </View>
       </Animated.View>
 
       <Modal visible={showResistanceModal} transparent animationType="slide">
@@ -199,6 +302,15 @@ export default function FocusSessionScreen() {
                 </Pressable>
               ))}
             </View>
+            {selectedReason && (
+              <Pressable
+                style={[styles.modalActionButton, { backgroundColor: theme.colors.error }]}
+                onPress={handleCancelSession}
+                disabled={cancelSession.isPending}
+              >
+                <Text style={styles.modalActionText}>Abandon Session</Text>
+              </Pressable>
+            )}
             <Pressable style={styles.cancelButton} onPress={() => setShowResistanceModal(false)}>
               <Text style={[styles.cancelText, { color: theme.colors.textMuted }]}>Cancel</Text>
             </Pressable>
@@ -270,6 +382,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '700',
     letterSpacing: -0.01,
+  },
+  startButton: {
+    width: '100%',
+    maxWidth: 320,
   },
   timerContainer: {
     position: 'relative',
@@ -414,6 +530,17 @@ const styles = StyleSheet.create({
   },
   reasonArrow: {
     fontSize: 20,
+  },
+  modalActionButton: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalActionText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
   },
   cancelButton: {
     marginTop: 16,

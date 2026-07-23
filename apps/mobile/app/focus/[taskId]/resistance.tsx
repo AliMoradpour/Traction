@@ -1,75 +1,62 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
+import { aiService, behaviorService } from '@/services';
 
 const RESISTANCE_REASONS = [
-  { id: '1', label: 'Task feels too large', icon: '📏' },
-  { id: '2', label: "I don't know where to start", icon: '🤔' },
-  { id: '3', label: 'Low energy', icon: '😴' },
-  { id: '4', label: 'Distracted', icon: '💭' },
-  { id: '5', label: 'Not interested', icon: '😐' },
+  { id: '1', label: 'Task feels too large', icon: '📏', value: 'Task feels too large' },
+  { id: '2', label: "I don't know where to start", icon: '🤔', value: "I don't know where to start" },
+  { id: '3', label: 'Low energy', icon: '😴', value: 'Low energy' },
+  { id: '4', label: 'Distracted', icon: '💭', value: 'Distracted' },
+  { id: '5', label: 'Not interested', icon: '😐', value: 'Not interested' },
 ];
 
-const AI_RECOMMENDATIONS: Record<string, { title: string; steps: string[] }> = {
-  '1': {
-    title: 'Break it down',
-    steps: [
-      'Identify the smallest possible first step',
-      'Set a 5-minute timer for just that step',
-      'Commit to nothing more than starting',
-    ],
-  },
-  '2': {
-    title: 'Start messy',
-    steps: [
-      'Open the document or tool',
-      'Write one sentence, no matter how bad',
-      'Let momentum build from there',
-    ],
-  },
-  '3': {
-    title: 'Match energy to task',
-    steps: [
-      'Take a 2-minute breathing break',
-      'Switch to a low-energy variant',
-      'Or postpone to your next energy peak',
-    ],
-  },
-  '4': {
-    title: 'Reset focus',
-    steps: [
-      'Close all unnecessary tabs',
-      'Put your phone in another room',
-      'Restart timer for 10 focus minutes',
-    ],
-  },
-  '5': {
-    title: 'Connect to purpose',
-    steps: [
-      'Remind yourself why this matters',
-      'Link completion to a reward',
-      'Consider if this task is truly necessary',
-    ],
-  },
-};
+interface AnalysisResult {
+  title: string;
+  steps: string[];
+}
 
 export default function ResistanceScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const theme = useTractionTheme();
   const router = useRouter();
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [isLoadingAnalysis, setIsLoadingAnalysis] = useState(false);
 
-  const recommendation = selectedReason ? AI_RECOMMENDATIONS[selectedReason] : null;
+  const handleSelect = useCallback(async (reasonId: string) => {
+    const reason = RESISTANCE_REASONS.find((r) => r.id === reasonId);
+    if (!reason) return;
 
-  const handleSelect = (reasonId: string) => {
     setSelectedReason(reasonId);
-  };
+    setIsLoadingAnalysis(true);
+
+    behaviorService.track({
+      type: 'WHY_AM_I_STUCK',
+      taskId,
+      metadata: reason.value,
+    });
+
+    try {
+      const result = await aiService.stuckAnalysis(reason.value, taskId);
+      if (result && result.title) {
+        setAnalysis(result);
+      } else {
+        setAnalysis(null);
+      }
+    } catch {
+      setAnalysis(null);
+    } finally {
+      setIsLoadingAnalysis(false);
+    }
+  }, [taskId]);
+
+  const selectedReasonData = RESISTANCE_REASONS.find((r) => r.id === selectedReason);
 
   const handleApply = () => {
-    // TODO: Apply recommendation and return to focus session
     router.back();
   };
 
@@ -110,34 +97,53 @@ export default function ResistanceScreen() {
         ) : (
           <>
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{recommendation?.title}</Text>
+              <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+                {analysis?.title ?? selectedReasonData?.label ?? 'Recommendation'}
+              </Text>
               <Text style={[styles.sectionSubtitle, { color: theme.colors.textMuted }]}>
                 Here's a personalized approach to overcome this friction
               </Text>
             </View>
 
-            <View style={[styles.recommendationCard, { backgroundColor: theme.colors.accentMuted }]}>
-              <View style={styles.recommendationHeader}>
-                <Text style={styles.recommendationIcon}>✨</Text>
-                <Text style={[styles.recommendationTitle, { color: theme.colors.accentText }]}>AI Recommendation</Text>
+            {isLoadingAnalysis ? (
+              <View style={styles.loadingState}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Analyzing...</Text>
               </View>
-              <View style={styles.stepsList}>
-                {recommendation?.steps.map((step, index) => (
-                  <View key={index} style={styles.stepItem}>
-                    <View style={[styles.stepNumber, { backgroundColor: theme.colors.primary }]}>
-                      <Text style={styles.stepNumberText}>{index + 1}</Text>
+            ) : analysis?.steps ? (
+              <View style={[styles.recommendationCard, { backgroundColor: theme.colors.accentMuted }]}>
+                <View style={styles.recommendationHeader}>
+                  <Text style={styles.recommendationIcon}>✨</Text>
+                  <Text style={[styles.recommendationTitle, { color: theme.colors.accentText }]}>AI Recommendation</Text>
+                </View>
+                <View style={styles.stepsList}>
+                  {analysis.steps.map((step, index) => (
+                    <View key={index} style={styles.stepItem}>
+                      <View style={[styles.stepNumber, { backgroundColor: theme.colors.primary }]}>
+                        <Text style={styles.stepNumberText}>{index + 1}</Text>
+                      </View>
+                      <Text style={[styles.stepText, { color: theme.colors.accentText }]}>{step}</Text>
                     </View>
-                    <Text style={[styles.stepText, { color: theme.colors.accentText }]}>{step}</Text>
-                  </View>
-                ))}
+                  ))}
+                </View>
               </View>
-            </View>
+            ) : (
+              <View style={[styles.recommendationCard, { backgroundColor: theme.colors.accentMuted }]}>
+                <View style={styles.recommendationHeader}>
+                  <Text style={styles.recommendationIcon}>💡</Text>
+                  <Text style={[styles.recommendationTitle, { color: theme.colors.accentText }]}>Tip</Text>
+                </View>
+                <Text style={[styles.tipText, { color: theme.colors.accentText }]}>
+                  You selected: {selectedReasonData?.label}. Take a moment to breathe, then try the smallest possible action.
+                </Text>
+              </View>
+            )}
 
             <View style={styles.actions}>
               <Button variant="primary" onPress={handleApply}>
                 Apply & Return
               </Button>
-              <Pressable onPress={() => setSelectedReason(null)}>
+              <Pressable onPress={() => { setSelectedReason(null); setAnalysis(null); }}>
                 <Text style={[styles.tryAgain, { color: theme.colors.textMuted }]}>Try a different approach</Text>
               </Pressable>
             </View>
@@ -206,6 +212,14 @@ const styles = StyleSheet.create({
   reasonArrow: {
     fontSize: 24,
   },
+  loadingState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 15,
+  },
   recommendationCard: {
     padding: 20,
     borderRadius: 16,
@@ -248,6 +262,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     lineHeight: 20,
+  },
+  tipText: {
+    fontSize: 15,
+    lineHeight: 22,
   },
   actions: {
     gap: 16,

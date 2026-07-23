@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
@@ -40,8 +40,12 @@ export default function TodayScreen() {
     useNativeDriver: true,
   }).start();
 
-  const handleStartSession = () => {
-    router.push('/focus/1');
+  const handleStartSession = (taskId?: string) => {
+    if (taskId) {
+      router.push(`/focus/${taskId}`);
+    } else {
+      Alert.alert('No task selected', 'Select a task to start a focus session.');
+    }
   };
 
   const handleTaskPress = (taskId: string) => {
@@ -152,7 +156,17 @@ export default function TodayScreen() {
                           <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(theme, task.priority) }]} />
                         </View>
                       </View>
-                      <Text style={[styles.moreIcon, { color: theme.colors.textSubtle }]}>⋮</Text>
+                      {!isCompleted && (
+                        <Pressable
+                          style={[styles.focusButton, { backgroundColor: theme.colors.primary }]}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            handleStartSession(task.id);
+                          }}
+                        >
+                          <Text style={styles.focusButtonText}>▶</Text>
+                        </Pressable>
+                      )}
                     </Pressable>
                   );
                 })}
@@ -283,8 +297,17 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  moreIcon: {
-    fontSize: 20,
+  focusButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  focusButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyState: {
     padding: 32,
