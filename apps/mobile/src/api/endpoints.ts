@@ -75,6 +75,12 @@ export const endpoints = {
     burnout: '/behavior/metrics/burnout',
     procrastination: '/behavior/metrics/procrastination',
   },
+  execution: {
+    readiness: '/execution/readiness',
+    resistance: '/execution/resistance',
+    momentum: '/execution/momentum',
+    stats: '/execution/stats',
+  },
   ai: {
     recommendations: '/ai/recommendations',
     generateRecommendation: '/ai/recommendations/generate',

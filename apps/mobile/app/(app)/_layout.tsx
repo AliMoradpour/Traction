@@ -51,6 +51,13 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="execution"
+        options={{
+          title: 'Execution',
+          tabBarIcon: ({ color, size }) => <Text style={{ fontSize: size, color }}>⚡</Text>,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

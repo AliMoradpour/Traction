@@ -73,6 +73,14 @@ export const queryKeys = {
     stats: () => [...queryKeys.behavior.all, 'stats'] as const,
   },
 
+  execution: {
+    all: ['execution'] as const,
+    readiness: () => [...queryKeys.execution.all, 'readiness'] as const,
+    resistance: () => [...queryKeys.execution.all, 'resistance'] as const,
+    momentum: () => [...queryKeys.execution.all, 'momentum'] as const,
+    stats: () => [...queryKeys.execution.all, 'stats'] as const,
+  },
+
   ai: {
     all: ['ai'] as const,
     recommendations: () => [...queryKeys.ai.all, 'recommendations'] as const,

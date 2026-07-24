@@ -8,6 +8,7 @@ export * from './useNotifications';
 export * from './useUser';
 export { useConnectivity, useOnlineStatus } from './useConnectivity';
 export * from './useBehavior';
+export * from './useExecution';
 export {
   useAIRecommendations,
   useAIStatus,

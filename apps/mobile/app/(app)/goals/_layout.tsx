@@ -5,7 +5,6 @@ export default function GoalsLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="create" />
-      <Stack.Screen name="select" />
       <Stack.Screen name="feasibility" />
       <Stack.Screen name="[goalId]/index" />
       <Stack.Screen name="[goalId]/edit" />

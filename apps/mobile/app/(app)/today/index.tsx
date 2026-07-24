@@ -103,12 +103,20 @@ export default function TodayScreen() {
           <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
-              <Pressable
-                style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
-                onPress={() => router.push('/(app)/today/planner' as any)}
-              >
-                <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
-              </Pressable>
+              <View style={styles.headerButtons}>
+                <Pressable
+                  style={[styles.smartStartButton, { backgroundColor: theme.colors.primaryContainer }]}
+                  onPress={() => router.push('/(app)/today/smart-start' as any)}
+                >
+                  <Text style={[styles.smartStartButtonText, { color: theme.colors.primary }]}>Smart Start</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
+                  onPress={() => router.push('/(app)/today/planner' as any)}
+                >
+                  <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
+                </Pressable>
+              </View>
             </View>
 
             {tasks && tasks.length > 0 ? (
@@ -261,6 +269,19 @@ const styles = StyleSheet.create({
   },
   aiPlanButtonText: {
     color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  smartStartButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  smartStartButtonText: {
     fontSize: 12,
     fontWeight: '600',
   },

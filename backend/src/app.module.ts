@@ -12,6 +12,7 @@ import { InsightsModule } from './modules/insights/insights.module';
 import { BehaviorModule } from './modules/behavior/behavior.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AIModule } from './modules/ai/ai.module';
+import { ExecutionModule } from './modules/execution/execution.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AIModule } from './modules/ai/ai.module';
     BehaviorModule,
     NotificationsModule,
     AIModule,
+    ExecutionModule,
   ],
 })
 export class AppModule {}

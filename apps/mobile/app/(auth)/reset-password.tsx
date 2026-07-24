@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
@@ -8,12 +8,13 @@ import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { resetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations';
+import { useResetPassword } from '@/hooks/useAuth';
 
 export default function ResetPasswordScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
   const { token } = useLocalSearchParams<{ token: string }>();
-  const [isLoading, setIsLoading] = useState(false);
+  const resetPassword = useResetPassword();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const {
@@ -29,17 +30,19 @@ export default function ResetPasswordScreen() {
   });
 
   const onSubmit = async (data: ResetPasswordFormData) => {
-    setIsLoading(true);
-    try {
-      // TODO: Call actual auth service
-      // For now, simulate resetting password
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setIsSuccess(true);
-    } catch (error) {
-      console.error('Reset password failed:', error);
-    } finally {
-      setIsLoading(false);
+    if (!token) {
+      Alert.alert('Error', 'Invalid or missing reset token.');
+      return;
     }
+    resetPassword.mutate(
+      { token, newPassword: data.password },
+      {
+        onSuccess: () => setIsSuccess(true),
+        onError: (error) => {
+          Alert.alert('Error', error instanceof Error ? error.message : 'Failed to reset password. Please try again.');
+        },
+      }
+    );
   };
 
   if (isSuccess) {
@@ -53,11 +56,14 @@ export default function ResetPasswordScreen() {
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
             Your password has been successfully reset. You can now sign in with your new password.
           </Text>
-          <Link href="/(auth)/login" asChild>
-            <Button variant="primary" size="lg" style={styles.signInButton}>
-              Sign In
-            </Button>
-          </Link>
+          <Button
+            variant="primary"
+            size="lg"
+            style={styles.signInButton}
+            onPress={() => router.replace('/(auth)/login')}
+          >
+            Sign In
+          </Button>
         </View>
       </SafeAreaView>
     );
@@ -101,7 +107,7 @@ export default function ResetPasswordScreen() {
             variant="primary"
             size="lg"
             onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
+            loading={resetPassword.isPending}
             style={styles.resetButton}
           >
             Reset Password

@@ -33,6 +33,10 @@ export const cacheConfig = {
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   },
+  execution: {
+    staleTime: 2 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  },
   auth: {
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,

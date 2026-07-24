@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { Link } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
@@ -8,10 +8,11 @@ import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations';
+import { useForgotPassword } from '@/hooks/useAuth';
 
 export default function ForgotPasswordScreen() {
   const theme = useTractionTheme();
-  const [isLoading, setIsLoading] = useState(false);
+  const forgotPassword = useForgotPassword();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const {
@@ -26,17 +27,12 @@ export default function ForgotPasswordScreen() {
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setIsLoading(true);
-    try {
-      // TODO: Call actual auth service
-      // For now, simulate sending reset email
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setIsSuccess(true);
-    } catch (error) {
-      console.error('Forgot password failed:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    forgotPassword.mutate(data, {
+      onSuccess: () => setIsSuccess(true),
+      onError: (error) => {
+        Alert.alert('Error', error instanceof Error ? error.message : 'Failed to send reset email. Please try again.');
+      },
+    });
   };
 
   if (isSuccess) {
@@ -48,7 +44,7 @@ export default function ForgotPasswordScreen() {
           </View>
           <Text style={[styles.title, { color: theme.colors.text }]}>Check Your Email</Text>
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-            We've sent a password reset link to your email address.
+            If an account exists with that email, you'll receive a password reset link shortly.
           </Text>
           <Link href="/(auth)/login" asChild>
             <Button variant="primary" size="lg" style={styles.backButton}>
@@ -90,7 +86,7 @@ export default function ForgotPasswordScreen() {
             variant="primary"
             size="lg"
             onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
+            loading={forgotPassword.isPending}
             style={styles.sendButton}
           >
             Send Reset Link

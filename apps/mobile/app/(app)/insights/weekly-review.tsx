@@ -19,8 +19,6 @@ export default function WeeklyReviewScreen() {
     ? Math.round((wins.length / (wins.length + patterns.length)) * 100) || 0
     : 0;
 
-  const handleApplyToCalendar = () => {};
-
   const handleClose = () => {
     router.back();
   };
@@ -133,9 +131,6 @@ export default function WeeklyReviewScreen() {
               <Text style={[styles.aiContent, { color: theme.colors.onPrimaryContainer }]}>
                 {nextShift}
               </Text>
-              <Button variant="secondary" onPress={handleApplyToCalendar} style={styles.applyButton}>
-                Apply to Calendar
-              </Button>
             </View>
           ) : null}
         </View>
@@ -310,9 +305,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     marginBottom: 16,
-  },
-  applyButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   completeSection: {
     alignItems: 'center',

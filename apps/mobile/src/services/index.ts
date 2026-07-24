@@ -11,6 +11,7 @@ export type {
 export { focusService } from './focus.service';
 export { notificationService } from './notification.service';
 export { behaviorService } from './behavior.service';
+export { executionService } from './execution.service';
 export { userService } from './user.service';
 
 export type {
@@ -50,6 +51,13 @@ export type {
   BehaviorEvent,
   BehaviorStats,
 } from './behavior.service';
+
+export type {
+  ReadinessScore,
+  ResistanceDetection,
+  MomentumMetrics,
+  ExecutionStats,
+} from './execution.service';
 
 export type {
   UserProfile,
