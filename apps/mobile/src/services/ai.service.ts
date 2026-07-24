@@ -29,6 +29,26 @@ export interface SimplifiedTask {
   motivation: string;
 }
 
+export interface AIUsageSummary {
+  dailyRequests: number;
+  monthlyRequests: number;
+  totalTokens: number;
+  estimatedCost: number;
+}
+
+export interface AIUsageByFeature {
+  feature: string;
+  requests: number;
+  tokens: number;
+  percentage: number;
+}
+
+export interface AIUsageByDay {
+  date: string;
+  requests: number;
+  tokens: number;
+}
+
 export const aiService = {
   getRecommendations: async (): Promise<AIRecommendation[]> => {
     try {
@@ -123,6 +143,37 @@ export const aiService = {
     } catch (error) {
       console.warn('Failed to get AI status:', error);
       return { configured: false };
+    }
+  },
+
+  getUsageSummary: async (): Promise<AIUsageSummary | null> => {
+    try {
+      const response = await apiClient.get(endpoints.ai.usageSummary);
+      return response.data ?? null;
+    } catch (error) {
+      console.warn('Failed to get AI usage summary:', error);
+      return null;
+    }
+  },
+
+  getUsageByFeature: async (): Promise<AIUsageByFeature[]> => {
+    try {
+      const response = await apiClient.get(endpoints.ai.usageByFeature);
+      return response.data ?? [];
+    } catch (error) {
+      console.warn('Failed to get AI usage by feature:', error);
+      return [];
+    }
+  },
+
+  getUsageByDay: async (days?: number): Promise<AIUsageByDay[]> => {
+    try {
+      const params = days ? { days } : {};
+      const response = await apiClient.get(endpoints.ai.usageByDay, { params });
+      return response.data ?? [];
+    } catch (error) {
+      console.warn('Failed to get AI usage by day:', error);
+      return [];
     }
   },
 };

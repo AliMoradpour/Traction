@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { AIService } from './ai.service';
 import { DailyBriefService } from './daily-brief.service';
 import { TaskBreakdownService } from './task-breakdown.service';
@@ -8,7 +8,12 @@ import { WeeklyReviewService } from './weekly-review.service';
 import { GoalRecoveryService } from './goal-recovery.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
 import { AIObservabilityService } from './ai-observability.service';
-import { AIRecommendationResponseDto } from './dto/ai.dto';
+import {
+  AIRecommendationResponseDto,
+  AIUsageSummaryDto,
+  AIUsageByFeatureDto,
+  AIUsageByDayDto,
+} from './dto/ai.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -120,6 +125,31 @@ export class AIController {
   @ApiResponse({ status: 200, description: 'Usage statistics' })
   async getUsageStats(@CurrentUser('id') userId: string) {
     return this.rateLimitService.getUsageStats(userId);
+  }
+
+  @Get('usage/summary')
+  @ApiOperation({ summary: 'Get AI usage summary' })
+  @ApiResponse({ status: 200, description: 'Usage summary with daily/monthly counts and cost', type: AIUsageSummaryDto })
+  async getUsageSummary(@CurrentUser('id') userId: string): Promise<AIUsageSummaryDto> {
+    return this.observabilityService.getUsageSummary(userId);
+  }
+
+  @Get('usage/by-feature')
+  @ApiOperation({ summary: 'Get AI usage breakdown by feature' })
+  @ApiResponse({ status: 200, description: 'Usage breakdown by feature', type: [AIUsageByFeatureDto] })
+  async getUsageByFeature(@CurrentUser('id') userId: string): Promise<AIUsageByFeatureDto[]> {
+    return this.observabilityService.getUsageByFeature(userId);
+  }
+
+  @Get('usage/by-day')
+  @ApiOperation({ summary: 'Get AI usage by day' })
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to include (default: 7)' })
+  @ApiResponse({ status: 200, description: 'Daily usage trend', type: [AIUsageByDayDto] })
+  async getUsageByDay(
+    @CurrentUser('id') userId: string,
+    @Query('days') days?: number,
+  ): Promise<AIUsageByDayDto[]> {
+    return this.observabilityService.getUsageByDay(userId, days || 7);
   }
 
   @Get('metrics')

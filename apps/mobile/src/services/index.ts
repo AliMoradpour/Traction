@@ -2,7 +2,12 @@ export { taskService } from './task.service';
 export { goalService } from './goal.service';
 export { insightService } from './insight.service';
 export { aiService } from './ai.service';
-export type { AIRecommendation } from './ai.service';
+export type {
+  AIRecommendation,
+  AIUsageSummary,
+  AIUsageByFeature,
+  AIUsageByDay,
+} from './ai.service';
 export { focusService } from './focus.service';
 export { notificationService } from './notification.service';
 export { behaviorService } from './behavior.service';

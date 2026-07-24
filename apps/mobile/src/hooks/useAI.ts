@@ -1,7 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { cacheConfig } from '@/lib/cacheConfig';
-import { aiService, type AIRecommendation } from '@/services';
+import {
+  aiService,
+  type AIRecommendation,
+  type AIUsageSummary,
+  type AIUsageByFeature,
+  type AIUsageByDay,
+} from '@/services';
 
 // Queries
 export function useAIRecommendations() {
@@ -103,5 +109,29 @@ export function useGoalRecovery() {
       queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.ai.all });
     },
+  });
+}
+
+export function useUsageSummary() {
+  return useQuery<AIUsageSummary | null>({
+    queryKey: [...queryKeys.ai.all, 'usageSummary'],
+    queryFn: () => aiService.getUsageSummary(),
+    ...cacheConfig.ai,
+  });
+}
+
+export function useUsageByFeature() {
+  return useQuery<AIUsageByFeature[]>({
+    queryKey: [...queryKeys.ai.all, 'usageByFeature'],
+    queryFn: () => aiService.getUsageByFeature(),
+    ...cacheConfig.ai,
+  });
+}
+
+export function useUsageByDay(days?: number) {
+  return useQuery<AIUsageByDay[]>({
+    queryKey: [...queryKeys.ai.all, 'usageByDay', days],
+    queryFn: () => aiService.getUsageByDay(days),
+    ...cacheConfig.ai,
   });
 }

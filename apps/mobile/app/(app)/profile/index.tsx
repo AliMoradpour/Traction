@@ -21,6 +21,10 @@ const ENERGY_SETTINGS = [
   { id: 'breaks', label: 'Focus Breaks', value: 'Every 90m', icon: '☕' },
 ];
 
+const AI_SETTINGS = [
+  { id: 'usage', label: 'AI Usage', value: null, icon: '📊', route: '/profile/usage' },
+];
+
 export default function ProfileScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
@@ -168,6 +172,34 @@ export default function ProfileScreen() {
                   </View>
                 </Pressable>
                 {index < ENERGY_SETTINGS.length - 1 && (
+                  <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>AI SETTINGS</Text>
+          <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+            {AI_SETTINGS.map((setting, index) => (
+              <View key={setting.id}>
+                <Pressable
+                  style={styles.settingsItem}
+                  onPress={() => router.push(setting.route as any)}
+                >
+                  <View style={styles.settingsLeft}>
+                    <Text style={styles.settingsIcon}>{setting.icon}</Text>
+                    <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{setting.label}</Text>
+                  </View>
+                  <View style={styles.settingsRight}>
+                    {setting.value && (
+                      <Text style={[styles.settingsValue, { color: theme.colors.textMuted }]}>{setting.value}</Text>
+                    )}
+                    <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
+                  </View>
+                </Pressable>
+                {index < AI_SETTINGS.length - 1 && (
                   <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
                 )}
               </View>
