@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated, Modal, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +13,8 @@ import {
   useCancelFocusSession,
   useActiveFocusSession,
 } from '@/hooks/useFocus';
+import { useReadinessScore } from '@/hooks/useExecution';
+import { useBehaviorIndicators } from '@/hooks/useBehavior';
 import { behaviorService } from '@/services';
 
 const RESISTANCE_REASONS = [
@@ -31,6 +33,39 @@ const RESISTANCE_RECOMMENDATIONS: Record<string, string> = {
   'Not interested': "Connect this to your 'Why'. Completing this unlocks your evening freedom.",
 };
 
+function calculateAdaptiveDuration(
+  readinessScore: number,
+  momentumScore: number,
+  resistanceScore: number
+): number {
+  const hour = new Date().getHours();
+  const isEvening = hour >= 18;
+  const isAfternoon = hour >= 13 && hour < 18;
+
+  let base: number;
+  if (readinessScore > 80 && momentumScore >= 60) {
+    base = 50;
+  } else if (readinessScore > 60) {
+    base = 37;
+  } else if (readinessScore > 40) {
+    base = 25;
+  } else {
+    base = 17;
+  }
+
+  if (resistanceScore > 60) {
+    base = Math.min(base, 20);
+  }
+
+  if (isEvening) {
+    base = Math.round(base * 0.7);
+  } else if (isAfternoon) {
+    base = Math.round(base * 0.85);
+  }
+
+  return Math.max(10, Math.min(60, Math.round(base / 5) * 5));
+}
+
 export default function FocusSessionScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const theme = useTractionTheme();
@@ -38,18 +73,29 @@ export default function FocusSessionScreen() {
 
   const { data: task } = useTask(taskId ?? '');
   const { data: activeSession } = useActiveFocusSession();
+  const { data: readiness } = useReadinessScore();
+  const { data: indicators } = useBehaviorIndicators();
   const startSession = useStartFocusSession();
   const completeSession = useCompleteFocusSession();
   const pauseSession = usePauseFocusSession();
   const resumeSession = useResumeFocusSession();
   const cancelSession = useCancelFocusSession();
 
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const adaptiveDurationMin = useMemo(() => {
+    const readinessScore = readiness?.score ?? 50;
+    const momentumScore = indicators?.momentumScore ?? 50;
+    const resistanceScore = 50;
+    return calculateAdaptiveDuration(readinessScore, momentumScore, resistanceScore);
+  }, [readiness, indicators]);
+
+  const [timeLeft, setTimeLeft] = useState(adaptiveDurationMin * 60);
   const [isActive, setIsActive] = useState(false);
   const [showResistanceModal, setShowResistanceModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [aiInsight, setAiInsight] = useState('');
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [showDurationConfirm, setShowDurationConfirm] = useState(false);
+  const [confirmedDuration, setConfirmedDuration] = useState(adaptiveDurationMin);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -64,12 +110,27 @@ export default function FocusSessionScreen() {
 
   useEffect(() => {
     if (activeSession && activeSession.taskId === taskId) {
+      if (activeSession.status === 'PAUSED' || activeSession.status === 'ACTIVE') {
+        const started = new Date(activeSession.startedAt).getTime();
+        const elapsed = Date.now() - started;
+        if (elapsed > 5 * 60 * 1000) {
+          router.replace(`/focus/${taskId}/recovery`);
+          return;
+        }
+      }
       setSessionId(activeSession.id);
       setIsActive(activeSession.status === 'ACTIVE');
+      setShowDurationConfirm(false);
     }
-  }, [activeSession, taskId]);
+  }, [activeSession, taskId, router]);
 
   const handleStartSession = useCallback(async () => {
+    setShowDurationConfirm(true);
+  }, []);
+
+  const handleConfirmDuration = useCallback(async () => {
+    setShowDurationConfirm(false);
+    setTimeLeft(confirmedDuration * 60);
     try {
       const session = await startSession.mutateAsync(taskId);
       setSessionId(session.id);
@@ -78,7 +139,7 @@ export default function FocusSessionScreen() {
     } catch (error) {
       Alert.alert('Error', 'Failed to start focus session');
     }
-  }, [startSession, taskId]);
+  }, [startSession, taskId, confirmedDuration]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setTimeout>;
@@ -116,7 +177,7 @@ export default function FocusSessionScreen() {
   };
 
   const getProgress = () => {
-    const total = 25 * 60;
+    const total = confirmedDuration * 60;
     return (total - timeLeft) / total;
   };
 
@@ -196,14 +257,58 @@ export default function FocusSessionScreen() {
               <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
             </View>
 
-            <Button
-              variant="primary"
-              onPress={handleStartSession}
-              style={styles.startButton}
-              disabled={startSession.isPending}
-            >
-              {startSession.isPending ? 'Starting...' : '▶ START FOCUS SESSION'}
-            </Button>
+            {showDurationConfirm ? (
+              <View style={styles.durationConfirmContainer}>
+                <View style={[styles.durationCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+                  <Text style={[styles.durationCardLabel, { color: theme.colors.textMuted }]}>ADAPTIVE SESSION LENGTH</Text>
+                  <Text style={[styles.durationCardValue, { color: theme.colors.text }]}>{confirmedDuration} min</Text>
+                  <Text style={[styles.durationCardReason, { color: theme.colors.textMuted }]}>
+                    {readiness && readiness.score > 80
+                      ? 'High readiness — longer session recommended'
+                      : readiness && readiness.score > 60
+                      ? 'Good readiness — moderate session'
+                      : readiness && readiness.score > 40
+                      ? 'Moderate readiness — shorter session'
+                      : 'Low readiness — brief session recommended'}
+                  </Text>
+                  <View style={styles.durationAdjust}>
+                    <Pressable
+                      style={[styles.durationButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                      onPress={() => setConfirmedDuration((prev) => Math.max(10, prev - 5))}
+                    >
+                      <Text style={[styles.durationButtonText, { color: theme.colors.text }]}>-5m</Text>
+                    </Pressable>
+                    <Text style={[styles.durationValue, { color: theme.colors.text }]}>{confirmedDuration}m</Text>
+                    <Pressable
+                      style={[styles.durationButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                      onPress={() => setConfirmedDuration((prev) => Math.min(60, prev + 5))}
+                    >
+                      <Text style={[styles.durationButtonText, { color: theme.colors.text }]}>+5m</Text>
+                    </Pressable>
+                  </View>
+                </View>
+                <Button
+                  variant="primary"
+                  onPress={handleConfirmDuration}
+                  style={styles.startButton}
+                  disabled={startSession.isPending}
+                >
+                  {startSession.isPending ? 'Starting...' : `▶ START ${confirmedDuration} MIN SESSION`}
+                </Button>
+                <Pressable onPress={() => setShowDurationConfirm(false)}>
+                  <Text style={[styles.cancelConfirmText, { color: theme.colors.textMuted }]}>Cancel</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <Button
+                variant="primary"
+                onPress={handleStartSession}
+                style={styles.startButton}
+                disabled={startSession.isPending}
+              >
+                {startSession.isPending ? 'Starting...' : '▶ START FOCUS SESSION'}
+              </Button>
+            )}
           </>
         ) : (
           <>
@@ -386,6 +491,64 @@ const styles = StyleSheet.create({
   startButton: {
     width: '100%',
     maxWidth: 320,
+  },
+  durationConfirmContainer: {
+    width: '100%',
+    maxWidth: 320,
+    alignItems: 'center',
+    gap: 16,
+  },
+  durationCard: {
+    width: '100%',
+    padding: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  durationCardLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    letterSpacing: 0.05,
+    marginBottom: 8,
+  },
+  durationCardValue: {
+    fontSize: 48,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  durationCardReason: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  durationAdjust: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+  },
+  durationButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  durationButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  durationValue: {
+    fontSize: 24,
+    fontWeight: '700',
+    minWidth: 60,
+    textAlign: 'center',
+  },
+  cancelConfirmText: {
+    fontSize: 13,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.05,
   },
   timerContainer: {
     position: 'relative',

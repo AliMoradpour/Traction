@@ -6,6 +6,7 @@ export default function FocusLayout() {
       <Stack.Screen name="[taskId]" />
       <Stack.Screen name="[taskId]/resistance" />
       <Stack.Screen name="[taskId]/simplify" />
+      <Stack.Screen name="[taskId]/recovery" />
     </Stack>
   );
 }

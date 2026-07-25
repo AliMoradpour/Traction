@@ -10,6 +10,7 @@ export default function TodayLayout() {
       <Stack.Screen name="task-details" />
       <Stack.Screen name="planner" />
       <Stack.Screen name="smart-start" />
+      <Stack.Screen name="replan" />
     </Stack>
   );
 }

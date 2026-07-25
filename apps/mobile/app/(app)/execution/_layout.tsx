@@ -14,6 +14,7 @@ export default function ExecutionLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="momentum" />
       <Stack.Screen name="resistance" />
+      <Stack.Screen name="coaching" />
     </Stack>
   );
 }

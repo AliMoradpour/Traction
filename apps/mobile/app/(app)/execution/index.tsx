@@ -193,6 +193,15 @@ export default function ExecutionDashboardScreen() {
                 <Text style={[styles.actionTitle, { color: theme.colors.text }]}>Start Focus</Text>
               </Pressable>
             </View>
+            <View style={styles.quickActions}>
+              <Pressable
+                style={[styles.actionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                onPress={() => router.push('/(app)/execution/coaching' as Href)}
+              >
+                <Text style={styles.actionIcon}>🎯</Text>
+                <Text style={[styles.actionTitle, { color: theme.colors.text }]}>Get Coaching</Text>
+              </Pressable>
+            </View>
           </Animated.View>
         </ScrollView>
       )}

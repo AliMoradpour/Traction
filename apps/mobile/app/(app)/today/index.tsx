@@ -1,10 +1,11 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { useTasks, useCompleteTask } from '@/hooks/useTasks';
+import { useReadinessScore } from '@/hooks/useExecution';
 import { Task } from '@/services/task.service';
 
 function formatDuration(minutes?: number): string {
@@ -32,7 +33,15 @@ export default function TodayScreen() {
 
   const today = new Date().toISOString().split('T')[0];
   const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: today });
+  const { data: readiness } = useReadinessScore();
   const completeTask = useCompleteTask();
+
+  const isBehindSchedule = useMemo(() => {
+    if (!tasks || !readiness) return false;
+    const incomplete = tasks.filter((t) => t.status !== 'COMPLETED');
+    const hour = new Date().getHours();
+    return incomplete.length > 2 && hour >= 14;
+  }, [tasks, readiness]);
 
   Animated.timing(fadeAnim, {
     toValue: 1,
@@ -104,6 +113,14 @@ export default function TodayScreen() {
             <View style={styles.sectionHeader}>
               <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
               <View style={styles.headerButtons}>
+                {isBehindSchedule && (
+                  <Pressable
+                    style={[styles.replanButton, { backgroundColor: theme.colors.warning || theme.colors.accent }]}
+                    onPress={() => router.push('/(app)/today/replan' as any)}
+                  >
+                    <Text style={styles.replanButtonText}>Replan Day</Text>
+                  </Pressable>
+                )}
                 <Pressable
                   style={[styles.smartStartButton, { backgroundColor: theme.colors.primaryContainer }]}
                   onPress={() => router.push('/(app)/today/smart-start' as any)}
@@ -275,6 +292,16 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     gap: 8,
+  },
+  replanButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  replanButtonText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
   },
   smartStartButton: {
     paddingHorizontal: 12,
