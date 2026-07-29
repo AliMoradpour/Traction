@@ -6,6 +6,7 @@ import { useTractionTheme } from '@/theme';
 import { Button } from '@/components/ui/Button';
 import { useTasks, useCompleteTask } from '@/hooks/useTasks';
 import { useReadinessScore } from '@/hooks/useExecution';
+import { useUser } from '@/hooks/useAuth';
 import { Task } from '@/services/task.service';
 
 function formatDuration(minutes?: number): string {
@@ -14,6 +15,14 @@ function formatDuration(minutes?: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
+}
+
+function getGreeting(user: any): string {
+  const hour = new Date().getHours();
+  const name = user?.firstName || 'there';
+  if (hour < 12) return `Good morning, ${name}`;
+  if (hour < 17) return `Good afternoon, ${name}`;
+  return `Good evening, ${name}`;
 }
 
 function getPriorityColor(theme: any, priority: Task['priority']): string {
@@ -34,6 +43,7 @@ export default function TodayScreen() {
   const today = new Date().toISOString().split('T')[0];
   const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: today });
   const { data: readiness } = useReadinessScore();
+  const { data: user } = useUser();
   const completeTask = useCompleteTask();
 
   const isBehindSchedule = useMemo(() => {
@@ -84,10 +94,16 @@ export default function TodayScreen() {
             <Text style={styles.avatarText}>A</Text>
           </View>
           <View>
-            <Text style={[styles.greeting, { color: theme.colors.text }]}>Good morning, Alex</Text>
+            <Text style={[styles.greeting, { color: theme.colors.text }]}>{getGreeting(user)}</Text>
             <Text style={[styles.date, { color: theme.colors.textMuted }]}>{dayName}, {monthDay}</Text>
           </View>
         </View>
+        <Pressable
+          style={[styles.reflectionButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+          onPress={() => router.push('/(app)/today/reflection')}
+        >
+          <Text style={[styles.reflectionButtonText, { color: theme.colors.text }]}>Reflect</Text>
+        </Pressable>
       </View>
 
       {isLoading ? (
@@ -259,6 +275,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.05,
+  },
+  reflectionButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  reflectionButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   content: {
     paddingHorizontal: 20,

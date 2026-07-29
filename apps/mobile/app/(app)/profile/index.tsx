@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
+import { useLogout } from '@/hooks/useAuth';
 
 const AI_PERSONALITIES = [
   { id: 'direct', label: 'Direct', icon: '⚡' },
@@ -29,6 +30,14 @@ export default function ProfileScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
   const [selectedPersonality, setSelectedPersonality] = useState('balanced');
+  const logout = useLogout();
+
+  const handleSignOut = () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Sign Out', style: 'destructive', onPress: () => logout.mutate() },
+    ]);
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -207,8 +216,14 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Pressable style={[styles.signOutButton, { backgroundColor: theme.colors.errorMuted, borderColor: theme.colors.error }]}>
-          <Text style={[styles.signOutText, { color: theme.colors.error }]}>Sign Out</Text>
+        <Pressable
+          style={[styles.signOutButton, { backgroundColor: theme.colors.errorMuted, borderColor: theme.colors.error }]}
+          onPress={handleSignOut}
+          disabled={logout.isPending}
+        >
+          <Text style={[styles.signOutText, { color: theme.colors.error }]}>
+            {logout.isPending ? 'Signing Out...' : 'Sign Out'}
+          </Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

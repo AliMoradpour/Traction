@@ -81,6 +81,12 @@ export default function RecoveryScreen() {
     }
   };
 
+  useEffect(() => {
+    if (!showRecovery && !loadingSession) {
+      router.replace(`/focus/${taskId}`);
+    }
+  }, [showRecovery, loadingSession, taskId, router]);
+
   if (loadingSession) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -92,7 +98,6 @@ export default function RecoveryScreen() {
   }
 
   if (!showRecovery) {
-    router.replace(`/focus/${taskId}`);
     return null;
   }
 

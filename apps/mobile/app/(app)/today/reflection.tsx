@@ -23,7 +23,8 @@ export default function ReflectionScreen() {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const [note, setNote] = useState('');
 
-  const { data: tasks, isLoading: loadingTasks } = useTasks({ status: 'pending' });
+  const { data: pendingTasksData, isLoading: loadingPending } = useTasks({ status: 'PENDING' });
+  const { data: completedTasksData, isLoading: loadingCompleted } = useTasks({ status: 'COMPLETED' });
   const trackBehavior = useTrackBehavior();
 
   const toggleCompleted = (taskId: string) => {
@@ -73,7 +74,7 @@ export default function ReflectionScreen() {
     }
   };
 
-  if (loadingTasks) {
+  if (loadingPending || loadingCompleted) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.loadingState}>
@@ -84,7 +85,8 @@ export default function ReflectionScreen() {
     );
   }
 
-  const taskList = tasks ?? [];
+  const completedList = completedTasksData ?? [];
+  const pendingList = pendingTasksData ?? [];
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -118,11 +120,11 @@ export default function ReflectionScreen() {
                 Every win counts. Select your finished tasks.
               </Text>
             </View>
-            {taskList.length === 0 ? (
-              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No tasks available.</Text>
+            {completedList.length === 0 ? (
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No completed tasks yet.</Text>
             ) : (
               <View style={styles.taskList}>
-                {taskList.map((task) => (
+                {completedList.map((task) => (
                   <Pressable
                     key={task.id}
                     style={[
@@ -166,11 +168,11 @@ export default function ReflectionScreen() {
                 It's okay. Let's identify the carry-overs.
               </Text>
             </View>
-            {taskList.length === 0 ? (
-              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>No tasks available.</Text>
+            {pendingList.length === 0 ? (
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>All tasks completed!</Text>
             ) : (
               <View style={styles.taskList}>
-                {taskList.map((task) => (
+                {pendingList.map((task) => (
                   <Pressable
                     key={task.id}
                     style={[

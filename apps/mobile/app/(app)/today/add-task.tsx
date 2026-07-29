@@ -44,6 +44,8 @@ export default function AddTaskScreen() {
       return;
     }
 
+    const today = new Date().toISOString().split('T')[0];
+
     createTask.mutate(
       {
         title: title.trim(),
@@ -52,6 +54,7 @@ export default function AddTaskScreen() {
         priority,
         duration: parseDuration(duration),
         goalId: goalId || undefined,
+        scheduledAt: today,
       },
       {
         onSuccess: () => {

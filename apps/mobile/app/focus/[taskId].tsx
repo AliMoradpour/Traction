@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useFocus';
 import { useReadinessScore } from '@/hooks/useExecution';
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useCompleteTask } from '@/hooks/useTasks';
 import { behaviorService } from '@/services';
 
 const RESISTANCE_REASONS = [
@@ -80,6 +81,7 @@ export default function FocusSessionScreen() {
   const pauseSession = usePauseFocusSession();
   const resumeSession = useResumeFocusSession();
   const cancelSession = useCancelFocusSession();
+  const completeTask = useCompleteTask();
 
   const adaptiveDurationMin = useMemo(() => {
     const readinessScore = readiness?.score ?? 50;
@@ -142,7 +144,7 @@ export default function FocusSessionScreen() {
   }, [startSession, taskId, confirmedDuration]);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setTimeout>;
+    let interval: ReturnType<typeof setInterval>;
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => prev - 1);
@@ -187,6 +189,9 @@ export default function FocusSessionScreen() {
       setIsActive(false);
       await completeSession.mutateAsync(sessionId);
       behaviorService.track({ type: 'FOCUS_COMPLETED', taskId, focusSessionId: sessionId });
+      if (taskId) {
+        completeTask.mutate(taskId);
+      }
       Alert.alert('Session Complete', 'Great work! You completed the focus session.', [
         { text: 'OK', onPress: () => router.back() },
       ]);
