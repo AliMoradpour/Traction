@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useCallback } from 'react';
+import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -111,11 +111,13 @@ export default function ReplanScreen() {
     }
   }, [plan, updateTask, router]);
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 500,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>

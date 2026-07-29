@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useWeeklyMetrics } from '@/hooks/useBehavior';
+import { Button } from '@/components/ui/Button';
 
 function startOfWeek(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');
@@ -49,7 +50,7 @@ export default function WeeklyMetricsScreen() {
   const router = useRouter();
   const [weekStart, setWeekStart] = useState(startOfWeek(todayStr()));
 
-  const { data: metrics, isLoading } = useWeeklyMetrics(weekStart);
+  const { data: metrics, isLoading, isError, refetch } = useWeeklyMetrics(weekStart);
 
   const isCurrentWeek = weekStart === startOfWeek(todayStr());
 
@@ -112,6 +113,15 @@ export default function WeeklyMetricsScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
@@ -285,6 +295,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   card: {
     padding: 16,

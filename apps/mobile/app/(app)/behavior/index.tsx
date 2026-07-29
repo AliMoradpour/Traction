@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,6 @@ import {
   useBehaviorIndicators,
   useBurnoutRisk,
   useProcrastinationProfile,
-  useBehaviorTimeline,
 } from '@/hooks/useBehavior';
 
 function ScoreColor(theme: any, score: number, inverted = false): string {
@@ -95,11 +94,13 @@ export default function BehaviorDashboardScreen() {
     refetchProcrastination();
   }, [refetchDaily, refetchIndicators, refetchBurnout, refetchProcrastination]);
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 500,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const todayDate = new Date();
   const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' });

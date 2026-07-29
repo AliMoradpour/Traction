@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useMomentum, useExecutionStats } from '@/hooks/useExecution';
+import { Button } from '@/components/ui/Button';
 
 function TrendArrow({ trend, theme }: { trend: string; theme: any }) {
   let symbol = '→';
@@ -32,16 +33,19 @@ export default function MomentumScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: momentum, isLoading: loadingMomentum, refetch: refetchMomentum } = useMomentum();
-  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useExecutionStats();
+  const { data: momentum, isLoading: loadingMomentum, isError: momentumError, refetch: refetchMomentum } = useMomentum();
+  const { data: stats, isLoading: loadingStats, isError: statsError, refetch: refetchStats } = useExecutionStats();
 
   const isLoading = loadingMomentum || loadingStats;
+  const isError = momentumError || statsError;
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 500,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -56,6 +60,15 @@ export default function MomentumScreen() {
       {isLoading ? (
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => { refetchMomentum(); refetchStats(); }} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView
@@ -171,6 +184,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   trendCard: {
     padding: 20,

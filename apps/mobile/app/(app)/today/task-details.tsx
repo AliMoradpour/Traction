@@ -170,7 +170,7 @@ export default function TaskDetailsScreen() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.field}>
           <Text style={[styles.label, { color: theme.colors.textMuted }]}>TASK NAME</Text>
           <TextInput

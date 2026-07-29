@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useProcrastinationProfile } from '@/hooks/useBehavior';
+import { Button } from '@/components/ui/Button';
 
 function getRecommendation(patterns: string[]): string[] {
   const recs: string[] = [];
@@ -37,7 +38,7 @@ function ScoreColor(theme: any, score: number): string {
 export default function ProcrastinationScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const { data: profile, isLoading } = useProcrastinationProfile();
+  const { data: profile, isLoading, isError, refetch } = useProcrastinationProfile();
 
   const recommendations = useMemo(() => {
     return getRecommendation(profile?.patterns ?? []);
@@ -60,6 +61,15 @@ export default function ProcrastinationScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
@@ -175,6 +185,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   gaugeCard: {
     padding: 24,

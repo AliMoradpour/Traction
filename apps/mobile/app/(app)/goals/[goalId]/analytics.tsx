@@ -3,6 +3,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useGoal, useGoalMilestones, useGoalHealth } from '@/hooks/useGoals';
+import { Button } from '@/components/ui/Button';
 
 function calcWeeksElapsed(startDate: string): number {
   const start = new Date(startDate);
@@ -23,17 +24,33 @@ export default function GoalAnalyticsScreen() {
   const router = useRouter();
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
 
-  const { data: goal, isLoading: goalLoading } = useGoal(goalId || '');
-  const { data: milestones, isLoading: milestonesLoading } = useGoalMilestones(goalId || '');
-  const { data: health, isLoading: healthLoading } = useGoalHealth(goalId || '');
+  const { data: goal, isLoading: goalLoading, isError: goalError, refetch: refetchGoal } = useGoal(goalId || '');
+  const { data: milestones, isLoading: milestonesLoading, isError: milestonesError, refetch: refetchMilestones } = useGoalMilestones(goalId || '');
+  const { data: health, isLoading: healthLoading, isError: healthError, refetch: refetchHealth } = useGoalHealth(goalId || '');
 
   const isLoading = goalLoading || milestonesLoading || healthLoading;
+  const isError = goalError || milestonesError || healthError;
 
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => { refetchGoal(); refetchMilestones(); refetchHealth(); }} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       </SafeAreaView>
     );

@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useBurnoutRisk } from '@/hooks/useBehavior';
+import { Button } from '@/components/ui/Button';
 
 const SIGNAL_LABELS = [
   'Completion decline',
@@ -74,7 +75,7 @@ function TrendArrow({ trend, theme }: { trend: string; theme: any }) {
 export default function BurnoutScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const { data: burnout, isLoading } = useBurnoutRisk();
+  const { data: burnout, isLoading, isError, refetch } = useBurnoutRisk();
 
   const signalScores = useMemo(() => {
     if (!burnout) return [0, 0, 0, 0, 0];
@@ -109,6 +110,15 @@ export default function BurnoutScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
@@ -207,6 +217,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   gaugeCard: {
     padding: 24,

@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useDailyMetrics } from '@/hooks/useBehavior';
+import { Button } from '@/components/ui/Button';
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr + 'T00:00:00');
@@ -37,7 +38,7 @@ export default function DailyMetricsScreen() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(todayStr());
 
-  const { data: metrics, isLoading } = useDailyMetrics(selectedDate);
+  const { data: metrics, isLoading, isError, refetch } = useDailyMetrics(selectedDate);
 
   const isToday = selectedDate === todayStr();
 
@@ -90,6 +91,15 @@ export default function DailyMetricsScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : !hasData ? (
         <View style={styles.centerContent}>
@@ -255,6 +265,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   emptyIcon: {
     fontSize: 40,

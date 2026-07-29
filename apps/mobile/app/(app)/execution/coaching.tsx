@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useReadinessScore, useResistance, useMomentum } from '@/hooks/useExecution';
+import { Button } from '@/components/ui/Button';
 
 interface CoachingRecommendation {
   category: 'resistance' | 'readiness' | 'momentum' | 'optimal';
@@ -77,11 +78,12 @@ export default function CoachingScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: readiness, isLoading: loadingReadiness, refetch: refetchReadiness } = useReadinessScore();
-  const { data: resistance, isLoading: loadingResistance, refetch: refetchResistance } = useResistance();
-  const { data: momentum, isLoading: loadingMomentum, refetch: refetchMomentum } = useMomentum();
+  const { data: readiness, isLoading: loadingReadiness, isError: readinessError, refetch: refetchReadiness } = useReadinessScore();
+  const { data: resistance, isLoading: loadingResistance, isError: resistanceError, refetch: refetchResistance } = useResistance();
+  const { data: momentum, isLoading: loadingMomentum, isError: momentumError, refetch: refetchMomentum } = useMomentum();
 
   const isLoading = loadingReadiness || loadingResistance || loadingMomentum;
+  const isError = readinessError || resistanceError || momentumError;
 
   const handleRefresh = () => {
     refetchReadiness();
@@ -196,11 +198,13 @@ export default function CoachingScreen() {
     return recs;
   }, [readinessScore, resistanceScore, currentStreak, trend]);
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 500,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -218,6 +222,15 @@ export default function CoachingScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Analyzing your execution...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => handleRefresh()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView
@@ -287,6 +300,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   content: {
     paddingHorizontal: 20,

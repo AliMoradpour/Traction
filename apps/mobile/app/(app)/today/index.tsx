@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo } from 'react';
+import { useRef, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,11 +53,13 @@ export default function TodayScreen() {
     return incomplete.length > 2 && hour >= 14;
   }, [tasks, readiness]);
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 600,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleStartSession = (taskId?: string) => {
     if (taskId) {

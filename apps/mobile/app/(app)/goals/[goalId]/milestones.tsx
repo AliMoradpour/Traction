@@ -165,7 +165,7 @@ export default function MilestonesScreen() {
         <View style={{ width: 60 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
             <Text style={[styles.progressTitle, { color: theme.colors.text }]}>Overall Progress</Text>

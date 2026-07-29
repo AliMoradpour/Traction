@@ -111,7 +111,7 @@ export default function ReflectionScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         {currentStep === 1 && (
           <View style={styles.step}>
             <View style={styles.stepHeader}>

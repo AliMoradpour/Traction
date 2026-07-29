@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useReadinessScore, useMomentum, useResistance, useExecutionStats } from '@/hooks/useExecution';
+import { Button } from '@/components/ui/Button';
 
 function TrendArrow({ trend, theme }: { trend: string; theme: any }) {
   let symbol = '→';
@@ -43,12 +44,13 @@ export default function ExecutionDashboardScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: readiness, isLoading: loadingReadiness, refetch: refetchReadiness } = useReadinessScore();
-  const { data: momentum, isLoading: loadingMomentum, refetch: refetchMomentum } = useMomentum();
-  const { data: resistance, isLoading: loadingResistance, refetch: refetchResistance } = useResistance();
-  const { data: stats, isLoading: loadingStats, refetch: refetchStats } = useExecutionStats();
+  const { data: readiness, isLoading: loadingReadiness, isError: readinessError, refetch: refetchReadiness } = useReadinessScore();
+  const { data: momentum, isLoading: loadingMomentum, isError: momentumError, refetch: refetchMomentum } = useMomentum();
+  const { data: resistance, isLoading: loadingResistance, isError: resistanceError, refetch: refetchResistance } = useResistance();
+  const { data: stats, isLoading: loadingStats, isError: statsError, refetch: refetchStats } = useExecutionStats();
 
   const isLoading = loadingReadiness || loadingMomentum || loadingResistance || loadingStats;
+  const isError = readinessError || momentumError || resistanceError || statsError;
 
   const handleRefresh = useCallback(() => {
     refetchReadiness();
@@ -57,11 +59,13 @@ export default function ExecutionDashboardScreen() {
     refetchStats();
   }, [refetchReadiness, refetchMomentum, refetchResistance, refetchStats]);
 
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 500,
-    useNativeDriver: true,
-  }).start();
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const todayDate = new Date();
   const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' });
@@ -82,6 +86,15 @@ export default function ExecutionDashboardScreen() {
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading...</Text>
+        </View>
+      ) : isError ? (
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => handleRefresh()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       ) : (
         <ScrollView
@@ -245,6 +258,11 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   gauge: {
     padding: 20,

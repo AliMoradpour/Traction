@@ -2,20 +2,37 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-nat
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useUsageSummary, useUsageByFeature, useUsageByDay } from '@/hooks/useAI';
+import { Button } from '@/components/ui/Button';
 
 export default function UsageScreen() {
   const theme = useTractionTheme();
-  const { data: summary, isLoading: summaryLoading } = useUsageSummary();
-  const { data: byFeature, isLoading: featureLoading } = useUsageByFeature();
-  const { data: byDay, isLoading: dayLoading } = useUsageByDay(7);
+  const { data: summary, isLoading: summaryLoading, isError: summaryError, refetch: refetchSummary } = useUsageSummary();
+  const { data: byFeature, isLoading: featureLoading, isError: featureError, refetch: refetchFeature } = useUsageByFeature();
+  const { data: byDay, isLoading: dayLoading, isError: dayError, refetch: refetchDay } = useUsageByDay(7);
 
   const isLoading = summaryLoading || featureLoading || dayLoading;
+  const isError = summaryError || featureError || dayError;
 
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isError) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.centerContent}>
+          <Text style={[styles.errorText, { color: theme.colors.danger }]}>
+            Failed to load data
+          </Text>
+          <Button variant="secondary" onPress={() => { refetchSummary(); refetchFeature(); refetchDay(); }} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
         </View>
       </SafeAreaView>
     );
@@ -153,6 +170,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  errorText: {
+    fontSize: 17,
+    fontWeight: '500',
+    textAlign: 'center',
   },
   content: {
     paddingHorizontal: 20,
