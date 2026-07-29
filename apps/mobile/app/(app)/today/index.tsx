@@ -1,5 +1,5 @@
-import { useRef, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Animated, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+import React, { useRef, useCallback, useMemo, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Pressable, Animated, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
@@ -34,6 +34,81 @@ function getPriorityColor(theme: any, priority: Task['priority']): string {
     default: return theme.colors.textMuted;
   }
 }
+
+const TaskCard = React.memo(function TaskCard({
+  task,
+  theme,
+  onComplete,
+  onStartSession,
+  onPress,
+}: {
+  task: Task;
+  theme: any;
+  onComplete: (id: string) => void;
+  onStartSession: (id: string) => void;
+  onPress: (id: string) => void;
+}) {
+  const isCompleted = task.status === 'COMPLETED';
+  return (
+    <Pressable
+      style={[
+        styles.taskCard,
+        { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
+        isCompleted && styles.taskCardCompleted,
+      ]}
+      onPress={() => onPress(task.id)}
+    >
+      <Pressable
+        style={[
+          styles.checkbox,
+          { borderColor: getPriorityColor(theme, task.priority) },
+          isCompleted && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
+        ]}
+        onPress={(e) => {
+          e.stopPropagation();
+          if (!isCompleted) onComplete(task.id);
+        }}
+      >
+        {isCompleted && <Text style={styles.checkmark}>✓</Text>}
+      </Pressable>
+      <View style={styles.taskContent}>
+        <Text
+          style={[
+            styles.taskTitle,
+            { color: theme.colors.text },
+            isCompleted && { textDecorationLine: 'line-through', color: theme.colors.textMuted },
+          ]}
+        >
+          {task.title}
+        </Text>
+        <View style={styles.taskMeta}>
+          {task.duration ? (
+            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
+              ⏱ {formatDuration(task.duration)}
+            </Text>
+          ) : null}
+          {task.category ? (
+            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
+              📁 {task.category}
+            </Text>
+          ) : null}
+          <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(theme, task.priority) }]} />
+        </View>
+      </View>
+      {!isCompleted && (
+        <Pressable
+          style={[styles.focusButton, { backgroundColor: theme.colors.primary }]}
+          onPress={(e) => {
+            e.stopPropagation();
+            onStartSession(task.id);
+          }}
+        >
+          <Text style={styles.focusButtonText}>▶</Text>
+        </Pressable>
+      )}
+    </Pressable>
+  );
+});
 
 export default function TodayScreen() {
   const theme = useTractionTheme();
@@ -123,114 +198,59 @@ export default function TodayScreen() {
           </Button>
         </View>
       ) : (
-        <ScrollView
+        <FlatList
+          data={tasks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item: task }) => (
+            <TaskCard
+              task={task}
+              theme={theme}
+              onComplete={handleCompleteTask}
+              onStartSession={handleStartSession}
+              onPress={handleTaskPress}
+            />
+          )}
+          ListHeaderComponent={
+            <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
+              <View style={styles.sectionHeader}>
+                <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
+                <View style={styles.headerButtons}>
+                  {isBehindSchedule && (
+                    <Pressable
+                      style={[styles.replanButton, { backgroundColor: theme.colors.warning || theme.colors.accent }]}
+                      onPress={() => router.push('/(app)/today/replan' as any)}
+                    >
+                      <Text style={styles.replanButtonText}>Replan Day</Text>
+                    </Pressable>
+                  )}
+                  <Pressable
+                    style={[styles.smartStartButton, { backgroundColor: theme.colors.primaryContainer }]}
+                    onPress={() => router.push('/(app)/today/smart-start' as any)}
+                  >
+                    <Text style={[styles.smartStartButtonText, { color: theme.colors.primary }]}>Smart Start</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
+                    onPress={() => router.push('/(app)/today/planner' as any)}
+                  >
+                    <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Animated.View>
+          }
+          ListEmptyComponent={
+            <View style={[styles.emptyState, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+              <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>📋</Text>
+              <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No tasks for today</Text>
+              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
+                Tap + to add your first task
+              </Text>
+            </View>
+          }
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={theme.colors.primary} />}
-        >
-          <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
-            <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
-              <View style={styles.headerButtons}>
-                {isBehindSchedule && (
-                  <Pressable
-                    style={[styles.replanButton, { backgroundColor: theme.colors.warning || theme.colors.accent }]}
-                    onPress={() => router.push('/(app)/today/replan' as any)}
-                  >
-                    <Text style={styles.replanButtonText}>Replan Day</Text>
-                  </Pressable>
-                )}
-                <Pressable
-                  style={[styles.smartStartButton, { backgroundColor: theme.colors.primaryContainer }]}
-                  onPress={() => router.push('/(app)/today/smart-start' as any)}
-                >
-                  <Text style={[styles.smartStartButtonText, { color: theme.colors.primary }]}>Smart Start</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
-                  onPress={() => router.push('/(app)/today/planner' as any)}
-                >
-                  <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
-                </Pressable>
-              </View>
-            </View>
-
-            {tasks && tasks.length > 0 ? (
-              <View style={styles.taskList}>
-                {tasks.map((task) => {
-                  const isCompleted = task.status === 'COMPLETED';
-                  return (
-                    <Pressable
-                      key={task.id}
-                      style={[
-                        styles.taskCard,
-                        { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
-                        isCompleted && styles.taskCardCompleted,
-                      ]}
-                      onPress={() => handleTaskPress(task.id)}
-                    >
-                      <Pressable
-                        style={[
-                          styles.checkbox,
-                          { borderColor: getPriorityColor(theme, task.priority) },
-                          isCompleted && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
-                        ]}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          if (!isCompleted) handleCompleteTask(task.id);
-                        }}
-                      >
-                        {isCompleted && <Text style={styles.checkmark}>✓</Text>}
-                      </Pressable>
-                      <View style={styles.taskContent}>
-                        <Text
-                          style={[
-                            styles.taskTitle,
-                            { color: theme.colors.text },
-                            isCompleted && { textDecorationLine: 'line-through', color: theme.colors.textMuted },
-                          ]}
-                        >
-                          {task.title}
-                        </Text>
-                        <View style={styles.taskMeta}>
-                          {task.duration ? (
-                            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-                              ⏱ {formatDuration(task.duration)}
-                            </Text>
-                          ) : null}
-                          {task.category ? (
-                            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-                              📁 {task.category}
-                            </Text>
-                          ) : null}
-                          <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(theme, task.priority) }]} />
-                        </View>
-                      </View>
-                      {!isCompleted && (
-                        <Pressable
-                          style={[styles.focusButton, { backgroundColor: theme.colors.primary }]}
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            handleStartSession(task.id);
-                          }}
-                        >
-                          <Text style={styles.focusButtonText}>▶</Text>
-                        </Pressable>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            ) : (
-              <View style={[styles.emptyState, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>📋</Text>
-                <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No tasks for today</Text>
-                <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
-                  Tap + to add your first task
-                </Text>
-              </View>
-            )}
-          </Animated.View>
-        </ScrollView>
+        />
       )}
 
       <Pressable style={[styles.fab, { backgroundColor: theme.colors.primary }]} onPress={handleAddTask}>

@@ -187,6 +187,49 @@ export class ExecutionService {
     trend: 'improving' | 'stable' | 'declining';
   }> {
     const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Batch query: Get all completed tasks in the last 30 days
+    const completedTasks = await this.prisma.task.findMany({
+      where: {
+        userId,
+        status: 'COMPLETED',
+        completedAt: { gte: thirtyDaysAgo },
+      },
+      select: {
+        completedAt: true,
+      },
+    });
+
+    // Batch query: Get all focus sessions in the last 30 days
+    const focusSessions = await this.prisma.focusSession.findMany({
+      where: {
+        userId,
+        startedAt: { gte: thirtyDaysAgo },
+      },
+      select: {
+        startedAt: true,
+      },
+    });
+
+    // Group tasks by day
+    const tasksByDay = new Map<string, number>();
+    completedTasks.forEach((task) => {
+      if (task.completedAt) {
+        const dayKey = new Date(task.completedAt).toISOString().split('T')[0];
+        tasksByDay.set(dayKey, (tasksByDay.get(dayKey) || 0) + 1);
+      }
+    });
+
+    // Group focus sessions by day
+    const sessionsByDay = new Map<string, number>();
+    focusSessions.forEach((session) => {
+      if (session.startedAt) {
+        const dayKey = new Date(session.startedAt).toISOString().split('T')[0];
+        sessionsByDay.set(dayKey, (sessionsByDay.get(dayKey) || 0) + 1);
+      }
+    });
 
     // Calculate current streak (days with at least 1 task completed)
     let currentStreak = 0;
@@ -194,20 +237,9 @@ export class ExecutionService {
     checkDate.setHours(0, 0, 0, 0);
 
     while (true) {
-      const dayStart = new Date(checkDate);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(checkDate);
-      dayEnd.setHours(23, 59, 59, 999);
-
-      const completedTasks = await this.prisma.task.count({
-        where: {
-          userId,
-          status: 'COMPLETED',
-          completedAt: { gte: dayStart, lte: dayEnd },
-        },
-      });
-
-      if (completedTasks === 0) break;
+      const dayKey = checkDate.toISOString().split('T')[0];
+      const completedCount = tasksByDay.get(dayKey) || 0;
+      if (completedCount === 0) break;
       currentStreak++;
       checkDate.setDate(checkDate.getDate() - 1);
     }
@@ -218,19 +250,9 @@ export class ExecutionService {
     checkDate.setHours(0, 0, 0, 0);
 
     while (true) {
-      const dayStart = new Date(checkDate);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(checkDate);
-      dayEnd.setHours(23, 59, 59, 999);
-
-      const focusSessions = await this.prisma.focusSession.count({
-        where: {
-          userId,
-          startedAt: { gte: dayStart, lte: dayEnd },
-        },
-      });
-
-      if (focusSessions === 0) break;
+      const dayKey = checkDate.toISOString().split('T')[0];
+      const sessionCount = sessionsByDay.get(dayKey) || 0;
+      if (sessionCount === 0) break;
       executionStreak++;
       checkDate.setDate(checkDate.getDate() - 1);
     }
@@ -241,19 +263,8 @@ export class ExecutionService {
     for (let i = 0; i < 14; i++) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
-      const dayStart = new Date(date);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(date);
-      dayEnd.setHours(23, 59, 59, 999);
-
-      const count = await this.prisma.task.count({
-        where: {
-          userId,
-          status: 'COMPLETED',
-          completedAt: { gte: dayStart, lte: dayEnd },
-        },
-      });
-      dailyCompletions.push(count);
+      const dayKey = date.toISOString().split('T')[0];
+      dailyCompletions.push(tasksByDay.get(dayKey) || 0);
     }
 
     // Find recovery streak (improvement after decline)
