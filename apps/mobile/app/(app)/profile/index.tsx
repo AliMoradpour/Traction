@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-nati
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
-import { useLogout } from '@/hooks/useAuth';
+import { useLogout, useUser } from '@/hooks/useAuth';
 
 const AI_PERSONALITIES = [
   { id: 'direct', label: 'Direct', icon: '⚡' },
@@ -31,6 +31,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [selectedPersonality, setSelectedPersonality] = useState('balanced');
   const logout = useLogout();
+  const { data: user } = useUser();
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -39,21 +40,24 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const userName = user ? [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email : 'User';
+  const userInitials = user ? [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join('').toUpperCase() || user.email?.[0]?.toUpperCase() || 'U' : 'U';
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <View style={[styles.avatar, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.avatarText, { color: theme.colors.text }]}>AS</Text>
+              <Text style={[styles.avatarText, { color: theme.colors.text }]}>{userInitials}</Text>
             </View>
             <View style={[styles.editBadge, { backgroundColor: theme.colors.primaryContainer }]}>
               <Text style={styles.editIcon}>✏️</Text>
             </View>
           </View>
           <View style={styles.profileInfo}>
-            <Text style={[styles.profileName, { color: theme.colors.text }]}>Alex Sterling</Text>
-            <Text style={[styles.profileRole, { color: theme.colors.textMuted }]}>Senior Product Designer</Text>
+            <Text style={[styles.profileName, { color: theme.colors.text }]}>{userName}</Text>
+            <Text style={[styles.profileRole, { color: theme.colors.textMuted }]}>{user?.email || ''}</Text>
           </View>
         </View>
 

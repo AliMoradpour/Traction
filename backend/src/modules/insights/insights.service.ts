@@ -86,12 +86,46 @@ export class InsightsService {
       take: 7,
     });
 
+    const hour = new Date().getHours();
+    let focusWindow: string;
+    if (hour < 12) focusWindow = 'Morning (current session)';
+    else if (hour < 17) focusWindow = 'Afternoon (current session)';
+    else focusWindow = 'Evening (current session)';
+
+    const recentSessions = focusSessions.filter(s => s.status === 'COMPLETED');
+    const avgDuration = recentSessions.length > 0
+      ? Math.round(recentSessions.reduce((sum, s) => {
+          const duration = s.endedAt && s.startedAt
+            ? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
+            : 0;
+          return sum + duration;
+        }, 0) / recentSessions.length)
+      : 0;
+
+    const energyLevel = Math.min(100, Math.max(0, 50 + recentSessions.length * 5 + (tasks.length > 0 ? 10 : 0)));
+
+    const recommendations: string[] = [];
+    if (tasks.length > 0) {
+      recommendations.push(`Start with: ${tasks[0].title}`);
+    }
+    if (recentSessions.length === 0) {
+      recommendations.push('Begin your first focus session today');
+    } else if (avgDuration < 15) {
+      recommendations.push('Try extending your focus sessions gradually');
+    }
+    if (tasks.length > 3) {
+      recommendations.push('Consider breaking large tasks into smaller ones');
+    }
+    if (recommendations.length === 0) {
+      recommendations.push('Keep up your consistent focus routine');
+    }
+
     return {
-      focusWindow: '9:00 AM - 12:00 PM',
-      frictionSummary: `You have ${tasks.length} pending tasks`,
+      focusWindow,
+      frictionSummary: `You have ${tasks.length} pending task${tasks.length !== 1 ? 's' : ''} and completed ${recentSessions.length} focus session${recentSessions.length !== 1 ? 's' : ''} recently`,
       prioritizedTasks: tasks.map(t => t.title),
-      energyLevel: 75,
-      recommendations: ['Start with your highest priority task', 'Take breaks between focus sessions'],
+      energyLevel,
+      recommendations,
     };
   }
 
@@ -102,18 +136,69 @@ export class InsightsService {
       take: 50,
     });
 
+    const focusEvents = events.filter(e => e.type === 'FOCUS_COMPLETED' || e.type === 'FOCUS_ABANDONED');
+    const completedFocus = focusEvents.filter(e => e.type === 'FOCUS_COMPLETED');
+    const abandonedFocus = focusEvents.filter(e => e.type === 'FOCUS_ABANDONED');
+
+    const patterns: string[] = [];
+    if (completedFocus.length > abandonedFocus.length) {
+      patterns.push('You complete more focus sessions than you abandon');
+    } else if (abandonedFocus.length > 0) {
+      patterns.push('You have abandoned some focus sessions recently');
+    }
+
+    const stuckEvents = events.filter(e => e.type === 'WHY_AM_I_STUCK');
+    if (stuckEvents.length > 2) {
+      patterns.push('You frequently encounter friction during tasks');
+    }
+
+    if (patterns.length === 0) {
+      patterns.push('Building your behavioral profile as you use the app');
+    }
+
+    const triggers: string[] = [];
+    if (stuckEvents.length > 0) {
+      const reasons = stuckEvents.map(e => e.metadata).filter(Boolean);
+      if (reasons.length > 0) {
+        triggers.push(`Common friction: ${reasons[0]}`);
+      }
+    }
+    if (abandonedFocus.length > 0) {
+      triggers.push('Focus abandonment detected in recent sessions');
+    }
+    if (triggers.length === 0) {
+      triggers.push('No significant triggers detected yet');
+    }
+
+    const suggestedChanges: string[] = [];
+    if (completedFocus.length < 3) {
+      suggestedChanges.push('Try to complete at least 3 focus sessions per day');
+    }
+    if (stuckEvents.length > 2) {
+      suggestedChanges.push('Consider breaking tasks into smaller pieces');
+    }
+    if (suggestedChanges.length === 0) {
+      suggestedChanges.push('Continue building consistent focus habits');
+    }
+
     return {
-      patterns: ['You are most productive in the morning', 'You tend to skip tasks after lunch'],
-      triggers: ['Long tasks cause procrastination', ' interruptions break your flow'],
-      suggestedChanges: ['Break long tasks into smaller pieces', 'Schedule deep work in the morning'],
+      patterns,
+      triggers,
+      suggestedChanges,
     };
   }
 
   async getWeeklyReview(userId: string): Promise<any> {
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
     const completedTasks = await this.prisma.task.findMany({
-      where: { userId, status: 'COMPLETED' },
+      where: {
+        userId,
+        status: 'COMPLETED',
+        completedAt: { gte: weekAgo },
+      },
       orderBy: { completedAt: 'desc' },
-      take: 10,
     });
 
     const pendingTasks = await this.prisma.task.findMany({
@@ -122,11 +207,30 @@ export class InsightsService {
       take: 10,
     });
 
+    const totalTasks = completedTasks.length + pendingTasks.length;
+    const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+
+    const wins = completedTasks.slice(0, 5).map(t => t.title);
+    if (wins.length === 0) {
+      wins.push('No tasks completed this week yet');
+    }
+
+    const commitments = pendingTasks.slice(0, 5).map(t => t.title);
+    if (commitments.length === 0) {
+      commitments.push('No pending tasks');
+    }
+
+    const nextShift = completionRate >= 80
+      ? 'Excellent completion rate! Maintain this momentum.'
+      : completionRate >= 50
+      ? 'Good progress. Focus on completing remaining tasks.'
+      : 'Try to complete more tasks next week. Consider reducing your task load.';
+
     return {
-      wins: completedTasks.slice(0, 3).map(t => t.title),
-      commitments: pendingTasks.slice(0, 3).map(t => t.title),
-      missedPatterns: ['You completed 70% of your tasks this week'],
-      nextShift: 'Focus on completing your top 3 priorities next week',
+      wins,
+      commitments,
+      missedPatterns: [`You completed ${completionRate}% of your tasks this week`],
+      nextShift,
     };
   }
 }
