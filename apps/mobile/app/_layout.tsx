@@ -6,8 +6,10 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { useAuthStore } from '@/store/auth.store';
 import { queryClient } from '@/lib/queryClient';
+import { setAuthFailureCallback } from '@/api/interceptors';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -47,9 +49,19 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const loadStoredAuth = useAuthStore((state) => state.loadStoredAuth);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const router = useRouter();
 
   useEffect(() => {
     loadStoredAuth();
+  }, []);
+
+  useEffect(() => {
+    setAuthFailureCallback(() => {
+      clearAuth();
+      queryClient.clear();
+      router.replace('/(auth)/login');
+    });
   }, []);
 
   useEffect(() => {
@@ -61,7 +73,9 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <AuthProvider>
-            <RootLayoutNav />
+            <ErrorBoundary>
+              <RootLayoutNav />
+            </ErrorBoundary>
             <StatusBar style="auto" />
           </AuthProvider>
         </ThemeProvider>

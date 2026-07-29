@@ -4,6 +4,12 @@ import * as SecureStore from 'expo-secure-store';
 const ACCESS_TOKEN_KEY = 'traction_access_token';
 const REFRESH_TOKEN_KEY = 'traction_refresh_token';
 
+let onAuthFailure: (() => void) | null = null;
+
+export function setAuthFailureCallback(callback: () => void) {
+  onAuthFailure = callback;
+}
+
 export interface ApiErrorResponse {
   data: null;
   meta: Record<string, unknown>;
@@ -127,6 +133,9 @@ export function setupInterceptors(client: AxiosInstance) {
         } catch (refreshError) {
           processQueue(refreshError, null);
           await tokenStorage.clearTokens();
+          if (onAuthFailure) {
+            onAuthFailure();
+          }
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;

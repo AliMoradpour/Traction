@@ -1,4 +1,20 @@
 import { QueryClient } from '@tanstack/react-query';
+import { parseApiError } from '@/api/errors';
+
+function handleGlobalError(error: unknown) {
+  const apiError = parseApiError(error);
+
+  if (apiError.code === 'NETWORK_ERROR' || apiError.code === 'TIMEOUT') {
+    console.warn('Network error:', apiError.message);
+    return;
+  }
+
+  if (apiError.code === 'UNAUTHORIZED') {
+    return;
+  }
+
+  console.warn('API error:', apiError.code, apiError.message);
+}
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,6 +28,7 @@ export const queryClient = new QueryClient({
     },
     mutations: {
       retry: 1,
+      onError: handleGlobalError,
     },
   },
 });
