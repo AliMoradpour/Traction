@@ -25,7 +25,7 @@ export function useRegister() {
     mutationFn: (data: RegisterRequest) => authApi.register(data),
     onSuccess: (data: AuthResponse) => {
       setAuth(data.user, data.accessToken, data.refreshToken);
-      router.replace('/(onboarding)/introduction');
+      router.replace('/(auth)/onboarding' as any);
     },
   });
 }
