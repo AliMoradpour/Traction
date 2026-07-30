@@ -57,10 +57,11 @@ function RootLayoutNav() {
     const inAuthGroup = seg0?.startsWith('(auth)') ?? false;
     const inOnboardingGroup = seg0?.startsWith('(onboarding)') ?? false;
     const isIndex = segments.length <= 1;
+    const isWelcomeIntroRoute = (segments as string[]).includes('welcome-intro');
 
     if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup && !isIndex) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
+    } else if (isAuthenticated && inAuthGroup && !isWelcomeIntroRoute) {
       router.replace('/(app)/today');
     }
   }, [isAuthenticated, isLoading, segments]);

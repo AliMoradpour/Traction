@@ -34,9 +34,9 @@ export default function OnboardingScreen() {
         dailyTime,
         onboardingComplete: true,
       } as any);
-      router.replace('/(app)/today');
+      router.replace('/(auth)/welcome-intro' as any);
     } catch (e) {
-      router.replace('/(app)/today');
+      router.replace('/(auth)/welcome-intro' as any);
     }
   };
 
