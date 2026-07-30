@@ -52,7 +52,7 @@ export default function ProfileScreen() {
       if (tapTimerRef.current) {
         clearTimeout(tapTimerRef.current);
       }
-      router.push('/profile/developer');
+      router.push('/profile/developer' as any);
     }
   }, [router]);
 
