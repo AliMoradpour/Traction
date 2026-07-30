@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -11,8 +12,33 @@ import { useAuthStore } from '@/store/auth.store';
 import { queryClient } from '@/lib/queryClient';
 import { setAuthFailureCallback } from '@/api/interceptors';
 import { issueReporter } from '@/lib/issueReporter';
+import { useConnectivity } from '@/hooks/useConnectivity';
 
 SplashScreen.preventAutoHideAsync();
+
+function OfflineBanner() {
+  const { isOffline } = useConnectivity();
+  if (!isOffline) return null;
+  return (
+    <View style={offlineStyles.banner}>
+      <Text style={offlineStyles.text}>You are offline</Text>
+    </View>
+  );
+}
+
+const offlineStyles = StyleSheet.create({
+  banner: {
+    backgroundColor: '#F59E0B',
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  text: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+});
 
 function RootLayoutNav() {
   const router = useRouter();
@@ -78,6 +104,7 @@ export default function RootLayout() {
         <ThemeProvider>
           <AuthProvider>
             <ErrorBoundary>
+              <OfflineBanner />
               <RootLayoutNav />
             </ErrorBoundary>
             <StatusBar style="auto" />
