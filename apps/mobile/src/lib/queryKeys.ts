@@ -90,4 +90,10 @@ export const queryKeys = {
     metrics: () => [...queryKeys.ai.all, 'metrics'] as const,
     status: () => [...queryKeys.ai.all, 'status'] as const,
   },
+
+  admin: {
+    all: ['admin'] as const,
+    dashboard: () => [...queryKeys.admin.all, 'dashboard'] as const,
+    users: (page: number) => [...queryKeys.admin.all, 'users', page] as const,
+  },
 } as const;

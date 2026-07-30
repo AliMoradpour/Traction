@@ -9,6 +9,7 @@ export interface AuthResponse {
     email: string;
     firstName?: string | null;
     lastName?: string | null;
+    role?: string;
   };
 }
 

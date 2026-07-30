@@ -253,6 +253,20 @@ export default function ProfileScreen() {
           </Text>
         </Pressable>
 
+        {user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' ? (
+          <Pressable
+            style={[styles.adminButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+            onPress={() => router.push('/(admin)' as any)}
+          >
+            <Text style={styles.adminIcon}>🛡️</Text>
+            <View style={styles.adminInfo}>
+              <Text style={[styles.adminTitle, { color: theme.colors.text }]}>Admin Panel</Text>
+              <Text style={[styles.adminSubtitle, { color: theme.colors.textMuted }]}>Manage users and system settings</Text>
+            </View>
+            <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
+          </Pressable>
+        ) : null}
+
         <Pressable style={styles.versionContainer} onPress={handleVersionTap}>
           <Text style={[styles.versionText, { color: theme.colors.textSubtle }]}>
             Traction v{config.appEnv === 'production' ? '1.0.0' : '1.0.0-dev'}
@@ -458,5 +472,28 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 13,
+  },
+  adminButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginTop: 8,
+  },
+  adminIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  adminInfo: {
+    flex: 1,
+  },
+  adminTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  adminSubtitle: {
+    fontSize: 13,
+    marginTop: 2,
   },
 });

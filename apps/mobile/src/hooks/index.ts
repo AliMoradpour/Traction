@@ -19,3 +19,4 @@ export {
   useStuckAnalysis,
   useGoalRecovery,
 } from './useAI';
+export { useAdminDashboard, useAdminUsers, useUpdateUserRole } from './useAdmin';
