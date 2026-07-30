@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { useAuthStore } from '@/store/auth.store';
 import { queryClient } from '@/lib/queryClient';
 import { setAuthFailureCallback } from '@/api/interceptors';
+import { issueReporter } from '@/lib/issueReporter';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,6 +22,9 @@ function RootLayoutNav() {
 
   useEffect(() => {
     if (isLoading) return;
+
+    const route = '/' + segments.join('/');
+    issueReporter.setCurrentRoute(route);
 
     const seg0 = segments[0] as string;
     const inAuthGroup = seg0?.startsWith('(auth)') ?? false;

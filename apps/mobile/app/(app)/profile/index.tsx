@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTractionTheme } from '@/theme';
 import { useLogout, useUser } from '@/hooks/useAuth';
+import config from '@/lib/config';
 
 const AI_PERSONALITIES = [
   { id: 'direct', label: 'Direct', icon: '⚡' },
@@ -32,6 +33,28 @@ export default function ProfileScreen() {
   const [selectedPersonality, setSelectedPersonality] = useState('balanced');
   const logout = useLogout();
   const { data: user } = useUser();
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleVersionTap = useCallback(() => {
+    tapCountRef.current += 1;
+
+    if (tapTimerRef.current) {
+      clearTimeout(tapTimerRef.current);
+    }
+
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0;
+    }, 2000);
+
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0;
+      if (tapTimerRef.current) {
+        clearTimeout(tapTimerRef.current);
+      }
+      router.push('/profile/developer');
+    }
+  }, [router]);
 
   const handleSignOut = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -229,6 +252,12 @@ export default function ProfileScreen() {
             {logout.isPending ? 'Signing Out...' : 'Sign Out'}
           </Text>
         </Pressable>
+
+        <Pressable style={styles.versionContainer} onPress={handleVersionTap}>
+          <Text style={[styles.versionText, { color: theme.colors.textSubtle }]}>
+            Traction v{config.appEnv === 'production' ? '1.0.0' : '1.0.0-dev'}
+          </Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -422,5 +451,12 @@ const styles = StyleSheet.create({
   signOutText: {
     fontSize: 17,
     fontWeight: '600',
+  },
+  versionContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  versionText: {
+    fontSize: 13,
   },
 });
