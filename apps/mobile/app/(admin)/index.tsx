@@ -12,6 +12,7 @@ import {
   FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTractionTheme } from '@/theme';
 import { useAdminDashboard, useAdminUsers, useUpdateUserRole } from '@/hooks/useAdmin';
 
@@ -84,6 +85,7 @@ function RolePickerModal({
 
 export default function AdminDashboardScreen() {
   const theme = useTractionTheme();
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<{ id: string; role: string } | null>(null);
@@ -159,6 +161,13 @@ export default function AdminDashboardScreen() {
           <StatCard label="Goals" value={stats.totalGoals || 0} color={theme.colors.accent} />
           <StatCard label="Focus Sessions" value={stats.totalFocusSessions || 0} color={theme.colors.warning} />
         </View>
+
+        <Pressable
+          style={[styles.analyticsButton, { backgroundColor: theme.colors.primary }]}
+          onPress={() => router.push('/(admin)/analytics' as any)}
+        >
+          <Text style={styles.analyticsButtonText}>View Analytics</Text>
+        </Pressable>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Users</Text>
@@ -375,6 +384,18 @@ const styles = StyleSheet.create({
   retryButtonText: {
     color: '#FFFFFF',
     fontSize: 15,
+    fontWeight: '600',
+  },
+  analyticsButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  analyticsButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
   },
   modalOverlay: {

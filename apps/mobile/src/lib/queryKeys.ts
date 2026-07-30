@@ -95,6 +95,7 @@ export const queryKeys = {
     all: ['admin'] as const,
     dashboard: () => [...queryKeys.admin.all, 'dashboard'] as const,
     users: (page: number) => [...queryKeys.admin.all, 'users', page] as const,
+    analytics: () => [...queryKeys.admin.all, 'analytics'] as const,
   },
 
   invites: {

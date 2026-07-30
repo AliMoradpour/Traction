@@ -42,4 +42,17 @@ export class AdminController {
   async getSystemHealth() {
     return this.adminService.getSystemHealth();
   }
+
+  @Get('analytics')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Get analytics data' })
+  async getAnalytics() {
+    const [engagement, retention, featureUsage] = await Promise.all([
+      this.adminService.getUserEngagementStats(),
+      this.adminService.getRetentionStats(),
+      this.adminService.getFeatureUsage(),
+    ]);
+
+    return { engagement, retention, featureUsage };
+  }
 }
