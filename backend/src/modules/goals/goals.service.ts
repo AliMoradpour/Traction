@@ -1,9 +1,21 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  CreateGoalDto, UpdateGoalDto, GoalQueryDto, GoalResponseDto,
-  CreateMilestoneDto, UpdateMilestoneDto, MilestoneResponseDto,
-  CreatePlanDto, UpdatePlanDto, PlanResponseDto,
+  CreateGoalDto,
+  UpdateGoalDto,
+  GoalQueryDto,
+  GoalResponseDto,
+  CreateMilestoneDto,
+  UpdateMilestoneDto,
+  MilestoneResponseDto,
+  CreatePlanDto,
+  UpdatePlanDto,
+  PlanResponseDto,
 } from './dto/goals.dto';
 import { GoalStatus, MilestoneStatus, PlanStatus } from '@prisma/client';
 
@@ -52,7 +64,7 @@ export class GoalsService {
     const updateData: any = { ...dto };
     if (dto.targetDate) updateData.targetDate = new Date(dto.targetDate);
     else if (dto.targetDate === null) delete updateData.targetDate;
-    Object.keys(updateData).forEach(key => {
+    Object.keys(updateData).forEach((key) => {
       if (updateData[key] === null) delete updateData[key];
     });
 
@@ -121,12 +133,17 @@ export class GoalsService {
       targetDate: goal.targetDate,
       daysRemaining,
       forecast: goal.progress > 50 ? 'On track' : 'Needs attention',
-      alternativeScenario: 'If you increase daily progress by 20%, you can complete this goal earlier.',
+      alternativeScenario:
+        'If you increase daily progress by 20%, you can complete this goal earlier.',
     };
   }
 
   // Milestones
-  async createMilestone(userId: string, goalId: string, dto: CreateMilestoneDto): Promise<MilestoneResponseDto> {
+  async createMilestone(
+    userId: string,
+    goalId: string,
+    dto: CreateMilestoneDto,
+  ): Promise<MilestoneResponseDto> {
     const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
     if (!goal) throw new NotFoundException('Goal not found');
     if (goal.userId !== userId) throw new ForbiddenException('Access denied');
@@ -153,19 +170,25 @@ export class GoalsService {
     });
   }
 
-  async updateMilestone(userId: string, goalId: string, milestoneId: string, dto: UpdateMilestoneDto): Promise<MilestoneResponseDto> {
+  async updateMilestone(
+    userId: string,
+    goalId: string,
+    milestoneId: string,
+    dto: UpdateMilestoneDto,
+  ): Promise<MilestoneResponseDto> {
     const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
     if (!goal) throw new NotFoundException('Goal not found');
     if (goal.userId !== userId) throw new ForbiddenException('Access denied');
 
     const milestone = await this.prisma.goalMilestone.findUnique({ where: { id: milestoneId } });
     if (!milestone) throw new NotFoundException('Milestone not found');
-    if (milestone.goalId !== goalId) throw new ForbiddenException('Milestone does not belong to this goal');
+    if (milestone.goalId !== goalId)
+      throw new ForbiddenException('Milestone does not belong to this goal');
 
     const updateData: any = { ...dto };
     if (dto.targetDate) updateData.targetDate = new Date(dto.targetDate);
     else if (dto.targetDate === null) delete updateData.targetDate;
-    Object.keys(updateData).forEach(key => {
+    Object.keys(updateData).forEach((key) => {
       if (updateData[key] === null) delete updateData[key];
     });
 
@@ -177,14 +200,19 @@ export class GoalsService {
     return updated;
   }
 
-  async removeMilestone(userId: string, goalId: string, milestoneId: string): Promise<{ message: string }> {
+  async removeMilestone(
+    userId: string,
+    goalId: string,
+    milestoneId: string,
+  ): Promise<{ message: string }> {
     const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
     if (!goal) throw new NotFoundException('Goal not found');
     if (goal.userId !== userId) throw new ForbiddenException('Access denied');
 
     const milestone = await this.prisma.goalMilestone.findUnique({ where: { id: milestoneId } });
     if (!milestone) throw new NotFoundException('Milestone not found');
-    if (milestone.goalId !== goalId) throw new ForbiddenException('Milestone does not belong to this goal');
+    if (milestone.goalId !== goalId)
+      throw new ForbiddenException('Milestone does not belong to this goal');
 
     await this.prisma.goalMilestone.delete({ where: { id: milestoneId } });
     return { message: 'Milestone deleted successfully' };
@@ -217,7 +245,12 @@ export class GoalsService {
     });
   }
 
-  async updatePlan(userId: string, goalId: string, planId: string, dto: UpdatePlanDto): Promise<PlanResponseDto> {
+  async updatePlan(
+    userId: string,
+    goalId: string,
+    planId: string,
+    dto: UpdatePlanDto,
+  ): Promise<PlanResponseDto> {
     const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
     if (!goal) throw new NotFoundException('Goal not found');
     if (goal.userId !== userId) throw new ForbiddenException('Access denied');

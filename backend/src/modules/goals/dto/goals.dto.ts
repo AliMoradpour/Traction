@@ -1,4 +1,13 @@
-import { IsString, IsOptional, IsEnum, IsInt, Min, Max, IsDateString, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  Min,
+  Max,
+  IsDateString,
+  IsBoolean,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GoalType, GoalStatus, GoalHealth, MilestoneStatus, PlanStatus } from '@prisma/client';
 

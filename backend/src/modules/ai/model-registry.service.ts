@@ -16,8 +16,10 @@ export class ModelRegistryService {
       primary: this.configService.get<string>('AI_MODEL_PRIMARY', 'anthropic/claude-3-haiku'),
       fallback: this.configService.get<string>('AI_MODEL_FALLBACK', 'anthropic/claude-3-haiku'),
     };
-    
-    this.logger.log(`Model registry initialized: primary=${this.models.primary}, fallback=${this.models.fallback}`);
+
+    this.logger.log(
+      `Model registry initialized: primary=${this.models.primary}, fallback=${this.models.fallback}`,
+    );
   }
 
   getPrimaryModel(): string {
@@ -35,7 +37,7 @@ export class ModelRegistryService {
       'task-breakdown': this.models.primary,
       'goal-recovery': this.models.primary,
       'stuck-analysis': this.models.primary,
-      'recommendations': this.models.primary,
+      recommendations: this.models.primary,
     };
 
     return featureModels[feature] ?? this.models.primary;

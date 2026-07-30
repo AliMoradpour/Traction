@@ -51,8 +51,8 @@ export class AIService {
       ]);
 
       const context = {
-        tasks: tasks.map(t => t.title),
-        goals: goals.map(g => g.title),
+        tasks: tasks.map((t) => t.title),
+        goals: goals.map((g) => g.title),
         focusSessions: sessions.length,
         recentActivity: `Last ${sessions.length} focus sessions completed`,
       };
@@ -61,7 +61,7 @@ export class AIService {
       if (!response) return null;
 
       const parsed = JSON.parse(response);
-      
+
       const recommendation = await this.prisma.aIRecommendation.create({
         data: {
           userId,
@@ -81,7 +81,10 @@ export class AIService {
     }
   }
 
-  async acceptRecommendation(userId: string, recommendationId: string): Promise<AIRecommendationResponseDto> {
+  async acceptRecommendation(
+    userId: string,
+    recommendationId: string,
+  ): Promise<AIRecommendationResponseDto> {
     const recommendation = await this.prisma.aIRecommendation.findUnique({
       where: { id: recommendationId },
     });
@@ -97,7 +100,10 @@ export class AIService {
     return updated;
   }
 
-  async dismissRecommendation(userId: string, recommendationId: string): Promise<AIRecommendationResponseDto> {
+  async dismissRecommendation(
+    userId: string,
+    recommendationId: string,
+  ): Promise<AIRecommendationResponseDto> {
     const recommendation = await this.prisma.aIRecommendation.findUnique({
       where: { id: recommendationId },
     });
@@ -113,7 +119,10 @@ export class AIService {
     return updated;
   }
 
-  async analyzeGoalFeasibility(goalTitle: string, deadline?: string): Promise<{
+  async analyzeGoalFeasibility(
+    goalTitle: string,
+    deadline?: string,
+  ): Promise<{
     feasible: boolean;
     reason: string;
     suggestions: string[];
@@ -130,7 +139,10 @@ export class AIService {
     }
   }
 
-  async generateTaskBreakdown(taskTitle: string, description?: string): Promise<Array<{ title: string }> | null> {
+  async generateTaskBreakdown(
+    taskTitle: string,
+    description?: string,
+  ): Promise<Array<{ title: string }> | null> {
     if (!this.openRouter.isConfigured()) return null;
 
     try {
@@ -143,7 +155,10 @@ export class AIService {
     }
   }
 
-  async simplifyTask(taskTitle: string, resistanceLevel: number): Promise<{
+  async simplifyTask(
+    taskTitle: string,
+    resistanceLevel: number,
+  ): Promise<{
     simplifiedTitle: string;
     firstStep: string;
     motivation: string;

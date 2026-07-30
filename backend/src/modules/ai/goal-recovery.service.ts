@@ -28,10 +28,7 @@ export class GoalRecoveryService {
     private safetyService: AISafetyService,
   ) {}
 
-  async analyzeGoalRecovery(
-    userId: string,
-    goalId: string,
-  ): Promise<GoalRecovery | null> {
+  async analyzeGoalRecovery(userId: string, goalId: string): Promise<GoalRecovery | null> {
     const goal = await this.prisma.goal.findUnique({
       where: { id: goalId },
       include: {
@@ -62,17 +59,23 @@ export class GoalRecoveryService {
     }
 
     const model = this.modelRegistry.getModelForFeature('goal-recovery');
-    const response = await this.provider.chat(
-      [{ role: 'user', content: prompt }],
-      { model, temperature: 0.6, maxTokens: 500 },
-    );
+    const response = await this.provider.chat([{ role: 'user', content: prompt }], {
+      model,
+      temperature: 0.6,
+      maxTokens: 500,
+    });
 
     if (!response) {
       return this.getFallbackGoalRecovery(currentProgress, expectedProgress, daysRemaining);
     }
 
     const validatedContent = this.safetyService.validateResponse(response.content, 'goal-recovery');
-    await this.rateLimitService.recordUsage(userId, 'goal-recovery', response.model, response.usage.totalTokens);
+    await this.rateLimitService.recordUsage(
+      userId,
+      'goal-recovery',
+      response.model,
+      response.usage.totalTokens,
+    );
 
     try {
       const parsed = JSON.parse(validatedContent);
@@ -93,21 +96,33 @@ export class GoalRecoveryService {
   private calculateGoalMetrics(goal: any) {
     const now = new Date();
     const deadline = goal.deadline || new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    
-    const totalDays = Math.max(1, Math.ceil((deadline.getTime() - goal.createdAt.getTime()) / (24 * 60 * 60 * 1000)));
-    const daysPassed = Math.max(0, Math.ceil((now.getTime() - goal.createdAt.getTime()) / (24 * 60 * 60 * 1000)));
-    const daysRemaining = Math.max(0, Math.ceil((deadline.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)));
-    
+
+    const totalDays = Math.max(
+      1,
+      Math.ceil((deadline.getTime() - goal.createdAt.getTime()) / (24 * 60 * 60 * 1000)),
+    );
+    const daysPassed = Math.max(
+      0,
+      Math.ceil((now.getTime() - goal.createdAt.getTime()) / (24 * 60 * 60 * 1000)),
+    );
+    const daysRemaining = Math.max(
+      0,
+      Math.ceil((deadline.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)),
+    );
+
     const completedTasks = goal.tasks?.filter((t: any) => t.status === 'COMPLETED').length || 0;
     const totalTasks = goal.tasks?.length || 1;
     const currentProgress = (completedTasks / totalTasks) * 100;
-    
+
     const expectedProgress = Math.min(100, (daysPassed / totalDays) * 100);
-    
-    const lastTaskUpdate = goal.tasks?.length > 0
-      ? new Date(Math.max(...goal.tasks.map((t: any) => new Date(t.updatedAt).getTime())))
-      : goal.createdAt;
-    const daysSinceLastProgress = Math.ceil((now.getTime() - lastTaskUpdate.getTime()) / (24 * 60 * 60 * 1000));
+
+    const lastTaskUpdate =
+      goal.tasks?.length > 0
+        ? new Date(Math.max(...goal.tasks.map((t: any) => new Date(t.updatedAt).getTime())))
+        : goal.createdAt;
+    const daysSinceLastProgress = Math.ceil(
+      (now.getTime() - lastTaskUpdate.getTime()) / (24 * 60 * 60 * 1000),
+    );
 
     return {
       currentProgress,
@@ -123,7 +138,7 @@ export class GoalRecoveryService {
     daysRemaining: number,
   ): GoalRecovery {
     const gap = expectedProgress - currentProgress;
-    
+
     let urgencyLevel: GoalRecovery['urgencyLevel'] = 'low';
     if (gap > 50) urgencyLevel = 'critical';
     else if (gap > 30) urgencyLevel = 'high';
@@ -138,9 +153,10 @@ export class GoalRecoveryService {
         'Break remaining work into daily chunks',
         'Consider extending the deadline if possible',
       ],
-      consequences: gap > 30
-        ? 'Without action, this goal is at risk of failure.'
-        : 'You can recover with consistent effort.',
+      consequences:
+        gap > 30
+          ? 'Without action, this goal is at risk of failure.'
+          : 'You can recover with consistent effort.',
       shouldModifyGoal,
       modifiedGoalSuggestion: shouldModifyGoal
         ? 'Consider reducing scope or extending the deadline'

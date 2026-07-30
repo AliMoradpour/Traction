@@ -21,14 +21,18 @@ export class NotificationsService {
   }
 
   async findOne(userId: string, notificationId: string): Promise<NotificationResponseDto> {
-    const notification = await this.prisma.notification.findUnique({ where: { id: notificationId } });
+    const notification = await this.prisma.notification.findUnique({
+      where: { id: notificationId },
+    });
     if (!notification) throw new NotFoundException('Notification not found');
     if (notification.userId !== userId) throw new ForbiddenException('Access denied');
     return notification;
   }
 
   async markAsRead(userId: string, notificationId: string): Promise<NotificationResponseDto> {
-    const notification = await this.prisma.notification.findUnique({ where: { id: notificationId } });
+    const notification = await this.prisma.notification.findUnique({
+      where: { id: notificationId },
+    });
     if (!notification) throw new NotFoundException('Notification not found');
     if (notification.userId !== userId) throw new ForbiddenException('Access denied');
 
@@ -50,7 +54,9 @@ export class NotificationsService {
   }
 
   async remove(userId: string, notificationId: string): Promise<{ message: string }> {
-    const notification = await this.prisma.notification.findUnique({ where: { id: notificationId } });
+    const notification = await this.prisma.notification.findUnique({
+      where: { id: notificationId },
+    });
     if (!notification) throw new NotFoundException('Notification not found');
     if (notification.userId !== userId) throw new ForbiddenException('Access denied');
 

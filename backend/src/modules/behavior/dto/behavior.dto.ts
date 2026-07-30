@@ -97,7 +97,10 @@ export class DailyMetricsQueryDto {
 }
 
 export class WeeklyMetricsQueryDto {
-  @ApiPropertyOptional({ example: '2026-07-21', description: 'Week start date in YYYY-MM-DD format' })
+  @ApiPropertyOptional({
+    example: '2026-07-21',
+    description: 'Week start date in YYYY-MM-DD format',
+  })
   @IsDateString()
   @IsOptional()
   weekStart?: string;

@@ -26,8 +26,8 @@ export class PromptLoaderService {
         return;
       }
 
-      const files = fs.readdirSync(this.promptsDir).filter(f => f.endsWith('.md'));
-      
+      const files = fs.readdirSync(this.promptsDir).filter((f) => f.endsWith('.md'));
+
       for (const file of files) {
         const promptName = file.replace('.md', '');
         const content = fs.readFileSync(path.join(this.promptsDir, file), 'utf-8');
@@ -49,12 +49,12 @@ export class PromptLoaderService {
 
   renderPrompt(name: string, variables: Record<string, string>): string {
     let prompt = this.getPrompt(name);
-    
+
     for (const [key, value] of Object.entries(variables)) {
       const placeholder = `{{${key}}}`;
       prompt = prompt.replace(new RegExp(placeholder, 'g'), value);
     }
-    
+
     return prompt;
   }
 
@@ -64,13 +64,13 @@ export class PromptLoaderService {
 
   getPromptMetadata(name: string): PromptMetadata | null {
     const filePath = path.join(this.promptsDir, `${name}.md`);
-    
+
     if (!fs.existsSync(filePath)) {
       return null;
     }
 
     const stats = fs.statSync(filePath);
-    
+
     return {
       name,
       version: '1.0.0',

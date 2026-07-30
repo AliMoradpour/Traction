@@ -108,21 +108,40 @@ export class BehaviorService {
       },
     });
 
-    const tasksPlanned = tasks.filter((t) => t.scheduledAt && new Date(t.scheduledAt) >= dayStart && new Date(t.scheduledAt) <= dayEnd).length;
-    const tasksCompleted = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= dayStart && new Date(t.completedAt) <= dayEnd).length;
+    const tasksPlanned = tasks.filter(
+      (t) =>
+        t.scheduledAt && new Date(t.scheduledAt) >= dayStart && new Date(t.scheduledAt) <= dayEnd,
+    ).length;
+    const tasksCompleted = tasks.filter(
+      (t) =>
+        t.completedAt && new Date(t.completedAt) >= dayStart && new Date(t.completedAt) <= dayEnd,
+    ).length;
     const completionRate = tasksPlanned > 0 ? Math.round((tasksCompleted / tasksPlanned) * 100) : 0;
 
     const completedTasks = tasks.filter((t) => t.completedAt);
     const startDelays = completedTasks
       .filter((t) => t.scheduledAt && t.completedAt)
-      .map((t) => (new Date(t.completedAt!).getTime() - new Date(t.scheduledAt!).getTime()) / 60000);
-    const averageStartDelay = startDelays.length > 0 ? Math.round(startDelays.reduce((a, b) => a + b, 0) / startDelays.length) : 0;
+      .map(
+        (t) => (new Date(t.completedAt!).getTime() - new Date(t.scheduledAt!).getTime()) / 60000,
+      );
+    const averageStartDelay =
+      startDelays.length > 0
+        ? Math.round(startDelays.reduce((a, b) => a + b, 0) / startDelays.length)
+        : 0;
 
     const dueTasks = tasks.filter((t) => t.dueAt && t.completedAt);
-    const completionDelays = dueTasks.map((t) => (new Date(t.completedAt!).getTime() - new Date(t.dueAt!).getTime()) / 60000);
-    const averageCompletionDelay = completionDelays.length > 0 ? Math.round(completionDelays.reduce((a, b) => a + b, 0) / completionDelays.length) : 0;
+    const completionDelays = dueTasks.map(
+      (t) => (new Date(t.completedAt!).getTime() - new Date(t.dueAt!).getTime()) / 60000,
+    );
+    const averageCompletionDelay =
+      completionDelays.length > 0
+        ? Math.round(completionDelays.reduce((a, b) => a + b, 0) / completionDelays.length)
+        : 0;
 
-    const deepWorkMinutes = focusSessions.reduce((sum, s) => sum + (s.duration ? Math.round(s.duration / 60) : 0), 0);
+    const deepWorkMinutes = focusSessions.reduce(
+      (sum, s) => sum + (s.duration ? Math.round(s.duration / 60) : 0),
+      0,
+    );
 
     return {
       date: dayStart.toISOString().split('T')[0],
@@ -163,13 +182,24 @@ export class BehaviorService {
     const activeDays = new Set(events.map((e) => new Date(e.createdAt).toDateString())).size;
     const consistency = Math.round((activeDays / 7) * 100);
 
-    const tasksPlanned = tasks.filter((t) => t.scheduledAt && new Date(t.scheduledAt) >= weekStart && new Date(t.scheduledAt) <= weekEnd).length;
-    const weeklyCompletion = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= weekStart && new Date(t.completedAt) <= weekEnd).length;
-    const planningAccuracy = tasksPlanned > 0 ? Math.round((weeklyCompletion / tasksPlanned) * 100) : 0;
+    const tasksPlanned = tasks.filter(
+      (t) =>
+        t.scheduledAt && new Date(t.scheduledAt) >= weekStart && new Date(t.scheduledAt) <= weekEnd,
+    ).length;
+    const weeklyCompletion = tasks.filter(
+      (t) =>
+        t.completedAt && new Date(t.completedAt) >= weekStart && new Date(t.completedAt) <= weekEnd,
+    ).length;
+    const planningAccuracy =
+      tasksPlanned > 0 ? Math.round((weeklyCompletion / tasksPlanned) * 100) : 0;
 
     const now = new Date();
-    const missedTasks = tasks.filter((t) => t.dueAt && new Date(t.dueAt) < now && t.status !== 'COMPLETED').length;
-    const delayedTasks = tasks.filter((t) => t.dueAt && t.completedAt && new Date(t.completedAt) > new Date(t.dueAt)).length;
+    const missedTasks = tasks.filter(
+      (t) => t.dueAt && new Date(t.dueAt) < now && t.status !== 'COMPLETED',
+    ).length;
+    const delayedTasks = tasks.filter(
+      (t) => t.dueAt && t.completedAt && new Date(t.completedAt) > new Date(t.dueAt),
+    ).length;
 
     return {
       weekStart: weekStart.toISOString().split('T')[0],
@@ -200,25 +230,46 @@ export class BehaviorService {
 
     const scheduledTasks = tasks.filter((t) => t.scheduledAt);
     const completedScheduled = scheduledTasks.filter((t) => t.status === 'COMPLETED');
-    const executionScore = scheduledTasks.length > 0 ? Math.round((completedScheduled.length / scheduledTasks.length) * 100) : 0;
+    const executionScore =
+      scheduledTasks.length > 0
+        ? Math.round((completedScheduled.length / scheduledTasks.length) * 100)
+        : 0;
 
     const withDue = tasks.filter((t) => t.dueAt);
-    const completedOnTime = withDue.filter((t) => t.completedAt && new Date(t.completedAt) <= new Date(t.dueAt!));
-    const reliabilityScore = withDue.length > 0 ? Math.round((completedOnTime.length / withDue.length) * 100) : 0;
+    const completedOnTime = withDue.filter(
+      (t) => t.completedAt && new Date(t.completedAt) <= new Date(t.dueAt!),
+    );
+    const reliabilityScore =
+      withDue.length > 0 ? Math.round((completedOnTime.length / withDue.length) * 100) : 0;
 
     const planningAccuracy = executionScore;
 
     const recentCutoff = new Date();
     recentCutoff.setDate(recentCutoff.getDate() - 7);
-    const recentCompleted = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= recentCutoff).length;
+    const recentCompleted = tasks.filter(
+      (t) => t.completedAt && new Date(t.completedAt) >= recentCutoff,
+    ).length;
     const olderCutoff = new Date(recentCutoff);
     olderCutoff.setDate(olderCutoff.getDate() - 7);
-    const olderCompleted = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= olderCutoff && new Date(t.completedAt) < recentCutoff).length;
-    const momentumScore = olderCompleted > 0 ? Math.min(100, Math.round((recentCompleted / olderCompleted) * 50)) : recentCompleted > 0 ? 50 : 0;
+    const olderCompleted = tasks.filter(
+      (t) =>
+        t.completedAt &&
+        new Date(t.completedAt) >= olderCutoff &&
+        new Date(t.completedAt) < recentCutoff,
+    ).length;
+    const momentumScore =
+      olderCompleted > 0
+        ? Math.min(100, Math.round((recentCompleted / olderCompleted) * 50))
+        : recentCompleted > 0
+          ? 50
+          : 0;
 
     const snoozedCount = events.filter((e) => e.type === 'TASK_SNOOZED').length;
     const completedCount = events.filter((e) => e.type === 'TASK_COMPLETED').length;
-    const recoveryScore = snoozedCount + completedCount > 0 ? Math.round((completedCount / (snoozedCount + completedCount)) * 100) : 50;
+    const recoveryScore =
+      snoozedCount + completedCount > 0
+        ? Math.round((completedCount / (snoozedCount + completedCount)) * 100)
+        : 50;
 
     return {
       consistencyScore: Math.min(100, consistencyScore),
@@ -252,8 +303,15 @@ export class BehaviorService {
     let riskScore = 0;
     const signals: string[] = [];
 
-    const thisWeekTasks = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= twoWeeksAgo);
-    const lastWeekTasks = tasks.filter((t) => t.completedAt && new Date(t.completedAt) >= fourWeeksAgo && new Date(t.completedAt) < twoWeeksAgo);
+    const thisWeekTasks = tasks.filter(
+      (t) => t.completedAt && new Date(t.completedAt) >= twoWeeksAgo,
+    );
+    const lastWeekTasks = tasks.filter(
+      (t) =>
+        t.completedAt &&
+        new Date(t.completedAt) >= fourWeeksAgo &&
+        new Date(t.completedAt) < twoWeeksAgo,
+    );
     if (lastWeekTasks.length > 0 && thisWeekTasks.length < lastWeekTasks.length * 0.5) {
       riskScore += 20;
       signals.push('Rapidly decreasing completion rate');
@@ -274,28 +332,52 @@ export class BehaviorService {
     }
 
     const recentSessions = focusSessions.filter((s) => new Date(s.startedAt) >= twoWeeksAgo);
-    const olderSessions = focusSessions.filter((s) => new Date(s.startedAt) >= fourWeeksAgo && new Date(s.startedAt) < twoWeeksAgo);
-    const recentAvgDuration = recentSessions.length > 0 ? recentSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / recentSessions.length : 0;
-    const olderAvgDuration = olderSessions.length > 0 ? olderSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / olderSessions.length : 0;
+    const olderSessions = focusSessions.filter(
+      (s) => new Date(s.startedAt) >= fourWeeksAgo && new Date(s.startedAt) < twoWeeksAgo,
+    );
+    const recentAvgDuration =
+      recentSessions.length > 0
+        ? recentSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / recentSessions.length
+        : 0;
+    const olderAvgDuration =
+      olderSessions.length > 0
+        ? olderSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / olderSessions.length
+        : 0;
     if (olderAvgDuration > 0 && recentAvgDuration < olderAvgDuration * 0.6) {
       riskScore += 20;
       signals.push('Decreasing focus session duration');
     }
 
     const activeDaysThisWeek = new Set(
-      events.filter((e) => new Date(e.createdAt) >= twoWeeksAgo).map((e) => new Date(e.createdAt).toDateString())
+      events
+        .filter((e) => new Date(e.createdAt) >= twoWeeksAgo)
+        .map((e) => new Date(e.createdAt).toDateString()),
     ).size;
     if (activeDaysThisWeek < 3) {
       riskScore += 20;
       signals.push('Large inactivity gaps');
     }
 
-    const level = riskScore <= 25 ? 'low' : riskScore <= 50 ? 'moderate' : riskScore <= 75 ? 'high' : 'critical';
+    const level =
+      riskScore <= 25
+        ? 'low'
+        : riskScore <= 50
+          ? 'moderate'
+          : riskScore <= 75
+            ? 'high'
+            : 'critical';
 
     const thisWeekScore = riskScore;
-    const lastWeekEvents = events.filter((e) => new Date(e.createdAt) >= fourWeeksAgo && new Date(e.createdAt) < twoWeeksAgo);
+    const lastWeekEvents = events.filter(
+      (e) => new Date(e.createdAt) >= fourWeeksAgo && new Date(e.createdAt) < twoWeeksAgo,
+    );
     const lastWeekScore = lastWeekEvents.length > 0 ? 30 : 10;
-    const trend = thisWeekScore < lastWeekScore ? 'improving' : thisWeekScore > lastWeekScore ? 'worsening' : 'stable';
+    const trend =
+      thisWeekScore < lastWeekScore
+        ? 'improving'
+        : thisWeekScore > lastWeekScore
+          ? 'worsening'
+          : 'stable';
 
     return { level, score: Math.min(100, riskScore), signals, trend };
   }

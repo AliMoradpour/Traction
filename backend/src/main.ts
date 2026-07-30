@@ -32,7 +32,7 @@ async function bootstrap() {
 
   // CORS
   const corsOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
+    ? process.env.CORS_ORIGIN.split(',').map((s) => s.trim())
     : 'http://localhost:3001';
   app.enableCors({
     origin: corsOrigins,

@@ -38,7 +38,10 @@ export class MomentumResponseDto {
   @ApiProperty({ description: 'This month completion rate vs last month (percentage)' })
   monthlyMomentum: number;
 
-  @ApiProperty({ description: 'Overall momentum trend', enum: ['improving', 'stable', 'declining'] })
+  @ApiProperty({
+    description: 'Overall momentum trend',
+    enum: ['improving', 'stable', 'declining'],
+  })
   trend: 'improving' | 'stable' | 'declining';
 }
 

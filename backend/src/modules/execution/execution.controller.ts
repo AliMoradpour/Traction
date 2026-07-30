@@ -19,37 +19,45 @@ export class ExecutionController {
 
   @Get('readiness')
   @ApiOperation({ summary: 'Get execution readiness score' })
-  @ApiResponse({ status: 200, description: 'Readiness score with factors and explanation', type: ReadinessResponseDto })
-  async getReadiness(
-    @CurrentUser('id') userId: string,
-  ): Promise<ReadinessResponseDto> {
+  @ApiResponse({
+    status: 200,
+    description: 'Readiness score with factors and explanation',
+    type: ReadinessResponseDto,
+  })
+  async getReadiness(@CurrentUser('id') userId: string): Promise<ReadinessResponseDto> {
     return this.executionService.getReadinessScore(userId);
   }
 
   @Get('resistance')
   @ApiOperation({ summary: 'Get resistance detection analysis' })
-  @ApiResponse({ status: 200, description: 'Resistance score with patterns and suggestions', type: ResistanceResponseDto })
-  async getResistance(
-    @CurrentUser('id') userId: string,
-  ): Promise<ResistanceResponseDto> {
+  @ApiResponse({
+    status: 200,
+    description: 'Resistance score with patterns and suggestions',
+    type: ResistanceResponseDto,
+  })
+  async getResistance(@CurrentUser('id') userId: string): Promise<ResistanceResponseDto> {
     return this.executionService.detectResistance(userId);
   }
 
   @Get('momentum')
   @ApiOperation({ summary: 'Get momentum metrics' })
-  @ApiResponse({ status: 200, description: 'Momentum metrics with streaks and trends', type: MomentumResponseDto })
-  async getMomentum(
-    @CurrentUser('id') userId: string,
-  ): Promise<MomentumResponseDto> {
+  @ApiResponse({
+    status: 200,
+    description: 'Momentum metrics with streaks and trends',
+    type: MomentumResponseDto,
+  })
+  async getMomentum(@CurrentUser('id') userId: string): Promise<MomentumResponseDto> {
     return this.executionService.getMomentum(userId);
   }
 
   @Get('stats')
   @ApiOperation({ summary: 'Get execution statistics' })
-  @ApiResponse({ status: 200, description: 'Comprehensive execution statistics', type: ExecutionStatsResponseDto })
-  async getStats(
-    @CurrentUser('id') userId: string,
-  ): Promise<ExecutionStatsResponseDto> {
+  @ApiResponse({
+    status: 200,
+    description: 'Comprehensive execution statistics',
+    type: ExecutionStatsResponseDto,
+  })
+  async getStats(@CurrentUser('id') userId: string): Promise<ExecutionStatsResponseDto> {
     return this.executionService.getExecutionStats(userId);
   }
 }

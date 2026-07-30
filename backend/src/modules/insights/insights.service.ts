@@ -92,17 +92,24 @@ export class InsightsService {
     else if (hour < 17) focusWindow = 'Afternoon (current session)';
     else focusWindow = 'Evening (current session)';
 
-    const recentSessions = focusSessions.filter(s => s.status === 'COMPLETED');
-    const avgDuration = recentSessions.length > 0
-      ? Math.round(recentSessions.reduce((sum, s) => {
-          const duration = s.endedAt && s.startedAt
-            ? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
-            : 0;
-          return sum + duration;
-        }, 0) / recentSessions.length)
-      : 0;
+    const recentSessions = focusSessions.filter((s) => s.status === 'COMPLETED');
+    const avgDuration =
+      recentSessions.length > 0
+        ? Math.round(
+            recentSessions.reduce((sum, s) => {
+              const duration =
+                s.endedAt && s.startedAt
+                  ? (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 60000
+                  : 0;
+              return sum + duration;
+            }, 0) / recentSessions.length,
+          )
+        : 0;
 
-    const energyLevel = Math.min(100, Math.max(0, 50 + recentSessions.length * 5 + (tasks.length > 0 ? 10 : 0)));
+    const energyLevel = Math.min(
+      100,
+      Math.max(0, 50 + recentSessions.length * 5 + (tasks.length > 0 ? 10 : 0)),
+    );
 
     const recommendations: string[] = [];
     if (tasks.length > 0) {
@@ -123,7 +130,7 @@ export class InsightsService {
     return {
       focusWindow,
       frictionSummary: `You have ${tasks.length} pending task${tasks.length !== 1 ? 's' : ''} and completed ${recentSessions.length} focus session${recentSessions.length !== 1 ? 's' : ''} recently`,
-      prioritizedTasks: tasks.map(t => t.title),
+      prioritizedTasks: tasks.map((t) => t.title),
       energyLevel,
       recommendations,
     };
@@ -136,9 +143,11 @@ export class InsightsService {
       take: 50,
     });
 
-    const focusEvents = events.filter(e => e.type === 'FOCUS_COMPLETED' || e.type === 'FOCUS_ABANDONED');
-    const completedFocus = focusEvents.filter(e => e.type === 'FOCUS_COMPLETED');
-    const abandonedFocus = focusEvents.filter(e => e.type === 'FOCUS_ABANDONED');
+    const focusEvents = events.filter(
+      (e) => e.type === 'FOCUS_COMPLETED' || e.type === 'FOCUS_ABANDONED',
+    );
+    const completedFocus = focusEvents.filter((e) => e.type === 'FOCUS_COMPLETED');
+    const abandonedFocus = focusEvents.filter((e) => e.type === 'FOCUS_ABANDONED');
 
     const patterns: string[] = [];
     if (completedFocus.length > abandonedFocus.length) {
@@ -147,7 +156,7 @@ export class InsightsService {
       patterns.push('You have abandoned some focus sessions recently');
     }
 
-    const stuckEvents = events.filter(e => e.type === 'WHY_AM_I_STUCK');
+    const stuckEvents = events.filter((e) => e.type === 'WHY_AM_I_STUCK');
     if (stuckEvents.length > 2) {
       patterns.push('You frequently encounter friction during tasks');
     }
@@ -158,7 +167,7 @@ export class InsightsService {
 
     const triggers: string[] = [];
     if (stuckEvents.length > 0) {
-      const reasons = stuckEvents.map(e => e.metadata).filter(Boolean);
+      const reasons = stuckEvents.map((e) => e.metadata).filter(Boolean);
       if (reasons.length > 0) {
         triggers.push(`Common friction: ${reasons[0]}`);
       }
@@ -208,23 +217,25 @@ export class InsightsService {
     });
 
     const totalTasks = completedTasks.length + pendingTasks.length;
-    const completionRate = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+    const completionRate =
+      totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
 
-    const wins = completedTasks.slice(0, 5).map(t => t.title);
+    const wins = completedTasks.slice(0, 5).map((t) => t.title);
     if (wins.length === 0) {
       wins.push('No tasks completed this week yet');
     }
 
-    const commitments = pendingTasks.slice(0, 5).map(t => t.title);
+    const commitments = pendingTasks.slice(0, 5).map((t) => t.title);
     if (commitments.length === 0) {
       commitments.push('No pending tasks');
     }
 
-    const nextShift = completionRate >= 80
-      ? 'Excellent completion rate! Maintain this momentum.'
-      : completionRate >= 50
-      ? 'Good progress. Focus on completing remaining tasks.'
-      : 'Try to complete more tasks next week. Consider reducing your task load.';
+    const nextShift =
+      completionRate >= 80
+        ? 'Excellent completion rate! Maintain this momentum.'
+        : completionRate >= 50
+          ? 'Good progress. Focus on completing remaining tasks.'
+          : 'Try to complete more tasks next week. Consider reducing your task load.';
 
     return {
       wins,

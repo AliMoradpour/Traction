@@ -20,13 +20,15 @@ export class GoalHealthService {
       (Date.now() - goal.startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
 
-    const expectedProgress = daysRemaining !== null && daysSinceStart > 0
-      ? Math.min(100, (daysSinceStart / (daysSinceStart + daysRemaining)) * 100)
-      : goal.progress;
+    const expectedProgress =
+      daysRemaining !== null && daysSinceStart > 0
+        ? Math.min(100, (daysSinceStart / (daysSinceStart + daysRemaining)) * 100)
+        : goal.progress;
 
     let recommendation = '';
     if (goal.health === GoalHealth.AT_RISK) {
-      recommendation = 'Consider breaking this goal into smaller milestones or adjusting the timeline.';
+      recommendation =
+        'Consider breaking this goal into smaller milestones or adjusting the timeline.';
     } else if (goal.health === GoalHealth.BEHIND_SCHEDULE) {
       recommendation = 'You are behind schedule. Focus on completing the next milestone first.';
     } else if (goal.health === GoalHealth.SLIGHTLY_BEHIND) {
@@ -82,7 +84,11 @@ export class GoalHealthService {
     return this.getHealth(userId, goalId);
   }
 
-  private estimateCompletion(progress: number, daysSinceStart: number, daysRemaining: number | null): string {
+  private estimateCompletion(
+    progress: number,
+    daysSinceStart: number,
+    daysRemaining: number | null,
+  ): string {
     if (progress === 0) return 'Not started';
     if (progress >= 100) return 'Completed';
 

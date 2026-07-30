@@ -29,8 +29,8 @@ export class AIRateLimitService {
   constructor(private prisma: PrismaService) {}
 
   async checkRateLimit(userId: string, feature: string): Promise<RateLimitResult> {
-    const config = this.limits.find(l => l.feature === feature);
-    
+    const config = this.limits.find((l) => l.feature === feature);
+
     if (!config) {
       return { allowed: true, remaining: 999, resetAt: new Date() };
     }
@@ -76,7 +76,9 @@ export class AIRateLimitService {
     }
   }
 
-  async getUsageStats(userId: string): Promise<Record<string, { used: number; limit: number; remaining: number }>> {
+  async getUsageStats(
+    userId: string,
+  ): Promise<Record<string, { used: number; limit: number; remaining: number }>> {
     const stats: Record<string, { used: number; limit: number; remaining: number }> = {};
 
     for (const config of this.limits) {

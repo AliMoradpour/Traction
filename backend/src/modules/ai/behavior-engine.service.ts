@@ -31,11 +31,7 @@ export class BehaviorEngineService {
   constructor(private prisma: PrismaService) {}
 
   async analyzeBehavior(userId: string): Promise<BehaviorAnalysis> {
-    const [
-      tasks,
-      focusSessions,
-      behaviorEvents,
-    ] = await Promise.all([
+    const [tasks, focusSessions, behaviorEvents] = await Promise.all([
       this.prisma.task.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
@@ -65,26 +61,24 @@ export class BehaviorEngineService {
     };
   }
 
-  private calculatePatterns(
-    tasks: any[],
-    focusSessions: any[],
-    behaviorEvents: any[],
-  ) {
+  private calculatePatterns(tasks: any[], focusSessions: any[], behaviorEvents: any[]) {
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const recentTasks = tasks.filter(t => new Date(t.createdAt) > thirtyDaysAgo);
-    const completedTasks = recentTasks.filter(t => t.status === 'COMPLETED');
-    const skippedTasks = recentTasks.filter(t => t.status === 'SKIPPED');
+    const recentTasks = tasks.filter((t) => new Date(t.createdAt) > thirtyDaysAgo);
+    const completedTasks = recentTasks.filter((t) => t.status === 'COMPLETED');
+    const skippedTasks = recentTasks.filter((t) => t.status === 'SKIPPED');
 
     const averageTasksPerDay = recentTasks.length / 30;
     const completionRate = recentTasks.length > 0 ? completedTasks.length / recentTasks.length : 0;
     const skipRate = recentTasks.length > 0 ? skippedTasks.length / recentTasks.length : 0;
 
-    const completedSessions = focusSessions.filter(s => s.status === 'COMPLETED');
-    const averageFocusDuration = completedSessions.length > 0
-      ? completedSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0) / completedSessions.length
-      : 0;
+    const completedSessions = focusSessions.filter((s) => s.status === 'COMPLETED');
+    const averageFocusDuration =
+      completedSessions.length > 0
+        ? completedSessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0) /
+          completedSessions.length
+        : 0;
 
     const peakHour = this.findPeakHour(behaviorEvents);
     const consistencyScore = this.calculateConsistency(recentTasks);
@@ -101,15 +95,15 @@ export class BehaviorEngineService {
 
   private findPeakHour(events: any[]): number {
     const hourCounts: Record<number, number> = {};
-    
-    events.forEach(event => {
+
+    events.forEach((event) => {
       const hour = new Date(event.createdAt).getHours();
       hourCounts[hour] = (hourCounts[hour] || 0) + 1;
     });
 
     let maxHour = 9;
     let maxCount = 0;
-    
+
     Object.entries(hourCounts).forEach(([hour, count]) => {
       if (count > maxCount) {
         maxCount = count;
@@ -124,37 +118,29 @@ export class BehaviorEngineService {
     if (tasks.length < 7) return 0;
 
     const dayCounts: Record<string, number> = {};
-    tasks.forEach(task => {
+    tasks.forEach((task) => {
       const day = new Date(task.createdAt).toISOString().split('T')[0];
       dayCounts[day] = (dayCounts[day] || 0) + 1;
     });
 
     const days = Object.keys(dayCounts).length;
     const variance = this.calculateVariance(Object.values(dayCounts));
-    
-    const consistency = Math.max(0, 1 - (variance / (days + 1)));
+
+    const consistency = Math.max(0, 1 - variance / (days + 1));
     return Math.min(1, consistency);
   }
 
   private calculateVariance(values: number[]): number {
     if (values.length === 0) return 0;
-    
+
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
-    const squaredDiffs = values.map(v => Math.pow(v - mean, 2));
+    const squaredDiffs = values.map((v) => Math.pow(v - mean, 2));
     return squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
   }
 
-  private determineProfile(
-    patterns: any,
-    events: any[],
-  ): BehaviorProfile {
-    const {
-      completionRate,
-      skipRate,
-      consistencyScore,
-      peakProductivityHour,
-      averageTasksPerDay,
-    } = patterns;
+  private determineProfile(patterns: any, events: any[]): BehaviorProfile {
+    const { completionRate, skipRate, consistencyScore, peakProductivityHour, averageTasksPerDay } =
+      patterns;
 
     if (averageTasksPerDay < 1) return 'new-user';
     if (skipRate > 0.4) return 'avoider';
@@ -162,7 +148,7 @@ export class BehaviorEngineService {
     if (peakProductivityHour >= 20 || peakProductivityHour <= 5) return 'night-worker';
     if (completionRate > 0.7 && consistencyScore < 0.4) return 'deadline-driven';
     if (consistencyScore > 0.5 && completionRate > 0.5) return 'momentum-driven';
-    
+
     return 'sporadic';
   }
 
@@ -177,7 +163,11 @@ export class BehaviorEngineService {
         traits.push('Avoids difficult tasks', 'May procrastinate', 'Needs accountability');
         break;
       case 'night-worker':
-        traits.push('Most productive at night', 'May need adjusted schedules', 'Creative peak late');
+        traits.push(
+          'Most productive at night',
+          'May need adjusted schedules',
+          'Creative peak late',
+        );
         break;
       case 'deadline-driven':
         traits.push('Works best under pressure', 'Needs deadlines', 'Bursts of energy');
@@ -206,7 +196,7 @@ export class BehaviorEngineService {
 
   private calculateConfidence(taskCount: number, sessionCount: number): number {
     const dataPoints = taskCount + sessionCount;
-    
+
     if (dataPoints < 10) return 0.3;
     if (dataPoints < 30) return 0.5;
     if (dataPoints < 100) return 0.7;

@@ -30,12 +30,18 @@ export class AISafetyService {
 
   private getFallback(feature: string): string {
     switch (feature) {
-      case 'daily-brief': return 'Unable to generate daily brief. Please try again later.';
-      case 'weekly-review': return 'Unable to generate weekly review. Please try again later.';
-      case 'goal-recovery': return 'Unable to generate goal recovery. Please try again later.';
-      case 'task-breakdown': return 'Unable to generate task breakdown. Please try again later.';
-      case 'stuck-analysis': return 'Unable to generate stuck analysis. Please try again later.';
-      default: return 'Unable to process request. Please try again later.';
+      case 'daily-brief':
+        return 'Unable to generate daily brief. Please try again later.';
+      case 'weekly-review':
+        return 'Unable to generate weekly review. Please try again later.';
+      case 'goal-recovery':
+        return 'Unable to generate goal recovery. Please try again later.';
+      case 'task-breakdown':
+        return 'Unable to generate task breakdown. Please try again later.';
+      case 'stuck-analysis':
+        return 'Unable to generate stuck analysis. Please try again later.';
+      default:
+        return 'Unable to process request. Please try again later.';
     }
   }
 }

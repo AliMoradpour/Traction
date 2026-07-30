@@ -13,16 +13,19 @@ import { BehaviorModule } from './modules/behavior/behavior.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { AIModule } from './modules/ai/ai.module';
 import { ExecutionModule } from './modules/execution/execution.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 100,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 100,
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -35,6 +38,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
     NotificationsModule,
     AIModule,
     ExecutionModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

@@ -1,5 +1,13 @@
 import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { AIService } from './ai.service';
 import { DailyBriefService } from './daily-brief.service';
 import { TaskBreakdownService } from './task-breakdown.service';
@@ -35,7 +43,11 @@ export class AIController {
 
   @Get('recommendations')
   @ApiOperation({ summary: 'Get AI recommendations' })
-  @ApiResponse({ status: 200, description: 'List of recommendations', type: [AIRecommendationResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of recommendations',
+    type: [AIRecommendationResponseDto],
+  })
   async getRecommendations(
     @CurrentUser('id') userId: string,
   ): Promise<AIRecommendationResponseDto[]> {
@@ -44,7 +56,11 @@ export class AIController {
 
   @Post('recommendations/generate')
   @ApiOperation({ summary: 'Generate new AI recommendation' })
-  @ApiResponse({ status: 201, description: 'Recommendation generated', type: AIRecommendationResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Recommendation generated',
+    type: AIRecommendationResponseDto,
+  })
   async generateRecommendation(
     @CurrentUser('id') userId: string,
   ): Promise<AIRecommendationResponseDto | null> {
@@ -54,7 +70,11 @@ export class AIController {
   @Post('recommendations/:id/accept')
   @ApiOperation({ summary: 'Accept AI recommendation' })
   @ApiParam({ name: 'id', description: 'Recommendation ID' })
-  @ApiResponse({ status: 200, description: 'Recommendation accepted', type: AIRecommendationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Recommendation accepted',
+    type: AIRecommendationResponseDto,
+  })
   async acceptRecommendation(
     @CurrentUser('id') userId: string,
     @Param('id') id: string,
@@ -65,7 +85,11 @@ export class AIController {
   @Post('recommendations/:id/dismiss')
   @ApiOperation({ summary: 'Dismiss AI recommendation' })
   @ApiParam({ name: 'id', description: 'Recommendation ID' })
-  @ApiResponse({ status: 200, description: 'Recommendation dismissed', type: AIRecommendationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Recommendation dismissed',
+    type: AIRecommendationResponseDto,
+  })
   async dismissRecommendation(
     @CurrentUser('id') userId: string,
     @Param('id') id: string,
@@ -84,16 +108,18 @@ export class AIController {
   @ApiOperation({ summary: 'Break down task into steps' })
   @ApiParam({ name: 'taskId', description: 'Task ID' })
   @ApiResponse({ status: 200, description: 'Task breakdown' })
-  async breakdownTask(
-    @CurrentUser('id') userId: string,
-    @Param('taskId') taskId: string,
-  ) {
+  async breakdownTask(@CurrentUser('id') userId: string, @Param('taskId') taskId: string) {
     return this.taskBreakdownService.breakdownTask(userId, taskId);
   }
 
   @Post('stuck-analysis')
   @ApiOperation({ summary: 'Analyze why user is stuck' })
-  @ApiBody({ schema: { type: 'object', properties: { feeling: { type: 'string' }, taskId: { type: 'string' } } } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { feeling: { type: 'string' }, taskId: { type: 'string' } },
+    },
+  })
   @ApiResponse({ status: 200, description: 'Stuck analysis' })
   async stuckAnalysis(
     @CurrentUser('id') userId: string,
@@ -113,10 +139,7 @@ export class AIController {
   @ApiOperation({ summary: 'Analyze goal recovery' })
   @ApiParam({ name: 'goalId', description: 'Goal ID' })
   @ApiResponse({ status: 200, description: 'Goal recovery analysis' })
-  async goalRecovery(
-    @CurrentUser('id') userId: string,
-    @Param('goalId') goalId: string,
-  ) {
+  async goalRecovery(@CurrentUser('id') userId: string, @Param('goalId') goalId: string) {
     return this.goalRecoveryService.analyzeGoalRecovery(userId, goalId);
   }
 
@@ -129,21 +152,34 @@ export class AIController {
 
   @Get('usage/summary')
   @ApiOperation({ summary: 'Get AI usage summary' })
-  @ApiResponse({ status: 200, description: 'Usage summary with daily/monthly counts and cost', type: AIUsageSummaryDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Usage summary with daily/monthly counts and cost',
+    type: AIUsageSummaryDto,
+  })
   async getUsageSummary(@CurrentUser('id') userId: string): Promise<AIUsageSummaryDto> {
     return this.observabilityService.getUsageSummary(userId);
   }
 
   @Get('usage/by-feature')
   @ApiOperation({ summary: 'Get AI usage breakdown by feature' })
-  @ApiResponse({ status: 200, description: 'Usage breakdown by feature', type: [AIUsageByFeatureDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Usage breakdown by feature',
+    type: [AIUsageByFeatureDto],
+  })
   async getUsageByFeature(@CurrentUser('id') userId: string): Promise<AIUsageByFeatureDto[]> {
     return this.observabilityService.getUsageByFeature(userId);
   }
 
   @Get('usage/by-day')
   @ApiOperation({ summary: 'Get AI usage by day' })
-  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Number of days to include (default: 7)' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    type: Number,
+    description: 'Number of days to include (default: 7)',
+  })
   @ApiResponse({ status: 200, description: 'Daily usage trend', type: [AIUsageByDayDto] })
   async getUsageByDay(
     @CurrentUser('id') userId: string,

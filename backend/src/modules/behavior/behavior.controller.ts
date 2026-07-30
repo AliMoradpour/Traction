@@ -1,7 +1,21 @@
 import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { BehaviorService } from './behavior.service';
-import { TrackEventDto, BehaviorEventResponseDto, BehaviorQueryDto, DailyMetricsQueryDto, WeeklyMetricsQueryDto, IndicatorsQueryDto } from './dto/behavior.dto';
+import {
+  TrackEventDto,
+  BehaviorEventResponseDto,
+  BehaviorQueryDto,
+  DailyMetricsQueryDto,
+  WeeklyMetricsQueryDto,
+  IndicatorsQueryDto,
+} from './dto/behavior.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -24,7 +38,11 @@ export class BehaviorController {
 
   @Get()
   @ApiOperation({ summary: 'Get behavior history' })
-  @ApiResponse({ status: 200, description: 'List of behavior events', type: [BehaviorEventResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of behavior events',
+    type: [BehaviorEventResponseDto],
+  })
   async findAll(
     @CurrentUser('id') userId: string,
     @Query() query: BehaviorQueryDto,
@@ -35,9 +53,7 @@ export class BehaviorController {
   @Get('stats')
   @ApiOperation({ summary: 'Get behavior stats' })
   @ApiResponse({ status: 200, description: 'Behavior statistics' })
-  async getStats(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getStats(@CurrentUser('id') userId: string): Promise<any> {
     return this.behaviorService.getStats(userId);
   }
 
@@ -74,18 +90,14 @@ export class BehaviorController {
   @Get('metrics/burnout')
   @ApiOperation({ summary: 'Get burnout risk assessment' })
   @ApiResponse({ status: 200, description: 'Burnout risk level and signals' })
-  async getBurnoutRisk(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getBurnoutRisk(@CurrentUser('id') userId: string): Promise<any> {
     return this.behaviorService.getBurnoutRisk(userId);
   }
 
   @Get('metrics/procrastination')
   @ApiOperation({ summary: 'Get procrastination profile' })
   @ApiResponse({ status: 200, description: 'Procrastination patterns and score' })
-  async getProcrastinationProfile(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getProcrastinationProfile(@CurrentUser('id') userId: string): Promise<any> {
     return this.behaviorService.getProcrastinationProfile(userId);
   }
 

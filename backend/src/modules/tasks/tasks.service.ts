@@ -46,11 +46,7 @@ export class TasksService {
 
     const tasks = await this.prisma.task.findMany({
       where,
-      orderBy: [
-        { priority: 'desc' },
-        { scheduledAt: 'asc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ priority: 'desc' }, { scheduledAt: 'asc' }, { createdAt: 'desc' }],
     });
 
     return tasks;
@@ -86,7 +82,7 @@ export class TasksService {
     }
 
     const updateData: any = { ...dto };
-    Object.keys(updateData).forEach(key => {
+    Object.keys(updateData).forEach((key) => {
       if (updateData[key] === null) delete updateData[key];
     });
 
@@ -157,10 +153,7 @@ export class TasksService {
           lte: endOfDay,
         },
       },
-      orderBy: [
-        { priority: 'desc' },
-        { scheduledAt: 'asc' },
-      ],
+      orderBy: [{ priority: 'desc' }, { scheduledAt: 'asc' }],
     });
 
     return tasks;
@@ -172,10 +165,7 @@ export class TasksService {
         userId,
         goalId,
       },
-      orderBy: [
-        { priority: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
     });
 
     return tasks;
@@ -195,9 +185,30 @@ export class TasksService {
     if (task.userId !== userId) throw new ForbiddenException('Access denied');
 
     return [
-      { id: '1', title: 'Break down the task', description: 'Divide into smaller steps', durationMinutes: 5, status: 'pending', order: 1 },
-      { id: '2', title: 'Complete step 1', description: 'First actionable step', durationMinutes: 15, status: 'pending', order: 2 },
-      { id: '3', title: 'Complete step 2', description: 'Second actionable step', durationMinutes: 15, status: 'pending', order: 3 },
+      {
+        id: '1',
+        title: 'Break down the task',
+        description: 'Divide into smaller steps',
+        durationMinutes: 5,
+        status: 'pending',
+        order: 1,
+      },
+      {
+        id: '2',
+        title: 'Complete step 1',
+        description: 'First actionable step',
+        durationMinutes: 15,
+        status: 'pending',
+        order: 2,
+      },
+      {
+        id: '3',
+        title: 'Complete step 2',
+        description: 'Second actionable step',
+        durationMinutes: 15,
+        status: 'pending',
+        order: 3,
+      },
     ];
   }
 

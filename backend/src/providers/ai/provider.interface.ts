@@ -21,11 +21,8 @@ export interface AICompletionResponse {
 
 export interface AIProvider {
   readonly name: string;
-  
-  chat(
-    messages: AIMessage[],
-    options?: AICompletionOptions,
-  ): Promise<AICompletionResponse | null>;
-  
+
+  chat(messages: AIMessage[], options?: AICompletionOptions): Promise<AICompletionResponse | null>;
+
   isConfigured(): boolean;
 }

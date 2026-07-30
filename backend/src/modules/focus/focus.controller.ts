@@ -24,16 +24,22 @@ export class FocusController {
 
   @Get('active')
   @ApiOperation({ summary: 'Get active focus session' })
-  @ApiResponse({ status: 200, description: 'Active session or null', type: FocusSessionResponseDto })
-  async getActive(
-    @CurrentUser('id') userId: string,
-  ): Promise<FocusSessionResponseDto | null> {
+  @ApiResponse({
+    status: 200,
+    description: 'Active session or null',
+    type: FocusSessionResponseDto,
+  })
+  async getActive(@CurrentUser('id') userId: string): Promise<FocusSessionResponseDto | null> {
     return this.focusService.getActive(userId);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all focus sessions' })
-  @ApiResponse({ status: 200, description: 'List of focus sessions', type: [FocusSessionResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of focus sessions',
+    type: [FocusSessionResponseDto],
+  })
   async findAll(
     @CurrentUser('id') userId: string,
     @Query() query: FocusQueryDto,

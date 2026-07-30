@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto, TaskQueryDto, TaskResponseDto } from './dto/tasks.dto';
@@ -92,10 +102,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Get task steps' })
   @ApiParam({ name: 'id', description: 'Task ID' })
   @ApiResponse({ status: 200, description: 'Task steps' })
-  async getSteps(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<any[]> {
+  async getSteps(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any[]> {
     return this.tasksService.getSteps(userId, id);
   }
 
@@ -103,10 +110,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Simplify task with AI' })
   @ApiParam({ name: 'id', description: 'Task ID' })
   @ApiResponse({ status: 200, description: 'Simplified task steps' })
-  async simplify(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<any[]> {
+  async simplify(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any[]> {
     return this.tasksService.simplify(userId, id);
   }
 

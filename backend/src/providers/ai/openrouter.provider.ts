@@ -10,7 +10,7 @@ import {
 @Injectable()
 export class OpenRouterProvider implements AIProvider {
   readonly name = 'openrouter';
-  
+
   private readonly logger = new Logger(OpenRouterProvider.name);
   private readonly apiKey: string;
   private readonly baseUrl = 'https://openrouter.ai/api/v1';
@@ -19,8 +19,14 @@ export class OpenRouterProvider implements AIProvider {
 
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get<string>('OPENROUTER_API_KEY') || '';
-    this.defaultModel = this.configService.get<string>('AI_MODEL_PRIMARY', 'anthropic/claude-3-haiku');
-    this.fallbackModel = this.configService.get<string>('AI_MODEL_FALLBACK', 'anthropic/claude-3-haiku');
+    this.defaultModel = this.configService.get<string>(
+      'AI_MODEL_PRIMARY',
+      'anthropic/claude-3-haiku',
+    );
+    this.fallbackModel = this.configService.get<string>(
+      'AI_MODEL_FALLBACK',
+      'anthropic/claude-3-haiku',
+    );
   }
 
   async chat(
@@ -40,7 +46,7 @@ export class OpenRouterProvider implements AIProvider {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://traction.app',
           'X-Title': 'Traction',
@@ -56,17 +62,17 @@ export class OpenRouterProvider implements AIProvider {
       if (!response.ok) {
         const error = await response.text();
         this.logger.error(`OpenRouter API error: ${response.status}`, error);
-        
+
         if (response.status === 429) {
           return this.tryFallbackModel(messages, options);
         }
-        
+
         return null;
       }
 
       const data = await response.json();
       const choice = data.choices?.[0];
-      
+
       if (!choice?.message?.content) {
         this.logger.warn('No content in OpenRouter response');
         return null;
@@ -92,7 +98,7 @@ export class OpenRouterProvider implements AIProvider {
     options?: AICompletionOptions,
   ): Promise<AICompletionResponse | null> {
     const fallbackModel = this.fallbackModel;
-    
+
     if (!fallbackModel || fallbackModel === options?.model) {
       return null;
     }
@@ -103,7 +109,7 @@ export class OpenRouterProvider implements AIProvider {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://traction.app',
           'X-Title': 'Traction',
@@ -123,7 +129,7 @@ export class OpenRouterProvider implements AIProvider {
 
       const data = await response.json();
       const choice = data.choices?.[0];
-      
+
       if (!choice?.message?.content) {
         return null;
       }

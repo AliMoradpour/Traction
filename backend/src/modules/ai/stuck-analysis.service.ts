@@ -35,7 +35,7 @@ export class StuckAnalysisService {
     currentTaskId?: string,
   ): Promise<StuckAnalysis | null> {
     let currentTask = null;
-    
+
     if (currentTaskId) {
       currentTask = await this.prisma.task.findUnique({
         where: { id: currentTaskId },
@@ -58,17 +58,26 @@ export class StuckAnalysisService {
     }
 
     const model = this.modelRegistry.getModelForFeature('stuck-analysis');
-    const response = await this.provider.chat(
-      [{ role: 'user', content: prompt }],
-      { model, temperature: 0.6, maxTokens: 300 },
-    );
+    const response = await this.provider.chat([{ role: 'user', content: prompt }], {
+      model,
+      temperature: 0.6,
+      maxTokens: 300,
+    });
 
     if (!response) {
       return this.getFallbackAnalysis(feeling);
     }
 
-    const validatedContent = this.safetyService.validateResponse(response.content, 'stuck-analysis');
-    await this.rateLimitService.recordUsage(userId, 'stuck-analysis', response.model, response.usage.totalTokens);
+    const validatedContent = this.safetyService.validateResponse(
+      response.content,
+      'stuck-analysis',
+    );
+    await this.rateLimitService.recordUsage(
+      userId,
+      'stuck-analysis',
+      response.model,
+      response.usage.totalTokens,
+    );
 
     try {
       const parsed = JSON.parse(validatedContent);
@@ -99,12 +108,12 @@ export class StuckAnalysisService {
     });
 
     const activities: string[] = [];
-    
-    recentTasks.forEach(t => {
+
+    recentTasks.forEach((t) => {
       activities.push(`Task: ${t.title} (${t.status})`);
     });
-    
-    recentSessions.forEach(s => {
+
+    recentSessions.forEach((s) => {
       activities.push(`Focus session: ${s.duration || 0} minutes (${s.status})`);
     });
 
@@ -113,7 +122,7 @@ export class StuckAnalysisService {
 
   private getTimeOfDay(): string {
     const hour = new Date().getHours();
-    
+
     if (hour < 6) return 'late night';
     if (hour < 12) return 'morning';
     if (hour < 17) return 'afternoon';

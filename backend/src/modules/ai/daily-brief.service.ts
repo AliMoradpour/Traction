@@ -38,7 +38,7 @@ export class DailyBriefService {
   async getDailyBrief(userId: string): Promise<DailyBrief | null> {
     const today = new Date().toISOString().split('T')[0];
     const cacheKey = `daily-brief-${today}`;
-    
+
     const cached = await this.cacheService.get(userId, cacheKey);
     if (cached) {
       try {
@@ -49,7 +49,7 @@ export class DailyBriefService {
     }
 
     const brief = await this.generateDailyBrief(userId);
-    
+
     if (brief) {
       await this.cacheService.set(userId, cacheKey, JSON.stringify(brief), 'openrouter', 60 * 24);
     }
@@ -77,16 +77,20 @@ export class DailyBriefService {
 
     const prompt = this.promptLoader.renderPrompt('daily-brief', {
       date: today,
-      tasks: JSON.stringify(tasks.map(t => ({
-        title: t.title,
-        priority: t.priority,
-        friction: t.friction,
-        scheduledAt: t.scheduledAt,
-      }))),
-      goals: JSON.stringify(goals.map(g => ({
-        title: g.title,
-        deadline: g.targetDate,
-      }))),
+      tasks: JSON.stringify(
+        tasks.map((t) => ({
+          title: t.title,
+          priority: t.priority,
+          friction: t.friction,
+          scheduledAt: t.scheduledAt,
+        })),
+      ),
+      goals: JSON.stringify(
+        goals.map((g) => ({
+          title: g.title,
+          deadline: g.targetDate,
+        })),
+      ),
       behaviorProfile: JSON.stringify(behaviorProfile),
       frictionScore: JSON.stringify(frictionScore),
     });
@@ -97,21 +101,27 @@ export class DailyBriefService {
     }
 
     const model = this.modelRegistry.getModelForFeature('daily-brief');
-    const response = await this.provider.chat(
-      [{ role: 'user', content: prompt }],
-      { model, temperature: 0.7, maxTokens: 1000 },
-    );
+    const response = await this.provider.chat([{ role: 'user', content: prompt }], {
+      model,
+      temperature: 0.7,
+      maxTokens: 1000,
+    });
 
     if (!response) {
       return this.getFallbackDailyBrief(tasks, goals);
     }
 
     const validatedContent = this.safetyService.validateResponse(response.content, 'daily-brief');
-    await this.rateLimitService.recordUsage(userId, 'daily-brief', response.model, response.usage.totalTokens);
+    await this.rateLimitService.recordUsage(
+      userId,
+      'daily-brief',
+      response.model,
+      response.usage.totalTokens,
+    );
 
     try {
       const parsed = JSON.parse(validatedContent);
-      
+
       return {
         date: today,
         focusRecommendation: parsed.focusRecommendation,
@@ -129,17 +139,18 @@ export class DailyBriefService {
 
   private getFallbackDailyBrief(tasks: any[], goals: any[]): DailyBrief {
     const today = new Date().toISOString().split('T')[0];
-    
+
     const highPriorityTasks = tasks
-      .filter(t => t.priority === 'HIGH' || t.priority === 'URGENT')
+      .filter((t) => t.priority === 'HIGH' || t.priority === 'URGENT')
       .slice(0, 3)
-      .map(t => t.title);
+      .map((t) => t.title);
 
     return {
       date: today,
-      focusRecommendation: highPriorityTasks.length > 0
-        ? `Focus on: ${highPriorityTasks[0]}`
-        : 'Start with your most important task',
+      focusRecommendation:
+        highPriorityTasks.length > 0
+          ? `Focus on: ${highPriorityTasks[0]}`
+          : 'Start with your most important task',
       executionAdvice: [
         'Break tasks into smaller steps',
         'Take regular breaks',

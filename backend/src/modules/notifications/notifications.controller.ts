@@ -14,7 +14,11 @@ export class NotificationsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all notifications' })
-  @ApiResponse({ status: 200, description: 'List of notifications', type: [NotificationResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of notifications',
+    type: [NotificationResponseDto],
+  })
   async findAll(
     @CurrentUser('id') userId: string,
     @Query() query: NotificationQueryDto,
@@ -25,18 +29,14 @@ export class NotificationsController {
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notification count' })
   @ApiResponse({ status: 200, description: 'Unread count' })
-  async getUnreadCount(
-    @CurrentUser('id') userId: string,
-  ): Promise<{ count: number }> {
+  async getUnreadCount(@CurrentUser('id') userId: string): Promise<{ count: number }> {
     return this.notificationsService.getUnreadCount(userId);
   }
 
   @Get('preferences')
   @ApiOperation({ summary: 'Get notification preferences' })
   @ApiResponse({ status: 200, description: 'Notification preferences' })
-  async getPreferences(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getPreferences(@CurrentUser('id') userId: string): Promise<any> {
     return this.notificationsService.getPreferences(userId);
   }
 
@@ -54,16 +54,18 @@ export class NotificationsController {
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read' })
   @ApiResponse({ status: 200, description: 'Count of updated notifications' })
-  async markAllAsRead(
-    @CurrentUser('id') userId: string,
-  ): Promise<{ count: number }> {
+  async markAllAsRead(@CurrentUser('id') userId: string): Promise<{ count: number }> {
     return this.notificationsService.markAllAsRead(userId);
   }
 
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiParam({ name: 'id', description: 'Notification ID' })
-  @ApiResponse({ status: 200, description: 'Notification marked as read', type: NotificationResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Notification marked as read',
+    type: NotificationResponseDto,
+  })
   async markAsRead(
     @CurrentUser('id') userId: string,
     @Param('id') id: string,

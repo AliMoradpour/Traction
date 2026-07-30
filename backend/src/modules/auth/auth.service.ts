@@ -60,6 +60,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     };
   }
@@ -95,6 +96,7 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
       },
     };
   }
@@ -129,10 +131,7 @@ export class AuthService {
     });
 
     // Generate new tokens
-    const tokens = await this.generateTokens(
-      refreshToken.user.id,
-      refreshToken.user.email,
-    );
+    const tokens = await this.generateTokens(refreshToken.user.id, refreshToken.user.email);
 
     // Store new refresh token
     await this.storeRefreshToken(refreshToken.user.id, tokens.refreshToken);
@@ -145,6 +144,7 @@ export class AuthService {
         email: refreshToken.user.email,
         firstName: refreshToken.user.firstName,
         lastName: refreshToken.user.lastName,
+        role: refreshToken.user.role,
       },
     };
   }
@@ -207,13 +207,13 @@ export class AuthService {
   private async storeRefreshToken(userId: string, token: string) {
     const expiresIn = this.configService.get('JWT_REFRESH_EXPIRATION', '7d');
     const expiresAt = new Date();
-    
+
     // Parse expiration string (e.g., "7d")
     const match = expiresIn.match(/^(\d+)([dhm])$/);
     if (match) {
       const value = parseInt(match[1], 10);
       const unit = match[2];
-      
+
       switch (unit) {
         case 'd':
           expiresAt.setDate(expiresAt.getDate() + value);

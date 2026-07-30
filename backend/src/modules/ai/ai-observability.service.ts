@@ -67,27 +67,28 @@ export class AIObservabilityService {
 
   async getMetrics(): Promise<AIMetrics> {
     const totalRequests = await this.prisma.aIUsage.count();
-    
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
+
     const recentUsage = await this.prisma.aIUsage.findMany({
       where: { createdAt: { gte: thirtyDaysAgo } },
     });
 
     const totalTokens = recentUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
-    
-    const averageResponseTime = this.responseTimes.length > 0
-      ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length
-      : 0;
+
+    const averageResponseTime =
+      this.responseTimes.length > 0
+        ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length
+        : 0;
 
     const cacheTotal = await this.prisma.aICache.count();
     const cacheExpired = await this.prisma.aICache.count({
       where: { expiresAt: { lt: new Date() } },
     });
-    
+
     const cacheHitRate = cacheTotal > 0 ? (cacheTotal - cacheExpired) / cacheTotal : 0;
-    
+
     const totalAttempts = this.successes + this.failures;
     const failureRate = totalAttempts > 0 ? this.failures / totalAttempts : 0;
 
@@ -103,10 +104,17 @@ export class AIObservabilityService {
   }
 
   async getFeatureMetrics(): Promise<AIFeatureMetrics[]> {
-    const features = ['daily-brief', 'weekly-review', 'task-breakdown', 'goal-recovery', 'stuck-analysis', 'recommendations'];
-    
+    const features = [
+      'daily-brief',
+      'weekly-review',
+      'task-breakdown',
+      'goal-recovery',
+      'stuck-analysis',
+      'recommendations',
+    ];
+
     const metrics: AIFeatureMetrics[] = [];
-    
+
     for (const feature of features) {
       const usage = await this.prisma.aIUsage.findMany({
         where: { feature },
@@ -128,10 +136,10 @@ export class AIObservabilityService {
 
   async getUsageSummary(userId: string): Promise<AIUsageSummary> {
     const now = new Date();
-    
+
     const startOfDay = new Date(now);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     const [dailyCount, monthlyCount, monthlyUsage] = await Promise.all([
@@ -183,7 +191,7 @@ export class AIObservabilityService {
     });
 
     const featureMap = new Map<string, { requests: number; tokens: number }>();
-    
+
     for (const record of usage) {
       const existing = featureMap.get(record.feature) || { requests: 0, tokens: 0 };
       featureMap.set(record.feature, {

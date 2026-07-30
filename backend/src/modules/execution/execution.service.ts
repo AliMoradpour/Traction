@@ -13,7 +13,9 @@ export class ExecutionService {
     private tasksService: TasksService,
   ) {}
 
-  async getReadinessScore(userId: string): Promise<{ score: number; factors: string[]; explanation: string }> {
+  async getReadinessScore(
+    userId: string,
+  ): Promise<{ score: number; factors: string[]; explanation: string }> {
     const now = new Date();
     const sevenDaysAgo = new Date(now);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -40,7 +42,7 @@ export class ExecutionService {
     let totalScore = 0;
 
     // Focus session completion rate (25%)
-    const completedSessions = focusSessions.filter(s => s.status === 'COMPLETED').length;
+    const completedSessions = focusSessions.filter((s) => s.status === 'COMPLETED').length;
     const totalSessions = focusSessions.length;
     const focusRate = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
     const focusContribution = Math.round(focusRate * 0.25);
@@ -48,7 +50,7 @@ export class ExecutionService {
     factors.push(`Focus completion: ${focusRate}% (contributes ${focusContribution} points)`);
 
     // Task completion rate (25%)
-    const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
+    const completedTasks = tasks.filter((t) => t.status === 'COMPLETED').length;
     const totalTasks = tasks.length;
     const taskRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
     const taskContribution = Math.round(taskRate * 0.25);
@@ -58,7 +60,9 @@ export class ExecutionService {
     // Time since last activity (15%)
     let activityScore = 100;
     if (lastActivity) {
-      const hoursSinceLastActivity = Math.floor((now.getTime() - new Date(lastActivity.createdAt).getTime()) / (1000 * 60 * 60));
+      const hoursSinceLastActivity = Math.floor(
+        (now.getTime() - new Date(lastActivity.createdAt).getTime()) / (1000 * 60 * 60),
+      );
       if (hoursSinceLastActivity <= 1) activityScore = 100;
       else if (hoursSinceLastActivity <= 4) activityScore = 80;
       else if (hoursSinceLastActivity <= 12) activityScore = 60;
@@ -70,22 +74,28 @@ export class ExecutionService {
     factors.push(`Last activity: ${activityScore}% (contributes ${activityContribution} points)`);
 
     // Procrastination level (15%)
-    const snoozeEvents = events.filter(e => e.type === 'TASK_SNOOZED').length;
-    const procrastinationScore = Math.max(0, 100 - (snoozeEvents * 20));
+    const snoozeEvents = events.filter((e) => e.type === 'TASK_SNOOZED').length;
+    const procrastinationScore = Math.max(0, 100 - snoozeEvents * 20);
     const procrastinationContribution = Math.round(procrastinationScore * 0.15);
     totalScore += procrastinationContribution;
-    factors.push(`Low procrastination: ${procrastinationScore}% (contributes ${procrastinationContribution} points)`);
+    factors.push(
+      `Low procrastination: ${procrastinationScore}% (contributes ${procrastinationContribution} points)`,
+    );
 
     // Pending tasks (10%)
-    const pendingTasks = tasks.filter(t => t.status === 'PENDING').length;
-    const pendingScore = Math.max(0, 100 - (pendingTasks * 10));
-    const pendingContribution = Math.round(pendingScore * 0.10);
+    const pendingTasks = tasks.filter((t) => t.status === 'PENDING').length;
+    const pendingScore = Math.max(0, 100 - pendingTasks * 10);
+    const pendingContribution = Math.round(pendingScore * 0.1);
     totalScore += pendingContribution;
-    factors.push(`Manageable workload: ${pendingScore}% (contributes ${pendingContribution} points)`);
+    factors.push(
+      `Manageable workload: ${pendingScore}% (contributes ${pendingContribution} points)`,
+    );
 
     // Recent momentum (10%)
-    const recentCompleted = tasks.filter(t => t.completedAt && new Date(t.completedAt) >= sevenDaysAgo).length;
-    const olderCompleted = tasks.filter(t => {
+    const recentCompleted = tasks.filter(
+      (t) => t.completedAt && new Date(t.completedAt) >= sevenDaysAgo,
+    ).length;
+    const olderCompleted = tasks.filter((t) => {
       const completedAt = t.completedAt;
       if (!completedAt) return false;
       const d = new Date(completedAt);
@@ -95,21 +105,27 @@ export class ExecutionService {
     const olderAvg = olderCompleted / 23;
     const momentumRatio = olderAvg > 0 ? weeklyAvg / olderAvg : weeklyAvg > 0 ? 1 : 0;
     const momentumScore = Math.min(100, Math.round(momentumRatio * 50));
-    const momentumContribution = Math.round(momentumScore * 0.10);
+    const momentumContribution = Math.round(momentumScore * 0.1);
     totalScore += momentumContribution;
     factors.push(`Recent momentum: ${momentumScore}% (contributes ${momentumContribution} points)`);
 
     const finalScore = Math.min(100, Math.max(0, totalScore));
     let explanation = '';
-    if (finalScore >= 80) explanation = 'You are in a high-readiness state. Great time to tackle challenging tasks.';
-    else if (finalScore >= 60) explanation = 'You have moderate readiness. Consider starting with easier tasks to build momentum.';
-    else if (finalScore >= 40) explanation = 'Readiness is below average. Focus on small wins to build momentum.';
+    if (finalScore >= 80)
+      explanation = 'You are in a high-readiness state. Great time to tackle challenging tasks.';
+    else if (finalScore >= 60)
+      explanation =
+        'You have moderate readiness. Consider starting with easier tasks to build momentum.';
+    else if (finalScore >= 40)
+      explanation = 'Readiness is below average. Focus on small wins to build momentum.';
     else explanation = 'Readiness is low. Consider rest or very small, easy tasks to recover.';
 
     return { score: finalScore, factors, explanation };
   }
 
-  async detectResistance(userId: string): Promise<{ score: number; patterns: string[]; suggestions: string[] }> {
+  async detectResistance(
+    userId: string,
+  ): Promise<{ score: number; patterns: string[]; suggestions: string[] }> {
     const now = new Date();
     const twentyFourHoursAgo = new Date(now);
     twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
@@ -128,7 +144,7 @@ export class ExecutionService {
     let resistanceScore = 0;
 
     // Count TASK_SNOOZED events in last 24h
-    const snoozedCount = events.filter(e => e.type === 'TASK_SNOOZED').length;
+    const snoozedCount = events.filter((e) => e.type === 'TASK_SNOOZED').length;
     if (snoozedCount > 2) {
       resistanceScore += 30;
       patterns.push(`Snoozed ${snoozedCount} tasks in last 24 hours`);
@@ -136,7 +152,7 @@ export class ExecutionService {
     }
 
     // Count FOCUS_ABANDONED events in last 24h
-    const abandonedCount = events.filter(e => e.type === 'FOCUS_ABANDONED').length;
+    const abandonedCount = events.filter((e) => e.type === 'FOCUS_ABANDONED').length;
     if (abandonedCount > 1) {
       resistanceScore += 25;
       patterns.push(`Abandoned ${abandonedCount} focus sessions in last 24 hours`);
@@ -144,7 +160,7 @@ export class ExecutionService {
     }
 
     // Count tasks created but not started
-    const unstartedTasks = tasks.filter(t => t.status === 'PENDING').length;
+    const unstartedTasks = tasks.filter((t) => t.status === 'PENDING').length;
     if (unstartedTasks > 5) {
       resistanceScore += 20;
       patterns.push(`${unstartedTasks} tasks pending without progress`);
@@ -159,7 +175,7 @@ export class ExecutionService {
     });
 
     if (tasksWithActions.length > 0) {
-      const delays = tasksWithActions.map(t => {
+      const delays = tasksWithActions.map((t) => {
         const created = new Date(t.createdAt).getTime();
         const started = t.scheduledAt ? new Date(t.scheduledAt).getTime() : created;
         return (started - created) / (1000 * 60 * 60); // hours
@@ -167,13 +183,16 @@ export class ExecutionService {
       const avgDelay = delays.reduce((a, b) => a + b, 0) / delays.length;
       if (avgDelay > 24) {
         resistanceScore += 15;
-        patterns.push(`Average delay of ${Math.round(avgDelay)} hours between task creation and action`);
+        patterns.push(
+          `Average delay of ${Math.round(avgDelay)} hours between task creation and action`,
+        );
         suggestions.push('Schedule tasks immediately when you create them');
       }
     }
 
     const finalScore = Math.min(100, resistanceScore);
-    if (finalScore === 0) suggestions.push('Keep up the great work! No significant resistance detected.');
+    if (finalScore === 0)
+      suggestions.push('Keep up the great work! No significant resistance detected.');
 
     return { score: finalScore, patterns, suggestions };
   }
@@ -302,9 +321,12 @@ export class ExecutionService {
       }),
     ]);
 
-    const weeklyMomentum = lastWeekTasks > 0
-      ? Math.round(((thisWeekTasks - lastWeekTasks) / lastWeekTasks) * 100)
-      : thisWeekTasks > 0 ? 100 : 0;
+    const weeklyMomentum =
+      lastWeekTasks > 0
+        ? Math.round(((thisWeekTasks - lastWeekTasks) / lastWeekTasks) * 100)
+        : thisWeekTasks > 0
+          ? 100
+          : 0;
 
     // Monthly momentum (this month vs last month)
     const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -328,9 +350,12 @@ export class ExecutionService {
       }),
     ]);
 
-    const monthlyMomentum = lastMonthTasks > 0
-      ? Math.round(((thisMonthTasks - lastMonthTasks) / lastMonthTasks) * 100)
-      : thisMonthTasks > 0 ? 100 : 0;
+    const monthlyMomentum =
+      lastMonthTasks > 0
+        ? Math.round(((thisMonthTasks - lastMonthTasks) / lastMonthTasks) * 100)
+        : thisMonthTasks > 0
+          ? 100
+          : 0;
 
     // Overall trend
     let trend: 'improving' | 'stable' | 'declining' = 'stable';
@@ -407,35 +432,43 @@ export class ExecutionService {
       }),
     ]);
 
-    const totalFocusTime = Math.round(allSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
-    const weeklyFocusTime = Math.round(weeklySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
-    const dailyFocusTime = Math.round(dailySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60);
+    const totalFocusTime = Math.round(
+      allSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60,
+    );
+    const weeklyFocusTime = Math.round(
+      weeklySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60,
+    );
+    const dailyFocusTime = Math.round(
+      dailySessions.reduce((sum, s) => sum + (s.duration || 0), 0) / 60,
+    );
 
-    const averageSessionDuration = allSessions.length > 0
-      ? Math.round(allSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / allSessions.length)
-      : 0;
+    const averageSessionDuration =
+      allSessions.length > 0
+        ? Math.round(
+            allSessions.reduce((sum, s) => sum + (s.duration || 0), 0) / allSessions.length,
+          )
+        : 0;
 
     // Completion reliability (completed on time / total with due dates)
     const tasksWithDue = await this.prisma.task.findMany({
       where: { userId, dueAt: { not: null } },
     });
-    const completedOnTime = tasksWithDue.filter(t =>
-      t.status === 'COMPLETED' && t.completedAt && new Date(t.completedAt) <= new Date(t.dueAt!)
+    const completedOnTime = tasksWithDue.filter(
+      (t) =>
+        t.status === 'COMPLETED' && t.completedAt && new Date(t.completedAt) <= new Date(t.dueAt!),
     ).length;
-    const completionReliability = tasksWithDue.length > 0
-      ? Math.round((completedOnTime / tasksWithDue.length) * 100)
-      : 100;
+    const completionReliability =
+      tasksWithDue.length > 0 ? Math.round((completedOnTime / tasksWithDue.length) * 100) : 100;
 
     // Planning accuracy (completed as scheduled / total scheduled)
     const scheduledTasks = await this.prisma.task.findMany({
       where: { userId, scheduledAt: { not: null } },
     });
-    const completedScheduled = scheduledTasks.filter(t =>
-      t.status === 'COMPLETED'
-    ).length;
-    const planningAccuracy = scheduledTasks.length > 0
-      ? Math.round((completedScheduled / scheduledTasks.length) * 100)
-      : 100;
+    const completedScheduled = scheduledTasks.filter((t) => t.status === 'COMPLETED').length;
+    const planningAccuracy =
+      scheduledTasks.length > 0
+        ? Math.round((completedScheduled / scheduledTasks.length) * 100)
+        : 100;
 
     return {
       totalTasksCompleted,

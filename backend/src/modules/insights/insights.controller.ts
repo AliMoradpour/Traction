@@ -25,27 +25,21 @@ export class InsightsController {
   @Get('daily-brief')
   @ApiOperation({ summary: 'Get daily brief' })
   @ApiResponse({ status: 200, description: 'Daily brief' })
-  async getDailyBrief(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getDailyBrief(@CurrentUser('id') userId: string): Promise<any> {
     return this.insightsService.getDailyBrief(userId);
   }
 
   @Get('behavioral-awareness')
   @ApiOperation({ summary: 'Get behavioral awareness' })
   @ApiResponse({ status: 200, description: 'Behavioral awareness' })
-  async getBehavioralAwareness(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getBehavioralAwareness(@CurrentUser('id') userId: string): Promise<any> {
     return this.insightsService.getBehavioralAwareness(userId);
   }
 
   @Get('weekly-review')
   @ApiOperation({ summary: 'Get weekly review' })
   @ApiResponse({ status: 200, description: 'Weekly review' })
-  async getWeeklyReview(
-    @CurrentUser('id') userId: string,
-  ): Promise<any> {
+  async getWeeklyReview(@CurrentUser('id') userId: string): Promise<any> {
     return this.insightsService.getWeeklyReview(userId);
   }
 
@@ -63,9 +57,7 @@ export class InsightsController {
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all insights as read' })
   @ApiResponse({ status: 200, description: 'Count of updated insights' })
-  async markAllAsRead(
-    @CurrentUser('id') userId: string,
-  ): Promise<{ count: number }> {
+  async markAllAsRead(@CurrentUser('id') userId: string): Promise<{ count: number }> {
     return this.insightsService.markAllAsRead(userId);
   }
 

@@ -25,10 +25,7 @@ export class TaskBreakdownService {
     private safetyService: AISafetyService,
   ) {}
 
-  async breakdownTask(
-    userId: string,
-    taskId: string,
-  ): Promise<TaskBreakdownStep[] | null> {
+  async breakdownTask(userId: string, taskId: string): Promise<TaskBreakdownStep[] | null> {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
     });
@@ -50,17 +47,26 @@ export class TaskBreakdownService {
     }
 
     const model = this.modelRegistry.getModelForFeature('task-breakdown');
-    const response = await this.provider.chat(
-      [{ role: 'user', content: prompt }],
-      { model, temperature: 0.5, maxTokens: 500 },
-    );
+    const response = await this.provider.chat([{ role: 'user', content: prompt }], {
+      model,
+      temperature: 0.5,
+      maxTokens: 500,
+    });
 
     if (!response) {
       return this.getFallbackBreakdown(task);
     }
 
-    const validatedContent = this.safetyService.validateResponse(response.content, 'task-breakdown');
-    await this.rateLimitService.recordUsage(userId, 'task-breakdown', response.model, response.usage.totalTokens);
+    const validatedContent = this.safetyService.validateResponse(
+      response.content,
+      'task-breakdown',
+    );
+    await this.rateLimitService.recordUsage(
+      userId,
+      'task-breakdown',
+      response.model,
+      response.usage.totalTokens,
+    );
 
     try {
       const parsed = JSON.parse(validatedContent);

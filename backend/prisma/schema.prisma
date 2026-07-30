@@ -35,8 +35,11 @@ model User {
 }
 
 enum UserRole {
-  USER
+  SUPER_ADMIN
   ADMIN
+  BETA_TESTER
+  PREMIUM_USER
+  USER
 }
 
 model UserProfile {

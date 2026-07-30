@@ -23,11 +23,7 @@ export class FrictionEngineService {
   constructor(private prisma: PrismaService) {}
 
   async calculateFriction(userId: string): Promise<FrictionAnalysis> {
-    const [
-      tasks,
-      focusSessions,
-      behaviorEvents,
-    ] = await Promise.all([
+    const [tasks, focusSessions, behaviorEvents] = await Promise.all([
       this.prisma.task.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
@@ -58,22 +54,18 @@ export class FrictionEngineService {
     };
   }
 
-  private calculateFactors(
-    tasks: any[],
-    focusSessions: any[],
-    behaviorEvents: any[],
-  ) {
+  private calculateFactors(tasks: any[], focusSessions: any[], behaviorEvents: any[]) {
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-    const recentTasks = tasks.filter(t => new Date(t.createdAt) > sevenDaysAgo);
-    const skippedTasks = recentTasks.filter(t => t.status === 'SKIPPED').length;
-    
+    const recentTasks = tasks.filter((t) => new Date(t.createdAt) > sevenDaysAgo);
+    const skippedTasks = recentTasks.filter((t) => t.status === 'SKIPPED').length;
+
     const procrastination = this.calculateProcrastination(behaviorEvents, sevenDaysAgo);
-    const unfinishedSessions = focusSessions.filter(s => s.status === 'ABANDONED').length;
+    const unfinishedSessions = focusSessions.filter((s) => s.status === 'ABANDONED').length;
     const inactivity = this.calculateInactivity(tasks, focusSessions, fourteenDaysAgo);
-    const reschedules = behaviorEvents.filter(e => e.type === 'TASK_SNOOZED').length;
+    const reschedules = behaviorEvents.filter((e) => e.type === 'TASK_SNOOZED').length;
 
     return {
       skippedTasks,
@@ -85,28 +77,28 @@ export class FrictionEngineService {
   }
 
   private calculateProcrastination(events: any[], since: Date): number {
-    const recentEvents = events.filter(e => new Date(e.createdAt) > since);
-    const snoozeCount = recentEvents.filter(e => e.type === 'TASK_SNOOZED').length;
-    const skipCount = recentEvents.filter(e => e.type === 'TASK_SKIPPED').length;
-    
+    const recentEvents = events.filter((e) => new Date(e.createdAt) > since);
+    const snoozeCount = recentEvents.filter((e) => e.type === 'TASK_SNOOZED').length;
+    const skipCount = recentEvents.filter((e) => e.type === 'TASK_SKIPPED').length;
+
     return Math.min(10, snoozeCount + skipCount);
   }
 
   private calculateInactivity(tasks: any[], sessions: any[], since: Date): number {
-    const recentTasks = tasks.filter(t => new Date(t.createdAt) > since);
-    const recentSessions = sessions.filter(s => new Date(s.startedAt) > since);
-    
+    const recentTasks = tasks.filter((t) => new Date(t.createdAt) > since);
+    const recentSessions = sessions.filter((s) => new Date(s.startedAt) > since);
+
     if (recentTasks.length === 0 && recentSessions.length === 0) {
       return 10;
     }
-    
+
     const lastActivity = Math.max(
       recentTasks.length > 0 ? new Date(recentTasks[0].createdAt).getTime() : 0,
       recentSessions.length > 0 ? new Date(recentSessions[0].startedAt).getTime() : 0,
     );
-    
+
     const daysSinceActivity = (Date.now() - lastActivity) / (24 * 60 * 60 * 1000);
-    
+
     if (daysSinceActivity > 7) return 10;
     if (daysSinceActivity > 3) return 7;
     if (daysSinceActivity > 1) return 3;
@@ -115,13 +107,13 @@ export class FrictionEngineService {
 
   private calculateScore(factors: any): number {
     let score = 0;
-    
+
     score += Math.min(30, factors.skippedTasks * 5);
     score += Math.min(25, factors.procrastination * 2.5);
     score += Math.min(20, factors.unfinishedSessions * 4);
     score += Math.min(15, factors.inactivity * 1.5);
     score += Math.min(10, factors.reschedules * 2);
-    
+
     return Math.min(100, Math.round(score));
   }
 

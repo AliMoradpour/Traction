@@ -1,10 +1,27 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { GoalsService } from './goals.service';
 import {
-  CreateGoalDto, UpdateGoalDto, GoalQueryDto, GoalResponseDto,
-  CreateMilestoneDto, UpdateMilestoneDto, MilestoneResponseDto,
-  CreatePlanDto, UpdatePlanDto, PlanResponseDto,
+  CreateGoalDto,
+  UpdateGoalDto,
+  GoalQueryDto,
+  GoalResponseDto,
+  CreateMilestoneDto,
+  UpdateMilestoneDto,
+  MilestoneResponseDto,
+  CreatePlanDto,
+  UpdatePlanDto,
+  PlanResponseDto,
 } from './dto/goals.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -85,10 +102,7 @@ export class GoalsController {
   @ApiOperation({ summary: 'Get goal feasibility analysis' })
   @ApiParam({ name: 'id', description: 'Goal ID' })
   @ApiResponse({ status: 200, description: 'Goal feasibility' })
-  async getFeasibility(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<any> {
+  async getFeasibility(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any> {
     return this.goalsService.getFeasibility(userId, id);
   }
 
@@ -96,10 +110,7 @@ export class GoalsController {
   @ApiOperation({ summary: 'Get goal health projection' })
   @ApiParam({ name: 'id', description: 'Goal ID' })
   @ApiResponse({ status: 200, description: 'Goal projection' })
-  async getProjection(
-    @CurrentUser('id') userId: string,
-    @Param('id') id: string,
-  ): Promise<any> {
+  async getProjection(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any> {
     return this.goalsService.getProjection(userId, id);
   }
 

@@ -49,7 +49,7 @@ export class OpenRouterService {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://traction.app',
           'X-Title': 'Traction',
@@ -85,10 +85,14 @@ Keep steps simple and clear. Return ONLY the JSON array, no other text.`;
 Title: ${taskTitle}
 ${taskDescription ? `Description: ${taskDescription}` : ''}`;
 
-    return this.chat([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ], 'anthropic/claude-3-haiku', { temperature: 0.5, maxTokens: 500 });
+    return this.chat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      'anthropic/claude-3-haiku',
+      { temperature: 0.5, maxTokens: 500 },
+    );
   }
 
   async analyzeGoalFeasibility(goalTitle: string, deadline?: string): Promise<string | null> {
@@ -103,10 +107,14 @@ Return ONLY the JSON object, no other text.`;
 Title: ${goalTitle}
 ${deadline ? `Deadline: ${deadline}` : 'No deadline set'}`;
 
-    return this.chat([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ], 'anthropic/claude-3-haiku', { temperature: 0.5, maxTokens: 500 });
+    return this.chat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      'anthropic/claude-3-haiku',
+      { temperature: 0.5, maxTokens: 500 },
+    );
   }
 
   async generateInsight(type: string, data: Record<string, unknown>): Promise<string | null> {
@@ -120,10 +128,14 @@ Return ONLY the JSON object, no other text.`;
     const userPrompt = `Generate a ${type} insight from this data:
 ${JSON.stringify(data, null, 2)}`;
 
-    return this.chat([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ], 'anthropic/claude-3-haiku', { temperature: 0.7, maxTokens: 500 });
+    return this.chat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      'anthropic/claude-3-haiku',
+      { temperature: 0.7, maxTokens: 500 },
+    );
   }
 
   async getRecommendation(context: {
@@ -143,10 +155,14 @@ Return ONLY the JSON object, no other text.`;
     const userPrompt = `Based on this context, give me one recommendation:
 ${JSON.stringify(context, null, 2)}`;
 
-    return this.chat([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ], 'anthropic/claude-3-haiku', { temperature: 0.7, maxTokens: 300 });
+    return this.chat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      'anthropic/claude-3-haiku',
+      { temperature: 0.7, maxTokens: 300 },
+    );
   }
 
   async simplifyTask(taskTitle: string, resistanceLevel: number): Promise<string | null> {
@@ -161,10 +177,14 @@ Return ONLY the JSON object, no other text.`;
     const userPrompt = `Simplify this task (resistance level: ${resistanceLevel}/5):
 ${taskTitle}`;
 
-    return this.chat([
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ], 'anthropic/claude-3-haiku', { temperature: 0.6, maxTokens: 300 });
+    return this.chat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      'anthropic/claude-3-haiku',
+      { temperature: 0.6, maxTokens: 300 },
+    );
   }
 
   isConfigured(): boolean {

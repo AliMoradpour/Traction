@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateProfileDto, UpdatePreferencesDto, UserProfileResponseDto, UserResponseDto } from './dto/users.dto';
+import {
+  UpdateProfileDto,
+  UpdatePreferencesDto,
+  UserProfileResponseDto,
+  UserResponseDto,
+} from './dto/users.dto';
 
 @Injectable()
 export class UsersService {
@@ -58,7 +63,10 @@ export class UsersService {
     return profile;
   }
 
-  async updatePreferences(userId: string, dto: UpdatePreferencesDto): Promise<UserProfileResponseDto> {
+  async updatePreferences(
+    userId: string,
+    dto: UpdatePreferencesDto,
+  ): Promise<UserProfileResponseDto> {
     // Ensure profile exists
     await this.prisma.userProfile.upsert({
       where: { userId },
@@ -67,7 +75,7 @@ export class UsersService {
     });
 
     const updateData: any = { ...dto };
-    Object.keys(updateData).forEach(key => {
+    Object.keys(updateData).forEach((key) => {
       if (updateData[key] === null) delete updateData[key];
     });
 

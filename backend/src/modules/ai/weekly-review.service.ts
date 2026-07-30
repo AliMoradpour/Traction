@@ -36,7 +36,7 @@ export class WeeklyReviewService {
   async getWeeklyReview(userId: string): Promise<WeeklyReview | null> {
     const { weekStart, weekEnd } = this.getWeekRange();
     const cacheKey = `weekly-review-${weekStart}`;
-    
+
     const cached = await this.cacheService.get(userId, cacheKey);
     if (cached) {
       try {
@@ -47,9 +47,15 @@ export class WeeklyReviewService {
     }
 
     const review = await this.generateWeeklyReview(userId, weekStart, weekEnd);
-    
+
     if (review) {
-      await this.cacheService.set(userId, cacheKey, JSON.stringify(review), 'openrouter', 60 * 24 * 7);
+      await this.cacheService.set(
+        userId,
+        cacheKey,
+        JSON.stringify(review),
+        'openrouter',
+        60 * 24 * 7,
+      );
     }
 
     return review;
@@ -59,11 +65,11 @@ export class WeeklyReviewService {
     const now = new Date();
     const dayOfWeek = now.getDay();
     const diff = now.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    
+
     const weekStart = new Date(now);
     weekStart.setDate(diff);
     weekStart.setHours(0, 0, 0, 0);
-    
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
     weekEnd.setHours(23, 59, 59, 999);
@@ -106,32 +112,42 @@ export class WeeklyReviewService {
       }),
     ]);
 
-    const completedTasks = tasks.filter(t => t.status === 'COMPLETED');
-    const skippedTasks = tasks.filter(t => t.status === 'SKIPPED');
+    const completedTasks = tasks.filter((t) => t.status === 'COMPLETED');
+    const skippedTasks = tasks.filter((t) => t.status === 'SKIPPED');
 
     const prompt = this.promptLoader.renderPrompt('weekly-review', {
       weekStart,
       weekEnd,
-      completedTasks: JSON.stringify(completedTasks.map(t => ({
-        title: t.title,
-        priority: t.priority,
-      }))),
-      skippedTasks: JSON.stringify(skippedTasks.map(t => ({
-        title: t.title,
-        reason: t.description,
-      }))),
-      focusSessions: JSON.stringify(focusSessions.map(s => ({
-        duration: s.duration,
-        status: s.status,
-      }))),
-      goalsProgress: JSON.stringify(goals.map(g => ({
-        title: g.title,
-        deadline: g.targetDate,
-      }))),
-      behaviorEvents: JSON.stringify(behaviorEvents.map(e => ({
-        type: e.type,
-        timestamp: e.createdAt,
-      }))),
+      completedTasks: JSON.stringify(
+        completedTasks.map((t) => ({
+          title: t.title,
+          priority: t.priority,
+        })),
+      ),
+      skippedTasks: JSON.stringify(
+        skippedTasks.map((t) => ({
+          title: t.title,
+          reason: t.description,
+        })),
+      ),
+      focusSessions: JSON.stringify(
+        focusSessions.map((s) => ({
+          duration: s.duration,
+          status: s.status,
+        })),
+      ),
+      goalsProgress: JSON.stringify(
+        goals.map((g) => ({
+          title: g.title,
+          deadline: g.targetDate,
+        })),
+      ),
+      behaviorEvents: JSON.stringify(
+        behaviorEvents.map((e) => ({
+          type: e.type,
+          timestamp: e.createdAt,
+        })),
+      ),
     });
 
     const rateLimitResult = await this.rateLimitService.checkRateLimit(userId, 'weekly-review');
@@ -140,21 +156,27 @@ export class WeeklyReviewService {
     }
 
     const model = this.modelRegistry.getModelForFeature('weekly-review');
-    const response = await this.provider.chat(
-      [{ role: 'user', content: prompt }],
-      { model, temperature: 0.7, maxTokens: 1000 },
-    );
+    const response = await this.provider.chat([{ role: 'user', content: prompt }], {
+      model,
+      temperature: 0.7,
+      maxTokens: 1000,
+    });
 
     if (!response) {
       return this.getFallbackWeeklyReview(completedTasks, skippedTasks, weekStart, weekEnd);
     }
 
     const validatedContent = this.safetyService.validateResponse(response.content, 'weekly-review');
-    await this.rateLimitService.recordUsage(userId, 'weekly-review', response.model, response.usage.totalTokens);
+    await this.rateLimitService.recordUsage(
+      userId,
+      'weekly-review',
+      response.model,
+      response.usage.totalTokens,
+    );
 
     try {
       const parsed = JSON.parse(validatedContent);
-      
+
       return {
         wins: parsed.wins || [],
         mistakes: parsed.mistakes || [],
@@ -178,16 +200,17 @@ export class WeeklyReviewService {
     weekStart: string,
     weekEnd: string,
   ): WeeklyReview {
-    const completionRate = completedTasks.length / (completedTasks.length + skippedTasks.length || 1);
-    
+    const completionRate =
+      completedTasks.length / (completedTasks.length + skippedTasks.length || 1);
+
     let overallRating: WeeklyReview['overallRating'] = 'average';
     if (completionRate > 0.8) overallRating = 'excellent';
     else if (completionRate > 0.6) overallRating = 'good';
     else if (completionRate < 0.4) overallRating = 'needs-improvement';
 
     return {
-      wins: completedTasks.slice(0, 3).map(t => `Completed: ${t.title}`),
-      mistakes: skippedTasks.slice(0, 2).map(t => `Skipped: ${t.title}`),
+      wins: completedTasks.slice(0, 3).map((t) => `Completed: ${t.title}`),
+      mistakes: skippedTasks.slice(0, 2).map((t) => `Skipped: ${t.title}`),
       patterns: ['Review your task completion patterns'],
       recommendations: ['Focus on completing one task at a time'],
       overallRating,
