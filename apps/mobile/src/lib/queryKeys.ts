@@ -96,4 +96,11 @@ export const queryKeys = {
     dashboard: () => [...queryKeys.admin.all, 'dashboard'] as const,
     users: (page: number) => [...queryKeys.admin.all, 'users', page] as const,
   },
+
+  invites: {
+    all: ['invites'] as const,
+    list: () => [...queryKeys.invites.all, 'list'] as const,
+    stats: () => [...queryKeys.invites.all, 'stats'] as const,
+    validate: (code: string) => [...queryKeys.invites.all, 'validate', code] as const,
+  },
 } as const;

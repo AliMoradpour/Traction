@@ -20,3 +20,10 @@ export {
   useGoalRecovery,
 } from './useAI';
 export { useAdminDashboard, useAdminUsers, useUpdateUserRole } from './useAdmin';
+export {
+  useMyInvites,
+  useInviteStats,
+  useCreateInvite,
+  useValidateInvite,
+  useAcceptInvite,
+} from './useInvites';

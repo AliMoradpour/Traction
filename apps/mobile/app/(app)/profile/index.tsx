@@ -27,6 +27,10 @@ const AI_SETTINGS = [
   { id: 'usage', label: 'AI Usage', value: null, icon: '📊', route: '/profile/usage' },
 ];
 
+const ADMIN_ACTIONS = [
+  { id: 'invites', label: 'Manage Invites', value: null, icon: '🎟️', route: '/profile/invites' },
+];
+
 export default function ProfileScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
@@ -242,6 +246,33 @@ export default function ProfileScreen() {
             ))}
           </View>
         </View>
+
+        {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>ADMIN</Text>
+            <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
+              {ADMIN_ACTIONS.map((action, index) => (
+                <View key={action.id}>
+                  <Pressable
+                    style={styles.settingsItem}
+                    onPress={() => router.push(action.route as any)}
+                  >
+                    <View style={styles.settingsLeft}>
+                      <Text style={styles.settingsIcon}>{action.icon}</Text>
+                      <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{action.label}</Text>
+                    </View>
+                    <View style={styles.settingsRight}>
+                      <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
+                    </View>
+                  </Pressable>
+                  {index < ADMIN_ACTIONS.length - 1 && (
+                    <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
 
         <Pressable
           style={[styles.signOutButton, { backgroundColor: theme.colors.errorMuted, borderColor: theme.colors.error }]}

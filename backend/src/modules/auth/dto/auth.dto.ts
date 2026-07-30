@@ -20,6 +20,11 @@ export class RegisterDto {
   @IsString()
   @IsOptional()
   lastName?: string;
+
+  @ApiPropertyOptional({ description: 'Beta invite code', example: 'ABC12345' })
+  @IsString()
+  @IsOptional()
+  inviteCode?: string;
 }
 
 export class LoginDto {

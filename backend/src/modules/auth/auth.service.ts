@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
+import { UserRole } from '@prisma/client';
 import {
   RegisterDto,
   LoginDto,
@@ -30,20 +31,64 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
+    // Validate invite code if provided
+    let role: UserRole = UserRole.USER;
+    let inviteId: string | null = null;
+
+    if (dto.inviteCode) {
+      const invite = await this.prisma.invite.findUnique({
+        where: { code: dto.inviteCode },
+      });
+
+      if (!invite) {
+        throw new BadRequestException('Invalid invite code');
+      }
+
+      if (invite.usedAt) {
+        throw new BadRequestException('Invite has already been used');
+      }
+
+      if (new Date() > invite.expiresAt) {
+        throw new BadRequestException('Invite has expired');
+      }
+
+      if (invite.email.toLowerCase() !== dto.email.toLowerCase()) {
+        throw new BadRequestException('Invite code is not valid for this email');
+      }
+
+      role = invite.role;
+      inviteId = invite.id;
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(dto.password, 12);
 
-    // Create user
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        password: hashedPassword,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        profile: {
-          create: {},
+    // Create user and mark invite as used in a transaction
+    const user = await this.prisma.$transaction(async (tx) => {
+      const newUser = await tx.user.create({
+        data: {
+          email: dto.email,
+          password: hashedPassword,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          role,
+          profile: {
+            create: {},
+          },
         },
-      },
+      });
+
+      if (inviteId) {
+        await tx.invite.update({
+          where: { id: inviteId },
+          data: {
+            usedById: newUser.id,
+            usedAt: new Date(),
+          },
+        });
+      }
+
+      return newUser;
     });
 
     // Generate tokens

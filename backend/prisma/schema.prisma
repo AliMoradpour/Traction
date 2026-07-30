@@ -30,6 +30,8 @@ model User {
   notifications Notification[]
   refreshTokens RefreshToken[]
   aiRecommendations AIRecommendation[]
+  invitedUsers  Invite[]   @relation("InvitedBy")
+  inviteUsed    Invite?    @relation("InviteUsed")
 
   @@map("users")
 }
@@ -468,4 +470,22 @@ model AIUsage {
   @@index([userId, feature, createdAt])
   @@index([createdAt])
   @@map("ai_usage")
+}
+
+model Invite {
+  id          String   @id @default(cuid())
+  email       String
+  code        String   @unique
+  role        UserRole @default(BETA_TESTER)
+  invitedById String
+  invitedBy   User     @relation("InvitedBy", fields: [invitedById], references: [id])
+  usedById    String?   @unique
+  usedBy      User?    @relation("InviteUsed", fields: [usedById], references: [id])
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([code])
+  @@index([email])
+  @@map("invites")
 }

@@ -14,6 +14,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { AIModule } from './modules/ai/ai.module';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { InvitesModule } from './modules/invites/invites.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AdminModule } from './modules/admin/admin.module';
     AIModule,
     ExecutionModule,
     AdminModule,
+    InvitesModule,
   ],
 })
 export class AppModule {}

@@ -98,4 +98,11 @@ export const endpoints = {
     metrics: '/ai/metrics',
     status: '/ai/status',
   },
+  invites: {
+    list: '/invites',
+    stats: '/invites/stats',
+    create: '/invites',
+    validate: (code: string) => '/invites/validate/' + code,
+    accept: (code: string) => '/invites/' + code + '/accept',
+  },
 };
