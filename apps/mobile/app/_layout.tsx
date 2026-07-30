@@ -13,6 +13,7 @@ import { queryClient } from '@/lib/queryClient';
 import { setAuthFailureCallback } from '@/api/interceptors';
 import { issueReporter } from '@/lib/issueReporter';
 import { useConnectivity } from '@/hooks/useConnectivity';
+import { perf } from '@/lib/perf';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -83,7 +84,10 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    loadStoredAuth();
+    perf.mark('auth-load-start');
+    loadStoredAuth().then(() => {
+      perf.measure('Auth token load', 'auth-load-start');
+    });
   }, []);
 
   useEffect(() => {
@@ -95,7 +99,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    SplashScreen.hideAsync();
+    perf.mark('splash-hide');
+    SplashScreen.hideAsync().then(() => {
+      perf.measure('Splash screen', 'splash-hide');
+    });
   }, []);
 
   return (
