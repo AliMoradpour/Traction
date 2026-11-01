@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from '../prisma/prisma.module';
 import { AIModule } from './ai.module';
 import { AIService } from './ai.service';
 import { OpenRouterService } from './openrouter.service';
@@ -18,7 +20,12 @@ describe('AI Module', () => {
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [AIModule],
+      // ConfigModule and PrismaModule are global in AppModule, so AIModule relies on them.
+      imports: [
+        ConfigModule.forRoot({ isGlobal: true, ignoreEnvFile: true }),
+        PrismaModule,
+        AIModule,
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue({})
@@ -26,7 +33,7 @@ describe('AI Module', () => {
   });
 
   afterAll(async () => {
-    await module.close();
+    await module?.close();
   });
 
   it('should export all services', () => {

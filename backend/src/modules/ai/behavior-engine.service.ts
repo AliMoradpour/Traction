@@ -138,7 +138,7 @@ export class BehaviorEngineService {
     return squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
   }
 
-  private determineProfile(patterns: any, events: any[]): BehaviorProfile {
+  private determineProfile(patterns: any, _events: any[]): BehaviorProfile {
     const { completionRate, skipRate, consistencyScore, peakProductivityHour, averageTasksPerDay } =
       patterns;
 

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsInt, Min, IsBoolean, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEnum } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { FocusStatus } from '@prisma/client';
 

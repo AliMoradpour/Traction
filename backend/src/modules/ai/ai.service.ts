@@ -20,7 +20,7 @@ export class AIService {
       });
       return recommendations;
     } catch (error) {
-      this.logger.warn('Failed to fetch recommendations, returning empty array');
+      this.logger.warn('Failed to fetch recommendations, returning empty array', error);
       return [];
     }
   }

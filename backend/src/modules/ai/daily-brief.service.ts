@@ -137,7 +137,7 @@ export class DailyBriefService {
     }
   }
 
-  private getFallbackDailyBrief(tasks: any[], goals: any[]): DailyBrief {
+  private getFallbackDailyBrief(tasks: any[], _goals: any[]): DailyBrief {
     const today = new Date().toISOString().split('T')[0];
 
     const highPriorityTasks = tasks

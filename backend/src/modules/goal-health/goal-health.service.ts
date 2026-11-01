@@ -20,11 +20,6 @@ export class GoalHealthService {
       (Date.now() - goal.startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
 
-    const expectedProgress =
-      daysRemaining !== null && daysSinceStart > 0
-        ? Math.min(100, (daysSinceStart / (daysSinceStart + daysRemaining)) * 100)
-        : goal.progress;
-
     let recommendation = '';
     if (goal.health === GoalHealth.AT_RISK) {
       recommendation =
@@ -76,7 +71,7 @@ export class GoalHealthService {
       }
     }
 
-    const updated = await this.prisma.goal.update({
+    await this.prisma.goal.update({
       where: { id: goalId },
       data: { health },
     });
@@ -87,7 +82,7 @@ export class GoalHealthService {
   private estimateCompletion(
     progress: number,
     daysSinceStart: number,
-    daysRemaining: number | null,
+    _daysRemaining: number | null,
   ): string {
     if (progress === 0) return 'Not started';
     if (progress >= 100) return 'Completed';

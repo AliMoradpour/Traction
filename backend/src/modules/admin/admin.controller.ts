@@ -32,7 +32,11 @@ export class AdminController {
   @Patch('users/:id/role')
   @Roles(UserRole.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update user role (SUPER_ADMIN only)' })
-  async updateUserRole(@Param('id') userId: string, @Body('role') role: UserRole, @Request() req: any) {
+  async updateUserRole(
+    @Param('id') userId: string,
+    @Body('role') role: UserRole,
+    @Request() req: any,
+  ) {
     return this.adminService.updateUserRole(userId, role, req.user.role);
   }
 

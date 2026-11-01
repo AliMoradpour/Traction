@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateGoalDto,
@@ -17,7 +12,7 @@ import {
   UpdatePlanDto,
   PlanResponseDto,
 } from './dto/goals.dto';
-import { GoalStatus, MilestoneStatus, PlanStatus } from '@prisma/client';
+import { GoalStatus, PlanStatus } from '@prisma/client';
 
 @Injectable()
 export class GoalsService {

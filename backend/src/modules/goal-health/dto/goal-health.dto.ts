@@ -1,5 +1,5 @@
-import { IsOptional, IsEnum } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 import { GoalHealth } from '@prisma/client';
 
 export class GoalHealthResponseDto {
