@@ -21,7 +21,7 @@ npm install
 
 # Frontend
 cd ../apps/mobile
-npm install
+npm install --legacy-peer-deps
 ```
 
 ---
@@ -39,7 +39,19 @@ psql -U postgres -c "CREATE DATABASE traction;"
 cd backend
 npx prisma generate
 npx prisma migrate deploy
+```
 
+### Existing database created before migrations were committed
+
+Databases set up earlier with `prisma db push` (when `prisma/migrations` was gitignored) already
+have the original tables. Mark the baseline as applied once, then deploy the rest:
+
+```bash
+npx prisma migrate resolve --applied 0_init
+npx prisma migrate deploy   # adds the feedback table
+```
+
+```bash
 # (Optional) Seed the database
 npm run prisma:seed
 ```
