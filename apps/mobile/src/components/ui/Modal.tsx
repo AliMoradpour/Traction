@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react';
 import {
   Modal as RNModal,
+  type ModalProps as RNModalProps,
   Pressable,
+  type StyleProp,
   StyleSheet,
   Text,
   View,
-  type ModalProps as RNModalProps,
-  type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export interface ModalProps extends Omit<RNModalProps, 'visible' | 'children'> {
   visible: boolean;

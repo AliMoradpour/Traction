@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { Dimensions, Pressable,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');

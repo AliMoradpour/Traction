@@ -1,22 +1,23 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Modal, Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo,useRef, useState } from 'react';
+import { Alert,Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useTask } from '@/hooks/useTasks';
+import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useReadinessScore } from '@/hooks/useExecution';
 import {
-  useStartFocusSession,
+  useActiveFocusSession,
+  useCancelFocusSession,
   useCompleteFocusSession,
   usePauseFocusSession,
   useResumeFocusSession,
-  useCancelFocusSession,
-  useActiveFocusSession,
+  useStartFocusSession,
 } from '@/hooks/useFocus';
-import { useReadinessScore } from '@/hooks/useExecution';
-import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useTask } from '@/hooks/useTasks';
 import { useCompleteTask } from '@/hooks/useTasks';
 import { behaviorService } from '@/services';
+import { useTractionTheme } from '@/theme';
 
 const RESISTANCE_REASONS = [
   'Task feels too large',

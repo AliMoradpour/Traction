@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useGoal, useGoalMilestones, useGoalHealth } from '@/hooks/useGoals';
+
 import { Button } from '@/components/ui/Button';
+import { useGoal, useGoalHealth,useGoalMilestones } from '@/hooks/useGoals';
+import { useTractionTheme } from '@/theme';
 
 function calcWeeksElapsed(startDate: string): number {
   const start = new Date(startDate);

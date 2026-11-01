@@ -3,14 +3,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
-  View,
   type ScrollViewProps,
   type StyleProp,
+  StyleSheet,
+  View,
   type ViewStyle,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export interface ScreenProps {
   children: ReactNode;

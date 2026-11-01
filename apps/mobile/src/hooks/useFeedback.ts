@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
+
 import { isPermanentFeedbackError, sendFeedback } from '../api/feedback';
 import { type FeedbackItem, useFeedbackStore } from '../store/feedback.store';
 import { useCurrentRoute } from './useCurrentRoute';

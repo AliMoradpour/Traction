@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useEffect,useState } from 'react';
+import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useGoal, useUpdateGoal } from '@/hooks/useGoals';
+
 import { Button } from '@/components/ui/Button';
+import { useGoal, useUpdateGoal } from '@/hooks/useGoals';
+import { useTractionTheme } from '@/theme';
 
 const STATUSES = ['ACTIVE', 'COMPLETED', 'PAUSED', 'ARCHIVED'] as const;
 const HEALTHS = ['ON_TRACK', 'SLIGHTLY_BEHIND', 'BEHIND_SCHEDULE', 'RECOVERY_NEEDED', 'AT_RISK'] as const;

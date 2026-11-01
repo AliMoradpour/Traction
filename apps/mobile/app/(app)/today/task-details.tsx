@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useEffect,useState } from 'react';
+import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useTask, useUpdateTask, useDeleteTask, useCompleteTask } from '@/hooks/useTasks';
 import { useGoals } from '@/hooks/useGoals';
+import { useCompleteTask,useDeleteTask, useTask, useUpdateTask } from '@/hooks/useTasks';
+import { useTractionTheme } from '@/theme';
 
 const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
   { label: 'Low', value: 'LOW' },

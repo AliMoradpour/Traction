@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { insightService } from '@/services/insight.service';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { insightService } from '@/services/insight.service';
 
 export function useInsights(params?: { type?: string; goalId?: string; read?: boolean; dismissed?: boolean }) {
   return useQuery({

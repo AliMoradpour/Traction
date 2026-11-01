@@ -1,13 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTractionTheme } from '@/theme';
+import { Link, useRouter } from 'expo-router';
+import { useForm } from 'react-hook-form';
+import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { registerSchema, type RegisterFormData } from '@/lib/validations';
 import { useRegister } from '@/hooks/useAuth';
+import { type RegisterFormData,registerSchema } from '@/lib/validations';
+import { useTractionTheme } from '@/theme';
 
 export default function RegisterScreen() {
   const theme = useTractionTheme();

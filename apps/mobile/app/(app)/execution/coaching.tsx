@@ -1,19 +1,20 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
-  RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect,useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useReadinessScore, useResistance, useMomentum } from '@/hooks/useExecution';
+
 import { Button } from '@/components/ui/Button';
+import { useMomentum,useReadinessScore, useResistance } from '@/hooks/useExecution';
+import { useTractionTheme } from '@/theme';
 
 interface CoachingRecommendation {
   category: 'resistance' | 'readiness' | 'momentum' | 'optimal';

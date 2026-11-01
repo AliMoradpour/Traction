@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useEffect,useState } from 'react';
+import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useGoal } from '@/hooks/useGoals';
+
 import { apiClient } from '@/api/client';
 import { endpoints } from '@/api/endpoints';
 import { Button } from '@/components/ui/Button';
+import { useGoal } from '@/hooks/useGoals';
+import { useTractionTheme } from '@/theme';
 
 interface RecoveryStrategy {
   title: string;

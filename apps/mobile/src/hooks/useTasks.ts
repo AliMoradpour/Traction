@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { taskService, CreateTaskRequest, UpdateTaskRequest } from '@/services/task.service';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { CreateTaskRequest, taskService, UpdateTaskRequest } from '@/services/task.service';
 
 export function useTasks(params?: { status?: string; category?: string; scheduledDate?: string; goalId?: string }) {
   return useQuery({

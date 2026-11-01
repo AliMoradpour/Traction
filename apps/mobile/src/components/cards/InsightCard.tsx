@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+import { Pressable, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 import { MetricPill } from '../ui/MetricPill';
 
 export interface InsightCardProps {

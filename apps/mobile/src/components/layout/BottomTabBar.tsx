@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export interface BottomTabItem {
   key: string;

@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useUsageSummary, useUsageByFeature, useUsageByDay } from '@/hooks/useAI';
+
 import { Button } from '@/components/ui/Button';
+import { useUsageByDay,useUsageByFeature, useUsageSummary } from '@/hooks/useAI';
+import { useTractionTheme } from '@/theme';
 
 export default function UsageScreen() {
   const theme = useTractionTheme();

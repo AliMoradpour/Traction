@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useTractionTheme, type TractionTheme } from '@/theme';
-import { Modal } from '@/components/ui/Modal';
-import { Button } from '@/components/ui/Button';
+
 import { Toast } from '@/components/feedback/Toast';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
 import { useFeedback } from '@/hooks/useFeedback';
+import { type TractionTheme,useTractionTheme } from '@/theme';
 
 type FeedbackType = 'bug' | 'feature' | 'general';
 

@@ -1,20 +1,21 @@
-import { useState, useCallback } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback,useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-  RefreshControl,
   ActivityIndicator,
-  Modal,
+  Alert,
   FlatList,
+  Modal,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useTractionTheme } from '@/theme';
+
 import { useAdminDashboard, useAdminUsers, useUpdateUserRole } from '@/hooks/useAdmin';
+import { useTractionTheme } from '@/theme';
 
 const ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Admin', color: '#EF4444' },

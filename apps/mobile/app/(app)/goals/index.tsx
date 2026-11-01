@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Pressable, RefreshControl,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
+import { LoadingSpinner } from '@/components/feedback/LoadingStates';
 import { useGoals } from '@/hooks/useGoals';
 import type { Goal, GoalHealth, GoalType } from '@/services/goal.service';
-import { LoadingSpinner } from '@/components/feedback/LoadingStates';
+import { useTractionTheme } from '@/theme';
 
 const TYPE_COLORS: Record<GoalType, string> = {
   IELTS: '#8B5CF6',

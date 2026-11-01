@@ -1,11 +1,12 @@
+import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Alert,Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useCreateTask } from '@/hooks/useTasks';
 import { useGoals } from '@/hooks/useGoals';
+import { useCreateTask } from '@/hooks/useTasks';
+import { useTractionTheme } from '@/theme';
 
 const CATEGORIES = ['Design', 'Dev', 'Ops', 'Admin', 'Personal', 'Learning'];
 const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [

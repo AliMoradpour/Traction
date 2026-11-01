@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet,Text, View } from 'react-native';
+
 import { Button } from '@/components/ui/Button';
 
 interface Props {

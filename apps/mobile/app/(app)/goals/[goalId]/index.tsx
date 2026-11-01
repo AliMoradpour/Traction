@@ -1,12 +1,13 @@
+import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useGoal, useDeleteGoal, useArchiveGoal, useGoalMilestones } from '@/hooks/useGoals';
-import { useTasks, useCompleteTask } from '@/hooks/useTasks';
+
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { useArchiveGoal, useDeleteGoal, useGoal, useGoalMilestones } from '@/hooks/useGoals';
+import { useCompleteTask,useTasks } from '@/hooks/useTasks';
+import { useTractionTheme } from '@/theme';
 
 const HEALTH_COLORS: Record<string, string> = {
   ON_TRACK: '#10B981',

@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useCallback,useRef, useState } from 'react';
+import { Alert,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { useLogout, useUser } from '@/hooks/useAuth';
 import config from '@/lib/config';
+import { useTractionTheme } from '@/theme';
 
 const AI_PERSONALITIES = [
   { id: 'direct', label: 'Direct', icon: '⚡' },

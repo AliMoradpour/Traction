@@ -1,9 +1,10 @@
-import { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated, Pressable } from 'react-native';
 import { Link } from 'expo-router';
+import { useEffect,useRef } from 'react';
+import { Animated, Pressable,StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
+import { useTractionTheme } from '@/theme';
 
 export default function WelcomeScreen() {
   const theme = useTractionTheme();

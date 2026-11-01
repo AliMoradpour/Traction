@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTractionTheme } from '@/theme';
+import { Link } from 'expo-router';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations';
 import { useForgotPassword } from '@/hooks/useAuth';
+import { type ForgotPasswordFormData,forgotPasswordSchema } from '@/lib/validations';
+import { useTractionTheme } from '@/theme';
 
 export default function ForgotPasswordScreen() {
   const theme = useTractionTheme();

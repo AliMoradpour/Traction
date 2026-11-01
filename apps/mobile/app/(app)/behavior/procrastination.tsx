@@ -1,17 +1,18 @@
+import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
   ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useProcrastinationProfile } from '@/hooks/useBehavior';
+
 import { Button } from '@/components/ui/Button';
+import { useProcrastinationProfile } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 function getRecommendation(patterns: string[]): string[] {
   const recs: string[] = [];

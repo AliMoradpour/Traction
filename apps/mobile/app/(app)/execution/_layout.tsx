@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+
 import { useTractionTheme } from '@/theme';
 
 export default function ExecutionLayout() {

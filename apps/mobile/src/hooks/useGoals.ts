@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { goalService, CreateGoalRequest, UpdateGoalRequest } from '@/services/goal.service';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { CreateGoalRequest, goalService, UpdateGoalRequest } from '@/services/goal.service';
 
 export function useGoals(params?: { status?: string; type?: string; category?: string }) {
   return useQuery({

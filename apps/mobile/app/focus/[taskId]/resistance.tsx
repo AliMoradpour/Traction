@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useCallback,useState } from 'react';
+import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
 import { aiService, behaviorService } from '@/services';
+import { useTractionTheme } from '@/theme';
 
 const RESISTANCE_REASONS = [
   { id: '1', label: 'Task feels too large', icon: '📏', value: 'Task feels too large' },

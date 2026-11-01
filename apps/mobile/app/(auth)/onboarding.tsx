@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useUpdateProfile, useUpdatePreferences } from '../../src/hooks/useProfile';
+import React, { useState } from 'react';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+import { useUpdatePreferences,useUpdateProfile } from '../../src/hooks/useProfile';
 import { useAuthStore } from '../../src/store/auth.store';
 
 const GOALS = ['Productivity', 'Focus', 'Health', 'Learning', 'Career', 'Personal', 'Other'];
@@ -40,7 +41,7 @@ export default function OnboardingScreen() {
     }
   };
 
-  const StepIndicator = () => (
+  const stepIndicator = (
     <View style={styles.stepIndicator}>
       {[0, 1, 2, 3].map((i) => (
         <View key={i} style={[styles.dot, i <= step && styles.dotActive]} />
@@ -50,7 +51,7 @@ export default function OnboardingScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <StepIndicator />
+      {stepIndicator}
 
       {step === 0 && (
         <>

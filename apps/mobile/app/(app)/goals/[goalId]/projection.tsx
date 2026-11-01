@@ -1,18 +1,19 @@
+import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   ActivityIndicator,
   Animated,
   Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useGoal, useGoalProjection } from '@/hooks/useGoals';
+
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { useGoal, useGoalProjection } from '@/hooks/useGoals';
+import { useTractionTheme } from '@/theme';
 
 function daysBetween(a: string, b: string): number {
   const dA = new Date(a);

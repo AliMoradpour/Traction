@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router';
-import { useTractionTheme } from '@/theme';
-import { Pressable, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Pressable, StyleSheet,Text } from 'react-native';
+
+import { useTractionTheme } from '@/theme';
 
 function BackButton() {
   const router = useRouter();

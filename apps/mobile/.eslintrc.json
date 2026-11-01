@@ -17,12 +17,28 @@
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
     "react/react-in-jsx-scope": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-explicit-any": "warn"
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react-hooks/refs": "off",
+    "react/no-unescaped-entities": "off",
+    "react-hooks/set-state-in-effect": "warn"
   },
   "settings": {
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    ".expo/",
+    "babel.config.js",
+    "metro.config.js",
+    "tailwind.config.js"
+  ]
 }

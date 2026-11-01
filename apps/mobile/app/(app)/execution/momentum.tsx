@@ -1,19 +1,20 @@
-import { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
-  RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect,useRef } from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useMomentum, useExecutionStats } from '@/hooks/useExecution';
+
 import { Button } from '@/components/ui/Button';
+import { useExecutionStats,useMomentum } from '@/hooks/useExecution';
+import { useTractionTheme } from '@/theme';
 
 function TrendArrow({ trend, theme }: { trend: string; theme: any }) {
   let symbol = '→';

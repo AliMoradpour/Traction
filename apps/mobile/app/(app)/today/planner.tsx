@@ -1,20 +1,21 @@
-import { useRef, useMemo, useCallback, useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect,useMemo, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
-  RefreshControl,
   ActivityIndicator,
   Alert,
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { useDailyBrief } from '@/hooks/useAI';
 import { useTasks } from '@/hooks/useTasks';
+import { useTractionTheme } from '@/theme';
 
 interface PrioritizedTask {
   id: string;

@@ -1,17 +1,18 @@
+import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import {
-  useGoalMilestones,
-  useCreateMilestone,
-  useUpdateMilestone,
-  useDeleteMilestone,
-} from '@/hooks/useGoals';
+
 import { Button } from '@/components/ui/Button';
-import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Modal } from '@/components/ui/Modal';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import {
+  useCreateMilestone,
+  useDeleteMilestone,
+  useGoalMilestones,
+  useUpdateMilestone,
+} from '@/hooks/useGoals';
+import { useTractionTheme } from '@/theme';
 
 function formatDate(dateString?: string): string {
   if (!dateString) return '';

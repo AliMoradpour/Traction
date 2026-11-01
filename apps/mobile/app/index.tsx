@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { Animated,StyleSheet, Text, View } from 'react-native';
+
 import { useTractionTheme } from '@/theme';
 
 export default function SplashScreen() {

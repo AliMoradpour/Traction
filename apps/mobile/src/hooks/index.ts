@@ -1,30 +1,29 @@
-export { useTheme } from '@/providers/ThemeProvider';
-export * from './useAuth';
-export * from './useTasks';
-export * from './useGoals';
-export * from './useInsights';
-export * from './useFocus';
-export * from './useNotifications';
-export * from './useUser';
-export { useConnectivity, useOnlineStatus } from './useConnectivity';
-export * from './useBehavior';
-export * from './useExecution';
-export * from './useFeedback';
-export {
-  useAIRecommendations,
-  useAIStatus,
-  useGenerateRecommendation,
-  useAcceptRecommendation,
-  useDismissRecommendation,
-  useBreakdownTask,
-  useStuckAnalysis,
-  useGoalRecovery,
-} from './useAI';
 export { useAdminDashboard, useAdminUsers, useUpdateUserRole } from './useAdmin';
 export {
-  useMyInvites,
-  useInviteStats,
-  useCreateInvite,
-  useValidateInvite,
+  useAcceptRecommendation,
+  useAIRecommendations,
+  useAIStatus,
+  useBreakdownTask,
+  useDismissRecommendation,
+  useGenerateRecommendation,
+  useGoalRecovery,
+  useStuckAnalysis,
+} from './useAI';
+export * from './useAuth';
+export * from './useBehavior';
+export { useConnectivity, useOnlineStatus } from './useConnectivity';
+export * from './useExecution';
+export * from './useFeedback';
+export * from './useFocus';
+export * from './useGoals';
+export * from './useInsights';
+export {
   useAcceptInvite,
+  useCreateInvite,
+  useInviteStats,
+  useMyInvites,
+  useValidateInvite,
 } from './useInvites';
+export * from './useNotifications';
+export * from './useTasks';
+export * from './useUser';

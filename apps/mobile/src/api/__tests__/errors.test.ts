@@ -1,9 +1,10 @@
-jest.mock('expo-secure-store', () => ({}));
-jest.mock('@/lib/config', () => ({ __esModule: true, default: { apiUrl: 'http://test' } }));
-
-import { normalizeApiError } from '../interceptors';
+/// <reference types="jest" />
 import { parseApiError } from '../errors';
 import { isPermanentFeedbackError } from '../feedback';
+import { normalizeApiError } from '../interceptors';
+
+jest.mock('expo-secure-store', () => ({}));
+jest.mock('@/lib/config', () => ({ __esModule: true, default: { apiUrl: 'http://test' } }));
 
 const httpError = (status: number, data: unknown) => ({ response: { status, data } });
 

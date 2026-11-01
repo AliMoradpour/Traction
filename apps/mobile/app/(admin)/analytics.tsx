@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
 
 function EngagementCard({ label, value, color }: { label: string; value: string | number; color: string }) {

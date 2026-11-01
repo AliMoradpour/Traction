@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { focusService } from '@/services/focus.service';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { focusService } from '@/services/focus.service';
 
 export function useStartFocusSession() {
   const queryClient = useQueryClient();

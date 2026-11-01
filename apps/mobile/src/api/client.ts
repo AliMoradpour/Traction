@@ -1,5 +1,7 @@
 import axios from 'axios';
+
 import config from '@/lib/config';
+
 import { setupInterceptors } from './interceptors';
 
 export const apiClient = axios.create({

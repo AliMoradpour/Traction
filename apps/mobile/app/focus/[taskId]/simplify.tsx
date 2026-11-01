@@ -1,11 +1,12 @@
+import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, Alert,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
 import { useSimplifyTask } from '@/hooks/useTasks';
 import { TaskStep } from '@/services/task.service';
+import { useTractionTheme } from '@/theme';
 
 export default function SimplifyScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();

@@ -1,5 +1,6 @@
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+import { type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export interface ProgressBarProps {
   value: number;

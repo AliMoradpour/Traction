@@ -1,22 +1,23 @@
-import { useRef, useMemo, useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect,useMemo, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
   ActivityIndicator,
   Alert,
+  Animated,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useTasks, useUpdateTask } from '@/hooks/useTasks';
-import { useReadinessScore } from '@/hooks/useExecution';
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useReadinessScore } from '@/hooks/useExecution';
+import { useTasks, useUpdateTask } from '@/hooks/useTasks';
 import { type Task } from '@/services/task.service';
+import { useTractionTheme } from '@/theme';
 
 function formatDuration(minutes?: number): string {
   if (!minutes) return '~25m';

@@ -1,19 +1,20 @@
-import { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useMemo,useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useTasks } from '@/hooks/useTasks';
 import { useReadinessScore } from '@/hooks/useExecution';
+import { useTasks } from '@/hooks/useTasks';
 import { type Task } from '@/services/task.service';
+import { useTractionTheme } from '@/theme';
 
 function formatDuration(minutes?: number): string {
   if (!minutes) return '';

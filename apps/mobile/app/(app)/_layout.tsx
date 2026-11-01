@@ -1,9 +1,10 @@
-import { View } from 'react-native';
 import { Tabs } from 'expo-router';
+import { View } from 'react-native';
 import { Text } from 'react-native';
-import { useTractionTheme } from '@/theme';
-import { TodayIcon, GoalsIcon, InsightsIcon, ProfileIcon } from '@/components/icons';
+
 import { FeedbackWidget } from '@/components/FeedbackWidget';
+import { GoalsIcon, InsightsIcon, ProfileIcon,TodayIcon } from '@/components/icons';
+import { useTractionTheme } from '@/theme';
 
 export default function AppLayout() {
   const theme = useTractionTheme();

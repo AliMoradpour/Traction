@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { useAIRecommendations } from '@/hooks/useAI';
-import { useBehaviorIndicators } from '@/hooks/useBehavior';
 import { useAcceptRecommendation, useDismissRecommendation } from '@/hooks/useAI';
+import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 export default function InsightsScreen() {
   const theme = useTractionTheme();

@@ -1,17 +1,18 @@
-import { useState, useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useCallback, useMemo,useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useWeeklyMetrics } from '@/hooks/useBehavior';
+
 import { Button } from '@/components/ui/Button';
+import { useWeeklyMetrics } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 function startOfWeek(dateStr: string): string {
   const d = new Date(dateStr + 'T00:00:00');

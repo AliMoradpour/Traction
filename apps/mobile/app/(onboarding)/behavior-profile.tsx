@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Pressable,StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
-import { useOnboardingStore } from '@/store/onboarding.store';
+
 import { Button } from '@/components/ui/Button';
+import { useOnboardingStore } from '@/store/onboarding.store';
+import { useTractionTheme } from '@/theme';
 
 const TOTAL_STEPS = 6;
 

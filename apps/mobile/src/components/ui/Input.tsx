@@ -1,15 +1,16 @@
 import { forwardRef, type ReactNode, useState } from 'react';
+import { Controller } from 'react-hook-form';
 import {
+  type StyleProp,
   StyleSheet,
   Text,
   TextInput,
   type TextInputProps,
   View,
-  type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { Controller } from 'react-hook-form';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export interface BaseInputProps extends TextInputProps {
   label?: string;

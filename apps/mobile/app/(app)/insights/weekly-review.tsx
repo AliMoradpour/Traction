@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
 import { useWeeklyReview } from '@/hooks/useAI';
+import { useTractionTheme } from '@/theme';
 
 export default function WeeklyReviewScreen() {
   const theme = useTractionTheme();

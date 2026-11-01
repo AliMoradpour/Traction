@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
 import { executionService } from '@/services/execution.service';
 
 export function useReadinessScore() {

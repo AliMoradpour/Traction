@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTractionTheme } from '@/theme';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { resetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations';
 import { useResetPassword } from '@/hooks/useAuth';
+import { type ResetPasswordFormData,resetPasswordSchema } from '@/lib/validations';
+import { useTractionTheme } from '@/theme';
 
 export default function ResetPasswordScreen() {
   const theme = useTractionTheme();

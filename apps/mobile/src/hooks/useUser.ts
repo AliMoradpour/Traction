@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { userService, UserPreferences } from '@/services/user.service';
-import { queryKeys } from '@/lib/queryKeys';
+
 import { cacheConfig } from '@/lib/cacheConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { UserPreferences,userService } from '@/services/user.service';
 
 export function useUserProfile() {
   return useQuery({

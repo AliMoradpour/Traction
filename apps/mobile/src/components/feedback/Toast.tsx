@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Animated,StyleSheet, Text, View } from 'react-native';
+
 import { useTractionTheme } from '@/theme';
 
 interface ToastProps {

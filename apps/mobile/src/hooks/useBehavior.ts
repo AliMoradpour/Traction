@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/queryKeys';
+import { useCallback } from 'react';
+
 import { cacheConfig } from '@/lib/cacheConfig';
-import { behaviorService, type BehaviorEvent } from '@/services';
+import { queryKeys } from '@/lib/queryKeys';
+import { type BehaviorEvent,behaviorService } from '@/services';
 
 export function useBehaviorTimeline(days = 30) {
   return useQuery({

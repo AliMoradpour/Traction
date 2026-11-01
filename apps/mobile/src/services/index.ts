@@ -1,65 +1,57 @@
-export { taskService } from './task.service';
-export { goalService } from './goal.service';
-export { insightService } from './insight.service';
-export { aiService } from './ai.service';
 export type {
   AIRecommendation,
-  AIUsageSummary,
-  AIUsageByFeature,
   AIUsageByDay,
+  AIUsageByFeature,
+  AIUsageSummary,
 } from './ai.service';
-export { focusService } from './focus.service';
-export { notificationService } from './notification.service';
-export { behaviorService } from './behavior.service';
-export { executionService } from './execution.service';
-export { userService } from './user.service';
-
-export type {
-  Task,
-  CreateTaskRequest,
-  UpdateTaskRequest,
-  TaskStep,
-} from './task.service';
-
-export type {
-  Goal,
-  CreateGoalRequest,
-  UpdateGoalRequest,
-  GoalMilestone,
-  GoalPlan,
-  GoalFeasibility,
-  GoalProjection,
-} from './goal.service';
-
-export type {
-  Insight,
-  DailyBrief,
-  BehavioralAwareness,
-  WeeklyReview,
-} from './insight.service';
-
-export type {
-  FocusSession,
-} from './focus.service';
-
-export type {
-  Notification,
-  NotificationPreferences,
-} from './notification.service';
-
+export { aiService } from './ai.service';
 export type {
   BehaviorEvent,
   BehaviorStats,
 } from './behavior.service';
-
+export { behaviorService } from './behavior.service';
 export type {
+  ExecutionStats,
+  MomentumMetrics,
   ReadinessScore,
   ResistanceDetection,
-  MomentumMetrics,
-  ExecutionStats,
 } from './execution.service';
-
+export { executionService } from './execution.service';
 export type {
-  UserProfile,
+  FocusSession,
+} from './focus.service';
+export { focusService } from './focus.service';
+export type {
+  CreateGoalRequest,
+  Goal,
+  GoalFeasibility,
+  GoalMilestone,
+  GoalPlan,
+  GoalProjection,
+  UpdateGoalRequest,
+} from './goal.service';
+export { goalService } from './goal.service';
+export type {
+  BehavioralAwareness,
+  DailyBrief,
+  Insight,
+  WeeklyReview,
+} from './insight.service';
+export { insightService } from './insight.service';
+export type {
+  Notification,
+  NotificationPreferences,
+} from './notification.service';
+export { notificationService } from './notification.service';
+export type {
+  CreateTaskRequest,
+  Task,
+  TaskStep,
+  UpdateTaskRequest,
+} from './task.service';
+export { taskService } from './task.service';
+export type {
   UserPreferences,
+  UserProfile,
 } from './user.service';
+export { userService } from './user.service';

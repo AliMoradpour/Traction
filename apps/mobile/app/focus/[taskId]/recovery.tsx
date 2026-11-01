@@ -1,21 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Animated,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import type { Href } from 'expo-router';
+import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useEffect, useRef,useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
+import { useActiveFocusSession, useCancelFocusSession,useResumeFocusSession } from '@/hooks/useFocus';
 import { useTask } from '@/hooks/useTasks';
-import { useActiveFocusSession, useResumeFocusSession, useCancelFocusSession } from '@/hooks/useFocus';
 import { behaviorService } from '@/services';
+import { useTractionTheme } from '@/theme';
 
 type RecoveryChoice = 'continue' | 'pause' | 'switch';
 
@@ -30,6 +31,8 @@ export default function RecoveryScreen() {
   const cancelSession = useCancelFocusSession();
 
   const [choice, setChoice] = useState<RecoveryChoice | null>(null);
+  // Captured once when the screen opens; reading the clock during render is impure.
+  const [openedAt] = useState(() => Date.now());
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -48,7 +51,7 @@ export default function RecoveryScreen() {
   const timeAway = (() => {
     if (!session) return 'a few minutes';
     const started = new Date(session.startedAt).getTime();
-    const now = Date.now();
+    const now = openedAt;
     const diffMs = now - started;
     const mins = Math.floor(diffMs / 60000);
     if (mins < 1) return 'less than a minute';

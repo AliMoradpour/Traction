@@ -1,17 +1,18 @@
-import { useRef, useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
-  ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect, useMemo,useRef } from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 function ScoreColor(theme: any, score: number): string {
   if (score > 70) return theme.colors.success;

@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ActivityIndicator,Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
-import { useTask, useDeleteTask } from '@/hooks/useTasks';
+import { useDeleteTask,useTask } from '@/hooks/useTasks';
 import { Task } from '@/services/task.service';
+import { useTractionTheme } from '@/theme';
 
 function formatDuration(minutes?: number): string {
   if (!minutes) return '';

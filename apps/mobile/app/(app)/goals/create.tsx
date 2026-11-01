@@ -1,19 +1,20 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Alert,
-  ActivityIndicator,
+  View,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { useCreateGoal } from '@/hooks/useGoals';
 import type { GoalType } from '@/services/goal.service';
+import { useTractionTheme } from '@/theme';
 
 const GOAL_TYPES: { key: GoalType; label: string; color: string }[] = [
   { key: 'IELTS', label: 'IELTS', color: '#8B5CF6' },

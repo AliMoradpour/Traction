@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { Animated,StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
+import { useTractionTheme } from '@/theme';
 
 export default function GoalFeasibilityScreen() {
   const theme = useTractionTheme();

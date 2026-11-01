@@ -1,6 +1,7 @@
-import { Controller, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
-import { View, Text, Pressable, StyleSheet, Modal } from 'react-native';
 import { useState } from 'react';
+import { type Control, Controller, type FieldPath, type FieldValues } from 'react-hook-form';
+import { Modal,Pressable, StyleSheet, Text, View } from 'react-native';
+
 import { useTractionTheme } from '@/theme';
 
 interface FormSelectOption {

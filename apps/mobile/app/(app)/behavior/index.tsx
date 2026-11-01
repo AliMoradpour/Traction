@@ -1,23 +1,24 @@
-import { useRef, useCallback, useMemo, useEffect } from 'react';
+import { type Href,useRouter } from 'expo-router';
+import { useCallback, useEffect,useMemo, useRef } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  Animated,
-  RefreshControl,
   ActivityIndicator,
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import {
-  useDailyMetrics,
   useBehaviorIndicators,
   useBurnoutRisk,
+  useDailyMetrics,
   useProcrastinationProfile,
 } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 function ScoreColor(theme: any, score: number, inverted = false): string {
   if (inverted) {

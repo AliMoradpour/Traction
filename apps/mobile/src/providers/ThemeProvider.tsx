@@ -1,12 +1,13 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { lightColors, darkColors, type TractionColors } from '@/theme/colors';
-import { typography } from '@/theme/typography';
-import { spacing } from '@/theme/spacing';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
+
+import { darkColors, lightColors, type TractionColors } from '@/theme/colors';
 import { radius } from '@/theme/radius';
 import { shadows } from '@/theme/shadows';
+import { spacing } from '@/theme/spacing';
+import { typography } from '@/theme/typography';
 
 interface ThemeContextValue {
   mode: 'light' | 'dark';

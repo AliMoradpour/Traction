@@ -1,14 +1,15 @@
-import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert, Share, Platform } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useTractionTheme } from '@/theme';
-import { useOnboardingStore } from '@/store/onboarding.store';
-import { issueReporter } from '@/lib/issueReporter';
+import { useState } from 'react';
+import { Alert, Platform,Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { apiClient } from '@/api/client';
 import config from '@/lib/config';
+import { issueReporter } from '@/lib/issueReporter';
+import { useOnboardingStore } from '@/store/onboarding.store';
+import { useTractionTheme } from '@/theme';
 
 export default function DeveloperScreen() {
   const theme = useTractionTheme();

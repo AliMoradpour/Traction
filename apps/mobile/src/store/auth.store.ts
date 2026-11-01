@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { tokenStorage } from '@/api/interceptors';
 
 interface User {

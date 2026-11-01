@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
+import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import { Button } from '@/components/ui/Button';
 import { useBehaviorIndicators, useBurnoutRisk, useProcrastinationProfile } from '@/hooks/useBehavior';
+import { useTractionTheme } from '@/theme';
 
 function ScoreBar({ label, score, color }: { label: string; score: number; color: string }) {
   return (

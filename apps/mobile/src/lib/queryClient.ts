@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+
 import { parseApiError } from '@/api/errors';
 import { queryKeys } from '@/lib/queryKeys';
 

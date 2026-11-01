@@ -1,1 +1,1 @@
-export { useUserProfile, useUpdateProfile, useUserPreferences, useUpdatePreferences } from './useUser';
+export { useUpdatePreferences,useUpdateProfile, useUserPreferences, useUserProfile } from './useUser';

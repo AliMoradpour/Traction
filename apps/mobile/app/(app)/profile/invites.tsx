@@ -1,23 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useCallback,useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Pressable,
-  TextInput,
   Alert,
+  Pressable,
   RefreshControl,
+  ScrollView,
   Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTractionTheme } from '@/theme';
+
 import {
-  useMyInvites,
-  useInviteStats,
-  useCreateInvite,
   type Invite,
+  useCreateInvite,
+  useInviteStats,
+  useMyInvites,
 } from '@/hooks/useInvites';
+import { useTractionTheme } from '@/theme';
 
 function getStatusColor(status: string, theme: any) {
   switch (status) {

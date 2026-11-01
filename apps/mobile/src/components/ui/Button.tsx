@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
   type GestureResponderEvent,
+  Pressable,
   type PressableProps,
   type StyleProp,
+  StyleSheet,
+  Text,
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import { useTractionTheme, type TractionTheme } from '../../theme';
+
+import { type TractionTheme,useTractionTheme } from '../../theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';

@@ -1,7 +1,7 @@
 import { logger } from './logger';
 
 const marks: Record<string, number> = {};
-const measures: Array<{ name: string; duration: number; timestamp: string }> = [];
+const measures: { name: string; duration: number; timestamp: string }[] = [];
 
 export const perf = {
   mark(name: string) {
