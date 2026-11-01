@@ -8,16 +8,18 @@
 
 ## Remaining Known Issues
 
-| # | Issue | Severity | Workaround |
-|---|-------|----------|------------|
-| 1 | Forgot password doesn't send email | Low | Use developer tools to reset password |
-| 2 | Reset password accepts any token | Low | Not user-facing |
-| 3 | Onboarding data not persisted | Medium | Re-do onboarding after reinstall |
-| 4 | Goal feasibility hardcoded | Low | Same for all goals |
-| 5 | Profile preferences not saved | Low | Re-configure after restart |
-| 6 | No email verification | Low | Acceptable for alpha |
-| 7 | Resistance/simplify screens unreachable | Low | Accessible via deep link |
-| 8 | Duplicate hook exports | Low | Functional but confusing |
+_Updated November 1, 2026._
+
+| # | Issue | Severity | Status |
+|---|-------|----------|--------|
+| 1 | Forgot password doesn't send email | Low | Fixed: emails sent over SMTP when configured; in development the reset link is logged. Production needs SMTP credentials |
+| 2 | Reset password accepts any token | Low | Fixed: single-use, expiring, hashed tokens |
+| 3 | Onboarding data not persisted | Medium | Fixed: saved on the server |
+| 4 | Goal feasibility hardcoded | Low | Fixed: computed from progress pace and deadline |
+| 5 | Profile preferences not saved | Low | Fixed: saved to `/users/me/preferences` |
+| 6 | No email verification | Low | Open: needs a product decision (required before login or not) |
+| 7 | Resistance/simplify screens unreachable | Low | Fixed: linked from focus sessions and task details |
+| 8 | Duplicate hook exports | Low | Open |
 
 ---
 

@@ -4,7 +4,7 @@
 
 | Tool | Version | Check |
 |------|---------|-------|
-| Node.js | ≥ 20 | `node -v` |
+| Node.js | ≥ 20.19 (CI uses 24) | `node -v` |
 | PostgreSQL | 14+ | `psql --version` |
 | npm | ≥ 10 | `npm -v` |
 
@@ -21,7 +21,7 @@ npm install
 
 # Frontend
 cd ../apps/mobile
-npm install --legacy-peer-deps
+npm install   # apps/mobile/.npmrc turns on legacy peer deps
 ```
 
 ---
@@ -48,7 +48,7 @@ have the original tables. Mark the baseline as applied once, then deploy the res
 
 ```bash
 npx prisma migrate resolve --applied 0_init
-npx prisma migrate deploy   # adds the feedback table
+npx prisma migrate deploy   # applies every later migration
 ```
 
 ```bash
@@ -83,6 +83,15 @@ CORS_ORIGIN="http://localhost:3001"
 OPENROUTER_API_KEY="sk-or-v1-..."
 AI_MODEL_PRIMARY="anthropic/claude-3-haiku"
 AI_MODEL_FALLBACK="anthropic/claude-3-haiku"
+
+# Password reset email. Leave SMTP_HOST empty in development and the reset
+# link is printed in the server log instead.
+SMTP_HOST=""
+SMTP_PORT=""
+SMTP_USER=""
+SMTP_PASS=""
+SMTP_FROM=""
+PASSWORD_RESET_URL="traction://reset-password"
 ```
 
 ### Frontend — `apps/mobile/.env`
@@ -91,6 +100,9 @@ AI_MODEL_FALLBACK="anthropic/claude-3-haiku"
 EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_APP_ENV=development
 ```
+
+The API lives under `/api`; the app adds it if the URL doesn't end in `/api`, so
+`http://localhost:3000` and `http://localhost:3000/api` both work.
 
 ---
 
@@ -101,12 +113,10 @@ cd backend
 npm run start:dev
 ```
 
-Runs at `http://localhost:3000` (hot-reloads on save).
+Runs at `http://localhost:3000`, with all routes under `/api` (hot-reloads on save).
 
-**Verify it's up:**
-```bash
-curl http://localhost:3000/health
-```
+**Verify it's up:** open the Swagger docs at `http://localhost:3000/api/docs`
+(served when `NODE_ENV` isn't `production`).
 
 ---
 
@@ -191,6 +201,29 @@ npx expo start --web
 | `npx expo start --clear` | Clear cache and restart |
 | `npx tsc --noEmit` | Check TypeScript in frontend |
 | `npx eas build` | Build native app |
+
+---
+
+## Checks (same as CI)
+
+GitHub Actions (`.github/workflows/ci.yml`) runs these on every push to `main`/`dev` and on PRs.
+
+```bash
+# Backend (needs DATABASE_URL pointing at a Postgres database)
+cd backend
+npx prisma migrate deploy
+npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+npx tsc --noEmit
+npx eslint "src/**/*.ts"
+npm test
+npm run build
+
+# Mobile
+cd apps/mobile
+npm run typecheck
+npm run lint
+npm test
+```
 
 ---
 

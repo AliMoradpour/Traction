@@ -2,6 +2,24 @@
 
 All notable changes to Traction will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- Password reset with emailed, single-use, expiring tokens; resetting signs out other sessions. Uses SMTP when configured, otherwise logs the link in development.
+- Onboarding answers and profile preferences are saved on the server.
+- Goal feasibility and projection computed from progress pace and the deadline (on-time chance, required pace, projected finish).
+- Focus sessions and task details link to the AI task breakdown and the "I'm stuck" plan.
+- GitHub Actions CI for backend (migrations on Postgres, typecheck, lint, test, build) and mobile (typecheck, lint, test).
+
+### Fixed
+- The app read API responses from a nonexistent `data` envelope, and requests missed the backend's `/api` prefix.
+- New users were sent past onboarding.
+- Pausing or resuming a focus session older than five minutes jumped to the recovery screen.
+- After an app restart the user profile wasn't loaded (no name, no admin entry).
+- Admin analytics ignored the app theme.
+- Token refresh deadlock; refresh tokens could be used as access tokens; rate limiting is now enforced.
+- Admin analytics reports real focus minutes, activity-based active users and true retention.
+
 ## [1.0.0-beta.1] - 2026-07-30
 
 ### Added

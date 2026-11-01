@@ -48,7 +48,7 @@ Built as a monorepo with a strict boundary between the mobile experience, backen
 
 ### Prerequisites
 
-- Node.js ≥ 20
+- Node.js ≥ 20.19
 - PostgreSQL 14+
 - npm ≥ 10
 
@@ -93,10 +93,12 @@ PORT=3000
 NODE_ENV=development
 CORS_ORIGIN="http://localhost:3001"
 OPENROUTER_API_KEY=
-SMTP_HOST=
+SMTP_HOST=          # leave empty in development: reset links are logged
 SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
+SMTP_FROM=
+PASSWORD_RESET_URL="traction://reset-password"
 ```
 
 Mobile — `apps/mobile/.env`:
@@ -105,6 +107,8 @@ Mobile — `apps/mobile/.env`:
 EXPO_PUBLIC_API_URL=http://localhost:3000
 EXPO_PUBLIC_APP_ENV=development
 ```
+
+All API routes are under `/api`; the app appends it to `EXPO_PUBLIC_API_URL` when missing.
 
 ### Development
 
@@ -152,17 +156,20 @@ Backend unit tests:
 npm run test
 ```
 
-Backend E2E tests:
-
-```
-npm run test:e2e
-```
-
 Backend test coverage:
 
 ```
 npm run test:cov
 ```
+
+Mobile typecheck, lint and tests:
+
+```
+cd apps/mobile
+npm run typecheck && npm run lint && npm test
+```
+
+CI (`.github/workflows/ci.yml`) runs all of these, plus migrations against a fresh Postgres, on every push and PR. See RUN.md → "Checks" to run the same steps locally.
 
 ---
 
