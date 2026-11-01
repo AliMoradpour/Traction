@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -16,6 +16,7 @@ import { WeeklyReviewService } from './weekly-review.service';
 import { GoalRecoveryService } from './goal-recovery.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
 import { AIObservabilityService } from './ai-observability.service';
+import { AICacheService } from './ai-cache.service';
 import {
   AIRecommendationResponseDto,
   AIUsageSummaryDto,
@@ -39,7 +40,15 @@ export class AIController {
     private readonly goalRecoveryService: GoalRecoveryService,
     private readonly rateLimitService: AIRateLimitService,
     private readonly observabilityService: AIObservabilityService,
+    private readonly cacheService: AICacheService,
   ) {}
+
+  @Delete('cache')
+  @ApiOperation({ summary: "Clear the current user's cached AI responses" })
+  async clearMyCache(@CurrentUser('id') userId: string): Promise<{ message: string }> {
+    await this.cacheService.invalidateAll(userId);
+    return { message: 'AI cache cleared' };
+  }
 
   @Get('recommendations')
   @ApiOperation({ summary: 'Get AI recommendations' })

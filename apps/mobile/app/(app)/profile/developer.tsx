@@ -69,7 +69,7 @@ export default function DeveloperScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await apiClient.post('/ai/cache/cleanup');
+              await apiClient.delete('/ai/cache');
               Alert.alert('Success', 'AI cache has been cleared.');
             } catch {
               Alert.alert('Error', 'Failed to clear AI cache.');
@@ -85,28 +85,6 @@ export default function DeveloperScreen() {
       'Reset Behavior Metrics',
       'This feature will be available in a future update.',
       [{ text: 'OK' }]
-    );
-  };
-
-  const handleSeedDemoAccount = async () => {
-    Alert.alert(
-      'Seed Demo Account',
-      'This will create a demo account with test data. Existing data may be overwritten.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Seed',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await apiClient.post('/dev/seed');
-              Alert.alert('Success', 'Demo account has been seeded.');
-            } catch {
-              Alert.alert('Error', 'Failed to seed demo account.');
-            }
-          },
-        },
-      ]
     );
   };
 
@@ -195,20 +173,6 @@ export default function DeveloperScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>DEVELOPMENT</Text>
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Pressable
-              style={styles.actionItem}
-              onPress={handleSeedDemoAccount}
-            >
-              <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🌱</Text>
-                <View>
-                  <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Seed Demo Account</Text>
-                  <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Create demo account with test data</Text>
-                </View>
-              </View>
-              <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-            </Pressable>
-            <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
             <Pressable
               style={styles.actionItem}
               onPress={handleExportLogs}
