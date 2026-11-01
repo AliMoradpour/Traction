@@ -1,7 +1,13 @@
-import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
 import {
@@ -209,7 +215,7 @@ export class AuthService {
     return { message: 'If the email exists, a reset link has been sent' };
   }
 
-  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+  async resetPassword(_dto: ResetPasswordDto): Promise<{ message: string }> {
     // In production, verify token and update password
     // For now, just return success message
     return { message: 'Password reset successful' };
@@ -235,15 +241,18 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string, email: string) {
-    const payload = { sub: userId, email };
-
+    // `typ` keeps refresh tokens from being accepted as access tokens (JwtStrategy rejects them),
+    // and `jti` makes every token unique so two issued in the same second don't collide on the
+    // refresh_tokens.token unique index.
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        expiresIn: this.configService.get('JWT_EXPIRATION', '15m'),
-      }),
-      this.jwtService.signAsync(payload, {
-        expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION', '7d'),
-      }),
+      this.jwtService.signAsync(
+        { sub: userId, email, typ: 'access' },
+        { expiresIn: this.configService.get('JWT_EXPIRATION', '15m'), jwtid: randomUUID() },
+      ),
+      this.jwtService.signAsync(
+        { sub: userId, email, typ: 'refresh' },
+        { expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION', '7d'), jwtid: randomUUID() },
+      ),
     ]);
 
     return { accessToken, refreshToken };

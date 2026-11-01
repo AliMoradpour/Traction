@@ -21,7 +21,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: string; email: string }) {
+  async validate(payload: { sub: string; email: string; typ?: string }) {
+    if (payload.typ !== 'access') {
+      // Refresh tokens (and legacy tokens without a type) must not authorize API requests.
+      throw new UnauthorizedException();
+    }
+
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: {

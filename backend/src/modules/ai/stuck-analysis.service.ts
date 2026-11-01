@@ -37,8 +37,8 @@ export class StuckAnalysisService {
     let currentTask = null;
 
     if (currentTaskId) {
-      currentTask = await this.prisma.task.findUnique({
-        where: { id: currentTaskId },
+      currentTask = await this.prisma.task.findFirst({
+        where: { id: currentTaskId, userId },
       });
     }
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -43,6 +44,11 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
     AdminModule,
     InvitesModule,
     FeedbackModule,
+  ],
+  providers: [
+    // Without this guard ThrottlerModule is configured but never enforced, so every
+    // @Throttle() limit (login, register, password reset, ...) would be a no-op.
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}
