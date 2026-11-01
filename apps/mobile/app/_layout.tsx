@@ -58,11 +58,14 @@ function RootLayoutNav() {
     const inAuthGroup = seg0?.startsWith('(auth)') ?? false;
     const inOnboardingGroup = seg0?.startsWith('(onboarding)') ?? false;
     const isIndex = segments.length <= 1;
-    const isWelcomeIntroRoute = (segments as string[]).includes('welcome-intro');
+    // Post-signup screens live in (auth) but are shown to authenticated users; don't bounce them.
+    const isPostSignupRoute = (segments as string[]).some(
+      (s) => s === 'welcome-intro' || s === 'onboarding',
+    );
 
     if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup && !isIndex) {
       router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup && !isWelcomeIntroRoute) {
+    } else if (isAuthenticated && inAuthGroup && !isPostSignupRoute) {
       router.replace('/(app)/today');
     }
   }, [isAuthenticated, isLoading, segments]);

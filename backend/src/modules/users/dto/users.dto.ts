@@ -1,4 +1,13 @@
-import { IsString, IsOptional, IsEnum, IsBoolean, IsInt, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsBoolean,
+  IsInt,
+  Min,
+  Max,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AIPersonality, DeepWorkMode, NotificationDensity } from '@prisma/client';
 
@@ -84,6 +93,29 @@ export class UpdatePreferencesDto {
   @Max(180)
   @IsOptional()
   focusBreakInterval?: number;
+
+  @ApiPropertyOptional({ example: 'Learn a language' })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  primaryGoal?: string;
+
+  @ApiPropertyOptional({ example: 'Beginner' })
+  @IsString()
+  @MaxLength(50)
+  @IsOptional()
+  experienceLevel?: string;
+
+  @ApiPropertyOptional({ example: '30 min' })
+  @IsString()
+  @MaxLength(50)
+  @IsOptional()
+  dailyTimeBudget?: string;
+
+  @ApiPropertyOptional({ description: 'Set true when the user finishes onboarding' })
+  @IsBoolean()
+  @IsOptional()
+  onboardingComplete?: boolean;
 }
 
 export class UserProfileResponseDto {
@@ -125,6 +157,18 @@ export class UserProfileResponseDto {
 
   @ApiProperty()
   focusBreakInterval: number;
+
+  @ApiPropertyOptional()
+  primaryGoal: string | null;
+
+  @ApiPropertyOptional()
+  experienceLevel: string | null;
+
+  @ApiPropertyOptional()
+  dailyTimeBudget: string | null;
+
+  @ApiPropertyOptional()
+  onboardingCompletedAt: Date | null;
 }
 
 export class UserResponseDto {

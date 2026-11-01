@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { type Href, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator,ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { useUpdatePreferences,useUpdateProfile } from '../../src/hooks/useProfile';
 import { useAuthStore } from '../../src/store/auth.store';
@@ -30,15 +30,16 @@ export default function OnboardingScreen() {
         lastName: lastName.trim(),
       });
       await updatePreferences.mutateAsync({
-        goals: [goal],
-        level,
-        dailyTime,
+        primaryGoal: goal,
+        experienceLevel: level,
+        dailyTimeBudget: dailyTime,
         onboardingComplete: true,
-      } as any);
-      router.replace('/(auth)/welcome-intro' as any);
-    } catch (e) {
-      router.replace('/(auth)/welcome-intro' as any);
+      });
+    } catch {
+      // Don't trap a new user on this screen; the answers can be changed later from Profile.
+      Alert.alert("Couldn't save your answers", 'You can update them later from your profile.');
     }
+    router.replace('/(auth)/welcome-intro' as Href);
   };
 
   const stepIndicator = (

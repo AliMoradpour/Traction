@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { cacheConfig } from '@/lib/cacheConfig';
 import { queryKeys } from '@/lib/queryKeys';
-import { UserPreferences,userService } from '@/services/user.service';
+import { UpdatePreferencesInput, userService } from '@/services/user.service';
 
 export function useUserProfile() {
   return useQuery({
@@ -36,7 +36,7 @@ export function useUpdatePreferences() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<UserPreferences>) => userService.updatePreferences(data),
+    mutationFn: (data: UpdatePreferencesInput) => userService.updatePreferences(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.users.preferences() });
     },

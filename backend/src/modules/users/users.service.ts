@@ -74,10 +74,19 @@ export class UsersService {
       update: {},
     });
 
-    const updateData: any = { ...dto };
+    const { onboardingComplete, ...fields } = dto;
+    const updateData: Record<string, unknown> = { ...fields };
     Object.keys(updateData).forEach((key) => {
-      if (updateData[key] === null) delete updateData[key];
+      if (updateData[key] === null || updateData[key] === undefined) delete updateData[key];
     });
+    if (onboardingComplete) {
+      // Record the first completion only; re-running onboarding keeps the original date.
+      const existing = await this.prisma.userProfile.findUnique({
+        where: { userId },
+        select: { onboardingCompletedAt: true },
+      });
+      if (!existing?.onboardingCompletedAt) updateData.onboardingCompletedAt = new Date();
+    }
 
     const profile = await this.prisma.userProfile.update({
       where: { userId },
