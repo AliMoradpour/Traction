@@ -111,9 +111,15 @@ export default function FocusSessionScreen() {
     }).start();
   }, []);
 
+  // Offer recovery only for a session that was already stale when this screen
+  // opened; later refetches (pause/resume, polling) must not kick the user out.
+  const recoveryChecked = useRef(false);
+
   useEffect(() => {
     if (activeSession && activeSession.taskId === taskId) {
-      if (activeSession.status === 'PAUSED' || activeSession.status === 'ACTIVE') {
+      const firstCheck = !recoveryChecked.current;
+      recoveryChecked.current = true;
+      if (firstCheck && (activeSession.status === 'PAUSED' || activeSession.status === 'ACTIVE')) {
         const started = new Date(activeSession.startedAt).getTime();
         const elapsed = Date.now() - started;
         if (elapsed > 5 * 60 * 1000) {
