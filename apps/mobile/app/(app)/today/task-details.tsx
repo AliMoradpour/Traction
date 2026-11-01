@@ -317,6 +317,22 @@ export default function TaskDetailsScreen() {
             <Button variant="secondary" onPress={handleToggleComplete} loading={completeTask.isPending}>
               Mark as Completed
             </Button>
+            <View style={styles.helpRow}>
+              <Button
+                variant="ghost"
+                onPress={() => router.push(`/focus/${taskId}/simplify`)}
+                style={styles.helpButton}
+              >
+                Break It Down
+              </Button>
+              <Button
+                variant="ghost"
+                onPress={() => router.push(`/focus/${taskId}/resistance`)}
+                style={styles.helpButton}
+              >
+                I'm Stuck
+              </Button>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -333,6 +349,14 @@ export default function TaskDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
+  helpRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 8,
+  },
+  helpButton: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },

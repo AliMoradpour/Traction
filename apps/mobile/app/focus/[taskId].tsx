@@ -246,6 +246,11 @@ export default function FocusSessionScreen() {
     behaviorService.track({ type: 'WHY_AM_I_STUCK', taskId, metadata: reason, focusSessionId: sessionId ?? undefined });
   };
 
+  const openHelp = (screen: 'simplify' | 'resistance') => {
+    setShowResistanceModal(false);
+    router.push(`/focus/${taskId}/${screen}`);
+  };
+
   const taskTitle = task?.title ?? 'Loading...';
 
   return (
@@ -365,6 +370,13 @@ export default function FocusSessionScreen() {
                   </Text>
                 </View>
                 <Text style={[styles.aiContent, { color: theme.colors.textMuted }]}>{aiInsight}</Text>
+                {selectedReason === 'Task feels too large' ? (
+                  <Pressable onPress={() => openHelp('simplify')} accessibilityRole="button">
+                    <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
+                      Break it down now ›
+                    </Text>
+                  </Pressable>
+                ) : null}
               </View>
             ) : null}
 
@@ -419,6 +431,26 @@ export default function FocusSessionScreen() {
                 </Pressable>
               ))}
             </View>
+            <View style={styles.deeperHelp}>
+              <Pressable
+                style={styles.deeperHelpLink}
+                onPress={() => openHelp('simplify')}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
+                  Break this task into steps ›
+                </Text>
+              </Pressable>
+              <Pressable
+                style={styles.deeperHelpLink}
+                onPress={() => openHelp('resistance')}
+                accessibilityRole="button"
+              >
+                <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
+                  Get a personalized plan ›
+                </Text>
+              </Pressable>
+            </View>
             {selectedReason && (
               <Pressable
                 style={[styles.modalActionButton, { backgroundColor: theme.colors.error }]}
@@ -439,6 +471,17 @@ export default function FocusSessionScreen() {
 }
 
 const styles = StyleSheet.create({
+  deeperHelp: {
+    marginTop: 12,
+    gap: 4,
+  },
+  deeperHelpLink: {
+    paddingVertical: 10,
+  },
+  deeperHelpText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
   container: {
     flex: 1,
   },
