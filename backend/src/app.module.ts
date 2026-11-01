@@ -15,6 +15,7 @@ import { AIModule } from './modules/ai/ai.module';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { InvitesModule } from './modules/invites/invites.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { InvitesModule } from './modules/invites/invites.module';
     ExecutionModule,
     AdminModule,
     InvitesModule,
+    FeedbackModule,
   ],
 })
 export class AppModule {}

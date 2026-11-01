@@ -32,6 +32,7 @@ model User {
   aiRecommendations AIRecommendation[]
   invitedUsers  Invite[]   @relation("InvitedBy")
   inviteUsed    Invite?    @relation("InviteUsed")
+  feedback      Feedback[]
 
   @@map("users")
 }
@@ -488,4 +489,25 @@ model Invite {
   @@index([code])
   @@index([email])
   @@map("invites")
+}
+
+enum FeedbackType {
+  BUG
+  FEATURE
+  GENERAL
+}
+
+model Feedback {
+  id        String       @id @default(cuid())
+  clientId  String       @unique // generated on device; makes retries idempotent
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      FeedbackType
+  message   String
+  screen    String?
+  createdAt DateTime     @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("feedback")
 }
