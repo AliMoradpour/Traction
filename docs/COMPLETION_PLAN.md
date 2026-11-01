@@ -23,7 +23,7 @@ Also fixed along the way: the app read every API response as `response.data.data
 | 4 | Password reset (real) | Single-use, expiring, hashed reset tokens; reset changes the password and signs out other sessions; email sent via SMTP when configured, link logged in development | ✅ 🙋 SMTP credentials for production |
 | 5 | Goal feasibility from data | Probability/timeline computed from progress velocity vs. time left, not hardcoded | ✅ |
 | 6 | Unreachable screens | Resistance / simplify screens reachable from the task & focus flows | ✅ |
-| 7 | UI polish | Admin analytics follows the app theme; restored session loads the user profile | ⏳ |
+| 7 | UI polish | Admin analytics follows the app theme; restored session loads the user profile | ✅ |
 | 8 | CI | GitHub Actions: backend (migrate on Postgres, typecheck, lint, test, build) + mobile (typecheck, lint, test) on every push/PR | ⏳ |
 | 9 | Docs | Known-issues table, RUN.md, CHANGELOG reflect reality | ⏳ |
 | 10 | Final verification | Full end-to-end API run against real Postgres; open PR `dev → main` | ⏳ 🙋 approve merge |
