@@ -12,7 +12,7 @@ Status legend: ✅ done · 🔄 in progress · ⏳ planned · 🙋 needs owner i
 
 ## Plan
 
-Also fixed along the way: the app read every API response as `response.data.data` (always undefined), and new users were redirected past onboarding.
+Also fixed along the way: the app read every API response as `response.data.data` (always undefined), and new users were redirected past onboarding. Later: app requests missed the backend's `/api` prefix; pausing/resuming an older focus session jumped to recovery; the mobile lockfile needed legacy peer deps for `npm ci`.
 
 
 | # | Part | What "done" means | Status |
@@ -24,8 +24,8 @@ Also fixed along the way: the app read every API response as `response.data.data
 | 5 | Goal feasibility from data | Probability/timeline computed from progress velocity vs. time left, not hardcoded | ✅ |
 | 6 | Unreachable screens | Resistance / simplify screens reachable from the task & focus flows | ✅ |
 | 7 | UI polish | Admin analytics follows the app theme; restored session loads the user profile | ✅ |
-| 8 | CI | GitHub Actions: backend (migrate on Postgres, typecheck, lint, test, build) + mobile (typecheck, lint, test) on every push/PR | ⏳ |
-| 9 | Docs | Known-issues table, RUN.md, CHANGELOG reflect reality | ⏳ |
+| 8 | CI | GitHub Actions: backend (migrate on Postgres, typecheck, lint, test, build) + mobile (typecheck, lint, test) on every push/PR | ✅ |
+| 9 | Docs | Known-issues table, RUN.md, CHANGELOG reflect reality | ✅ |
 | 10 | Final verification | Full end-to-end API run against real Postgres; open PR `dev → main` | ⏳ 🙋 approve merge |
 
 ## Needs the owner
