@@ -12,9 +12,10 @@ export async function sendFeedback(feedback: FeedbackPayload): Promise<void> {
   await apiClient.post('/feedback', feedback);
 }
 
-/** 4xx (other than timeout/rate-limit) means retrying the same payload will never succeed. */
+/** 4xx (other than auth/timeout/rate-limit) means retrying the same payload will never succeed. */
 export function isPermanentFeedbackError(error: unknown): boolean {
-  const status = (error as { response?: { status?: number } })?.response?.status;
+  // The response interceptor rejects with a normalized ApiErrorResponse carrying `status`.
+  const status = (error as { status?: number })?.status;
   return (
     status !== undefined &&
     status >= 400 &&

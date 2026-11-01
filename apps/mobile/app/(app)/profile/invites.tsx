@@ -128,7 +128,7 @@ export default function InvitesScreen() {
       setEmail('');
       Alert.alert('Success', 'Invite sent successfully!');
     } catch (error: any) {
-      Alert.alert('Error', error?.response?.data?.message || 'Failed to send invite');
+      Alert.alert('Error', error?.message || 'Failed to send invite');
     }
   };
 

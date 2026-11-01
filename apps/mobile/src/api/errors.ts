@@ -46,13 +46,25 @@ export class ServerError extends Error {
 
 export function parseApiError(error: unknown): ApiError {
   if (error && typeof error === 'object' && 'error' in error) {
-    const apiErr = error as { error: { code: string; message: string; details?: Record<string, unknown> }; status?: number };
-    return {
-      code: apiErr.error.code || 'UNKNOWN_ERROR',
-      message: apiErr.error.message || 'An unexpected error occurred',
-      status: apiErr.status,
-      details: apiErr.error.details,
+    const apiErr = error as {
+      error: unknown;
+      status?: number;
+      message?: string;
     };
+    // Normalized envelope (see normalizeApiError): error is { code, message }.
+    if (apiErr.error && typeof apiErr.error === 'object') {
+      const e = apiErr.error as {
+        code?: string;
+        message?: string;
+        details?: Record<string, unknown>;
+      };
+      return {
+        code: e.code || 'UNKNOWN_ERROR',
+        message: e.message || apiErr.message || 'An unexpected error occurred',
+        status: apiErr.status,
+        details: e.details,
+      };
+    }
   }
 
   if (error instanceof NetworkError) {

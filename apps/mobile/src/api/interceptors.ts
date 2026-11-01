@@ -13,12 +13,90 @@ export function setAuthFailureCallback(callback: () => void) {
 export interface ApiErrorResponse {
   data: null;
   meta: Record<string, unknown>;
+  /** HTTP status, or undefined for network failures / timeouts. */
+  status?: number;
+  /** Same as error.message; kept at the top level for callers that read `err.message`. */
+  message: string;
   error: {
     code: string;
     message: string;
     details?: Record<string, unknown>;
   };
 }
+
+const STATUS_CODES: Record<number, string> = {
+  400: 'VALIDATION_ERROR',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  409: 'CONFLICT',
+  422: 'VALIDATION_ERROR',
+  429: 'RATE_LIMITED',
+};
+
+/**
+ * Convert any axios failure into one ApiErrorResponse shape. NestJS errors arrive as
+ * { statusCode, message: string | string[], error: string }, which is not this shape, so they
+ * must be translated rather than passed through.
+ */
+export function normalizeApiError(error: unknown): ApiErrorResponse {
+  const err = error as {
+    code?: string;
+    message?: string;
+    response?: { status?: number; data?: unknown };
+  };
+  const make = (
+    code: string,
+    message: string,
+    status?: number,
+    details?: Record<string, unknown>,
+  ) =>
+    ({
+      data: null,
+      meta: {},
+      status,
+      message,
+      error: { code, message, details },
+    }) as ApiErrorResponse;
+
+  if (!err?.response) {
+    if (err?.code === 'ECONNABORTED' || err?.code === 'ETIMEDOUT') {
+      return make('TIMEOUT', 'Request timed out');
+    }
+    return make('NETWORK_ERROR', 'Network request failed');
+  }
+
+  const status = err.response.status;
+  const body = (err.response.data ?? {}) as {
+    message?: string | string[];
+    error?: unknown;
+  };
+
+  // Already in our envelope shape.
+  if (body.error && typeof body.error === 'object') {
+    const e = body.error as { code?: string; message?: string; details?: Record<string, unknown> };
+    const message = e.message || 'An unexpected error occurred';
+    return make(e.code || STATUS_CODES[status ?? 0] || 'SERVER_ERROR', message, status, e.details);
+  }
+
+  const messages = Array.isArray(body.message) ? body.message : body.message ? [body.message] : [];
+  const message =
+    messages.join('\n') ||
+    (typeof body.error === 'string' ? body.error : '') ||
+    'An unexpected error occurred';
+  const code =
+    STATUS_CODES[status ?? 0] || (status && status >= 500 ? 'SERVER_ERROR' : 'UNKNOWN_ERROR');
+  return make(code, message, status, messages.length > 1 ? { messages } : undefined);
+}
+
+/** 401s from these endpoints mean bad credentials or a dead session, not an expired access token. */
+const NO_REFRESH_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/refresh',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
 
 export const tokenStorage = {
   async getAccessToken(): Promise<string | null> {
@@ -89,7 +167,7 @@ export function setupInterceptors(client: AxiosInstance) {
       }
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 
   client.interceptors.response.use(
@@ -97,7 +175,14 @@ export function setupInterceptors(client: AxiosInstance) {
     async (error) => {
       const originalRequest = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      const isAuthEndpoint = NO_REFRESH_PATHS.some((p) => originalRequest?.url?.startsWith(p));
+
+      if (
+        error.response?.status === 401 &&
+        originalRequest &&
+        !originalRequest._retry &&
+        !isAuthEndpoint
+      ) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
@@ -142,13 +227,7 @@ export function setupInterceptors(client: AxiosInstance) {
         }
       }
 
-      const apiError: ApiErrorResponse = error.response?.data || {
-        data: null,
-        meta: {},
-        error: { code: 'UNKNOWN_ERROR', message: 'An unexpected error occurred' },
-      };
-
-      return Promise.reject(apiError);
-    }
+      return Promise.reject(normalizeApiError(error));
+    },
   );
 }

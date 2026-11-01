@@ -22,13 +22,28 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
-      retry: 2,
+      // Retrying a 4xx (bad input, forbidden, not found) can't succeed; only retry transient failures.
+      retry: (failureCount, error) => {
+        const status = parseApiError(error).status;
+        if (
+          status !== undefined &&
+          status >= 400 &&
+          status < 500 &&
+          status !== 408 &&
+          status !== 429
+        ) {
+          return false;
+        }
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       refetchOnMount: true,
     },
     mutations: {
-      retry: 1,
+      // Writes aren't idempotent: retrying a POST that timed out after reaching the server
+      // would create duplicates.
+      retry: 0,
       onError: handleGlobalError,
     },
   },
