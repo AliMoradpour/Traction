@@ -1,28 +1,47 @@
 import { useRouter } from 'expo-router';
-import { useCallback,useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { Alert,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useLogout, useUser } from '@/hooks/useAuth';
+import { useUpdatePreferences, useUserPreferences } from '@/hooks/useUser';
 import config from '@/lib/config';
+import type { UpdatePreferencesInput, UserPreferences } from '@/services/user.service';
 import { useTractionTheme } from '@/theme';
 
-const AI_PERSONALITIES = [
-  { id: 'direct', label: 'Direct', icon: '⚡' },
-  { id: 'balanced', label: 'Balanced', icon: '⚖️' },
-  { id: 'gentle', label: 'Gentle', icon: '🧘' },
+const AI_PERSONALITIES: { id: UserPreferences['aiPersonality']; label: string; icon: string }[] = [
+  { id: 'DIRECT', label: 'Direct', icon: '⚡' },
+  { id: 'BALANCED', label: 'Balanced', icon: '⚖️' },
+  { id: 'GENTLE', label: 'Gentle', icon: '🧘' },
 ];
 
-const PREFERENCES = [
-  { id: 'deep-work', label: 'Deep Work Mode', value: 'Intense', icon: '🧠' },
-  { id: 'notifications', label: 'Notification Density', value: 'Low', icon: '🔔' },
-  { id: 'auto-schedule', label: 'AI Auto-Scheduling', value: 'Enabled', icon: '✨' },
-];
+const DEEP_WORK: UserPreferences['deepWorkMode'][] = ['INTENSE', 'MODERATE', 'RELAXED'];
+const DENSITY: UserPreferences['notificationDensity'][] = ['LOW', 'MEDIUM', 'HIGH'];
+const BREAK_INTERVALS = [45, 60, 90, 120];
+const DAY_LABELS: Record<string, string> = {
+  mon: 'Mon',
+  tue: 'Tue',
+  wed: 'Wed',
+  thu: 'Thu',
+  fri: 'Fri',
+  sat: 'Sat',
+  sun: 'Sun',
+};
 
-const ENERGY_SETTINGS = [
-  { id: 'sleep', label: 'Sleep Sync', value: null, icon: '🌙' },
-  { id: 'breaks', label: 'Focus Breaks', value: 'Every 90m', icon: '☕' },
-];
+const titleCase = (v: string) => v.charAt(0) + v.slice(1).toLowerCase();
+const nextOf = <T,>(list: readonly T[], current: T) =>
+  list[(list.indexOf(current) + 1) % list.length];
+const hh = (h: number) => `${String(h).padStart(2, '0')}:00`;
+
+function describeDays(workDays: string): string {
+  const days = workDays
+    .split(',')
+    .map((d) => d.trim())
+    .filter(Boolean);
+  if (days.join(',') === 'mon,tue,wed,thu,fri') return 'Monday - Friday';
+  if (days.length === 7) return 'Every day';
+  return days.map((d) => DAY_LABELS[d] ?? d).join(', ');
+}
 
 const AI_SETTINGS = [
   { id: 'usage', label: 'AI Usage', value: null, icon: '📊', route: '/profile/usage' },
@@ -35,7 +54,73 @@ const ADMIN_ACTIONS = [
 export default function ProfileScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
-  const [selectedPersonality, setSelectedPersonality] = useState('balanced');
+  const { data: prefs } = useUserPreferences();
+  const updatePrefs = useUpdatePreferences();
+  const selectedPersonality = prefs?.aiPersonality ?? 'BALANCED';
+
+  const savePrefs = useCallback(
+    (patch: UpdatePreferencesInput) => {
+      updatePrefs.mutate(patch, {
+        onError: () => Alert.alert('Not saved', 'Your change was not saved. Please try again.'),
+      });
+    },
+    [updatePrefs],
+  );
+
+  const preferenceRows = [
+    {
+      id: 'deep-work',
+      label: 'Deep Work Mode',
+      icon: '🧠',
+      value: titleCase(prefs?.deepWorkMode ?? 'INTENSE'),
+      onPress: () => prefs && savePrefs({ deepWorkMode: nextOf(DEEP_WORK, prefs.deepWorkMode) }),
+    },
+    {
+      id: 'notifications',
+      label: 'Notification Density',
+      icon: '🔔',
+      value: titleCase(prefs?.notificationDensity ?? 'LOW'),
+      onPress: () =>
+        prefs && savePrefs({ notificationDensity: nextOf(DENSITY, prefs.notificationDensity) }),
+    },
+    {
+      id: 'auto-schedule',
+      label: 'AI Auto-Scheduling',
+      icon: '✨',
+      value: prefs?.aiAutoScheduling === false ? 'Disabled' : 'Enabled',
+      onPress: () => prefs && savePrefs({ aiAutoScheduling: !prefs.aiAutoScheduling }),
+    },
+  ];
+
+  const energyRows = [
+    {
+      id: 'sleep',
+      label: 'Sleep Sync',
+      icon: '🌙',
+      value: prefs?.sleepSync ? 'On' : 'Off',
+      onPress: () => prefs && savePrefs({ sleepSync: !prefs.sleepSync }),
+    },
+    {
+      id: 'breaks',
+      label: 'Focus Breaks',
+      icon: '☕',
+      value: `Every ${prefs?.focusBreakInterval ?? 90}m`,
+      onPress: () =>
+        prefs &&
+        savePrefs({
+          focusBreakInterval: nextOf(
+            BREAK_INTERVALS,
+            BREAK_INTERVALS.includes(prefs.focusBreakInterval) ? prefs.focusBreakInterval : 90,
+          ),
+        }),
+    },
+  ];
+
+  const workStart = prefs?.workStartHour ?? 9;
+  const workEnd = prefs?.workEndHour ?? 18;
+  const peakStart = prefs?.energyPeakStart ?? 10;
+  const peakEnd = prefs?.energyPeakEnd ?? 13;
+  const workSpanPct = `${Math.round((Math.max(0, workEnd - workStart) / 24) * 100)}%` as const;
   const logout = useLogout();
   const { data: user } = useUser();
   const tapCountRef = useRef(0);
@@ -105,7 +190,7 @@ export default function ProfileScreen() {
                     shadowRadius: 4,
                   },
                 ]}
-                onPress={() => setSelectedPersonality(personality.id)}
+                onPress={() => savePrefs({ aiPersonality: personality.id })}
               >
                 <Text style={styles.personalityIcon}>{personality.icon}</Text>
                 <Text
@@ -127,9 +212,15 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>PRODUCTIVITY PREFERENCES</Text>
           <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            {PREFERENCES.map((pref, index) => (
+            {preferenceRows.map((pref, index) => (
               <View key={pref.id}>
-                <Pressable style={styles.settingsItem}>
+                <Pressable
+                  style={styles.settingsItem}
+                  onPress={pref.onPress}
+                  disabled={!prefs}
+                  accessibilityRole="button"
+                  accessibilityHint="Tap to change"
+                >
                   <View style={styles.settingsLeft}>
                     <Text style={styles.settingsIcon}>{pref.icon}</Text>
                     <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{pref.label}</Text>
@@ -139,7 +230,7 @@ export default function ProfileScreen() {
                     <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
                   </View>
                 </Pressable>
-                {index < PREFERENCES.length - 1 && (
+                {index < preferenceRows.length - 1 && (
                   <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
                 )}
               </View>
@@ -157,11 +248,11 @@ export default function ProfileScreen() {
               </View>
               <View style={styles.energyContent}>
                 <View style={styles.energyRow}>
-                  <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Monday - Friday</Text>
-                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>09:00 — 18:00</Text>
+                  <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>{describeDays(prefs?.workDays ?? 'mon,tue,wed,thu,fri')}</Text>
+                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>{hh(workStart)} — {hh(workEnd)}</Text>
                 </View>
                 <View style={[styles.energyTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-                  <View style={[styles.energyFill, { backgroundColor: theme.colors.primaryContainer, width: '65%' }]} />
+                  <View style={[styles.energyFill, { backgroundColor: theme.colors.primaryContainer, width: workSpanPct }]} />
                 </View>
               </View>
             </View>
@@ -174,7 +265,7 @@ export default function ProfileScreen() {
               <View style={styles.energyContent}>
                 <View style={styles.energyRow}>
                   <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Daily Window</Text>
-                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>10:00 — 13:00</Text>
+                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>{hh(peakStart)} — {hh(peakEnd)}</Text>
                 </View>
                 <View style={styles.miniChart}>
                   {[20, 40, 90, 100, 80, 50, 30].map((value, index) => (
@@ -198,9 +289,15 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>ENERGY SETTINGS</Text>
           <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            {ENERGY_SETTINGS.map((setting, index) => (
+            {energyRows.map((setting, index) => (
               <View key={setting.id}>
-                <Pressable style={styles.settingsItem}>
+                <Pressable
+                  style={styles.settingsItem}
+                  onPress={setting.onPress}
+                  disabled={!prefs}
+                  accessibilityRole="button"
+                  accessibilityHint="Tap to change"
+                >
                   <View style={styles.settingsLeft}>
                     <Text style={styles.settingsIcon}>{setting.icon}</Text>
                     <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{setting.label}</Text>
@@ -212,7 +309,7 @@ export default function ProfileScreen() {
                     <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
                   </View>
                 </Pressable>
-                {index < ENERGY_SETTINGS.length - 1 && (
+                {index < energyRows.length - 1 && (
                   <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
                 )}
               </View>

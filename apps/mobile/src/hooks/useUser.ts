@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { cacheConfig } from '@/lib/cacheConfig';
 import { queryKeys } from '@/lib/queryKeys';
-import { UpdatePreferencesInput, userService } from '@/services/user.service';
+import { UpdatePreferencesInput, UserPreferences, userService } from '@/services/user.service';
 
 export function useUserProfile() {
   return useQuery({
@@ -34,11 +34,25 @@ export function useUserPreferences() {
 
 export function useUpdatePreferences() {
   const queryClient = useQueryClient();
+  const key = queryKeys.users.preferences();
 
   return useMutation({
     mutationFn: (data: UpdatePreferencesInput) => userService.updatePreferences(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.users.preferences() });
+    // Optimistic: reflect the change immediately, roll back if the server rejects it.
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: key });
+      const previous = queryClient.getQueryData<UserPreferences>(key);
+      if (previous) {
+        const { onboardingComplete: _ignored, ...fields } = data;
+        queryClient.setQueryData<UserPreferences>(key, { ...previous, ...fields });
+      }
+      return { previous };
+    },
+    onError: (_error, _data, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: key });
     },
   });
 }
