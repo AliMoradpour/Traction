@@ -90,22 +90,22 @@ export interface GoalProjection {
 export const goalService = {
   list: async (params?: { status?: string; type?: string; category?: string }): Promise<Goal[]> => {
     const response = await apiClient.get(endpoints.goals.list, { params });
-    return response.data.data;
+    return response.data;
   },
 
   detail: async (id: string): Promise<Goal> => {
     const response = await apiClient.get(endpoints.goals.detail(id));
-    return response.data.data;
+    return response.data;
   },
 
   create: async (data: CreateGoalRequest): Promise<Goal> => {
     const response = await apiClient.post(endpoints.goals.list, data);
-    return response.data.data;
+    return response.data;
   },
 
   update: async (id: string, data: UpdateGoalRequest): Promise<Goal> => {
     const response = await apiClient.patch(endpoints.goals.detail(id), data);
-    return response.data.data;
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -114,13 +114,13 @@ export const goalService = {
 
   archive: async (id: string): Promise<Goal> => {
     const response = await apiClient.patch(endpoints.goals.archive(id));
-    return response.data.data;
+    return response.data;
   },
 
   feasibility: async (id: string): Promise<GoalFeasibility | null> => {
     try {
       const response = await apiClient.get(endpoints.goals.feasibility(id));
-      return response.data.data ?? null;
+      return response.data ?? null;
     } catch (error) {
       console.warn('Failed to fetch goal feasibility:', error);
       return null;
@@ -130,7 +130,7 @@ export const goalService = {
   projection: async (id: string): Promise<GoalProjection | null> => {
     try {
       const response = await apiClient.get(endpoints.goals.projection(id));
-      return response.data.data ?? null;
+      return response.data ?? null;
     } catch (error) {
       console.warn('Failed to fetch goal projection:', error);
       return null;
@@ -139,17 +139,17 @@ export const goalService = {
 
   getMilestones: async (goalId: string): Promise<GoalMilestone[]> => {
     const response = await apiClient.get(endpoints.goals.milestones(goalId));
-    return response.data.data;
+    return response.data;
   },
 
   createMilestone: async (goalId: string, data: { title: string; description?: string; targetDate?: string }): Promise<GoalMilestone> => {
     const response = await apiClient.post(endpoints.goals.milestones(goalId), data);
-    return response.data.data;
+    return response.data;
   },
 
   updateMilestone: async (goalId: string, milestoneId: string, data: Partial<GoalMilestone>): Promise<GoalMilestone> => {
     const response = await apiClient.patch(endpoints.goals.milestoneDetail(goalId, milestoneId), data);
-    return response.data.data;
+    return response.data;
   },
 
   deleteMilestone: async (goalId: string, milestoneId: string): Promise<void> => {
@@ -158,17 +158,17 @@ export const goalService = {
 
   getPlans: async (goalId: string): Promise<GoalPlan[]> => {
     const response = await apiClient.get(endpoints.goals.plans(goalId));
-    return response.data.data;
+    return response.data;
   },
 
   createPlan: async (goalId: string, data: { title: string; description?: string; steps?: string }): Promise<GoalPlan> => {
     const response = await apiClient.post(endpoints.goals.plans(goalId), data);
-    return response.data.data;
+    return response.data;
   },
 
   updatePlan: async (goalId: string, planId: string, data: Partial<GoalPlan>): Promise<GoalPlan> => {
     const response = await apiClient.patch(endpoints.goals.planDetail(goalId, planId), data);
-    return response.data.data;
+    return response.data;
   },
 
   deletePlan: async (goalId: string, planId: string): Promise<void> => {
@@ -177,11 +177,11 @@ export const goalService = {
 
   getHealth: async (goalId: string): Promise<any> => {
     const response = await apiClient.get(endpoints.goalHealth.detail(goalId));
-    return response.data.data;
+    return response.data;
   },
 
   recalculateHealth: async (goalId: string): Promise<any> => {
     const response = await apiClient.post(endpoints.goalHealth.recalculate(goalId));
-    return response.data.data;
+    return response.data;
   },
 };

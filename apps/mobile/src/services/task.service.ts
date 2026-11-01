@@ -59,22 +59,22 @@ export interface TaskStep {
 export const taskService = {
   list: async (params?: { status?: string; category?: string; scheduledDate?: string; goalId?: string }): Promise<Task[]> => {
     const response = await apiClient.get(endpoints.tasks.list, { params });
-    return response.data.data;
+    return response.data;
   },
 
   detail: async (id: string): Promise<Task> => {
     const response = await apiClient.get(endpoints.tasks.detail(id));
-    return response.data.data;
+    return response.data;
   },
 
   create: async (data: CreateTaskRequest): Promise<Task> => {
     const response = await apiClient.post(endpoints.tasks.list, data);
-    return response.data.data;
+    return response.data;
   },
 
   update: async (id: string, data: UpdateTaskRequest): Promise<Task> => {
     const response = await apiClient.patch(endpoints.tasks.detail(id), data);
-    return response.data.data;
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -83,13 +83,13 @@ export const taskService = {
 
   complete: async (id: string): Promise<Task> => {
     const response = await apiClient.post(endpoints.tasks.complete(id));
-    return response.data.data;
+    return response.data;
   },
 
   steps: async (taskId: string): Promise<TaskStep[]> => {
     try {
       const response = await apiClient.get(endpoints.tasks.steps(taskId));
-      return response.data.data ?? [];
+      return response.data ?? [];
     } catch (error) {
       console.warn('Failed to fetch task steps:', error);
       return [];
@@ -99,7 +99,7 @@ export const taskService = {
   simplify: async (taskId: string): Promise<TaskStep[]> => {
     try {
       const response = await apiClient.post(endpoints.tasks.simplify(taskId));
-      return response.data.data ?? [];
+      return response.data ?? [];
     } catch (error) {
       console.warn('Failed to simplify task:', error);
       return [];
@@ -108,11 +108,11 @@ export const taskService = {
 
   focusSessions: async (taskId: string): Promise<any[]> => {
     const response = await apiClient.get(endpoints.tasks.focusSessions(taskId));
-    return response.data.data;
+    return response.data;
   },
 
   byDate: async (date: string): Promise<Task[]> => {
     const response = await apiClient.get(endpoints.tasks.byDate(date));
-    return response.data.data;
+    return response.data;
   },
 };

@@ -40,27 +40,27 @@ export interface WeeklyReview {
 export const insightService = {
   list: async (params?: { type?: string; goalId?: string; read?: boolean; dismissed?: boolean }): Promise<Insight[]> => {
     const response = await apiClient.get(endpoints.insights.list, { params });
-    return response.data.data;
+    return response.data;
   },
 
   detail: async (id: string): Promise<Insight> => {
     const response = await apiClient.get(endpoints.insights.detail(id));
-    return response.data.data;
+    return response.data;
   },
 
   markAsRead: async (id: string): Promise<Insight> => {
     const response = await apiClient.patch(endpoints.insights.markRead(id));
-    return response.data.data;
+    return response.data;
   },
 
   dismiss: async (id: string): Promise<Insight> => {
     const response = await apiClient.patch(endpoints.insights.dismiss(id));
-    return response.data.data;
+    return response.data;
   },
 
   markAllAsRead: async (): Promise<{ count: number }> => {
     const response = await apiClient.patch(endpoints.insights.markAllRead);
-    return response.data.data;
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -69,16 +69,16 @@ export const insightService = {
 
   getDailyBrief: async (): Promise<DailyBrief> => {
     const response = await apiClient.get(endpoints.insights.dailyBrief);
-    return response.data.data;
+    return response.data;
   },
 
   getBehavioralAwareness: async (): Promise<BehavioralAwareness> => {
     const response = await apiClient.get(endpoints.insights.behavioralAwareness);
-    return response.data.data;
+    return response.data;
   },
 
   getWeeklyReview: async (): Promise<WeeklyReview> => {
     const response = await apiClient.get(endpoints.insights.weeklyReview);
-    return response.data.data;
+    return response.data;
   },
 };

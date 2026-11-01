@@ -32,21 +32,21 @@ export interface ExecutionStats {
 export const executionService = {
   getReadiness: async (): Promise<ReadinessScore> => {
     const response = await apiClient.get(endpoints.execution.readiness);
-    return response.data.data;
+    return response.data;
   },
 
   getResistance: async (): Promise<ResistanceDetection> => {
     const response = await apiClient.get(endpoints.execution.resistance);
-    return response.data.data;
+    return response.data;
   },
 
   getMomentum: async (): Promise<MomentumMetrics> => {
     const response = await apiClient.get(endpoints.execution.momentum);
-    return response.data.data;
+    return response.data;
   },
 
   getStats: async (): Promise<ExecutionStats> => {
     const response = await apiClient.get(endpoints.execution.stats);
-    return response.data.data;
+    return response.data;
   },
 };

@@ -25,22 +25,22 @@ export interface NotificationPreferences {
 export const notificationService = {
   list: async (params?: { type?: string; read?: boolean }): Promise<Notification[]> => {
     const response = await apiClient.get(endpoints.notifications.list, { params });
-    return response.data.data;
+    return response.data;
   },
 
   detail: async (id: string): Promise<Notification> => {
     const response = await apiClient.get(endpoints.notifications.detail(id));
-    return response.data.data;
+    return response.data;
   },
 
   markAsRead: async (id: string): Promise<Notification> => {
     const response = await apiClient.patch(endpoints.notifications.markRead(id));
-    return response.data.data;
+    return response.data;
   },
 
   markAllAsRead: async (): Promise<{ count: number }> => {
     const response = await apiClient.patch(endpoints.notifications.markAllRead);
-    return response.data.data;
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -49,11 +49,11 @@ export const notificationService = {
 
   getUnreadCount: async (): Promise<{ count: number }> => {
     const response = await apiClient.get(endpoints.notifications.unreadCount);
-    return response.data.data;
+    return response.data;
   },
 
   getPreferences: async (): Promise<NotificationPreferences> => {
     const response = await apiClient.get(endpoints.notifications.preferences);
-    return response.data.data;
+    return response.data;
   },
 };

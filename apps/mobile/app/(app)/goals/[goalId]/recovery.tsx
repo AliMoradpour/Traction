@@ -48,7 +48,7 @@ export default function GoalRecoveryScreen() {
     apiClient
       .post(endpoints.ai.goalRecovery(goalId))
       .then((res) => {
-        setRecoveryData(res.data.data);
+        setRecoveryData(res.data);
       })
       .catch(() => {
         setError('Unable to analyze recovery options right now. You can still adjust your goal manually below.');

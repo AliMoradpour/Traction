@@ -75,7 +75,7 @@ export const behaviorService = {
     value?: string;
   }): Promise<BehaviorEvent> => {
     const response = await apiClient.post(endpoints.behavior.track, data);
-    return response.data.data;
+    return response.data;
   },
 
   list: async (params?: {
@@ -86,17 +86,17 @@ export const behaviorService = {
     endDate?: string;
   }): Promise<BehaviorEvent[]> => {
     const response = await apiClient.get(endpoints.behavior.list, { params });
-    return response.data.data;
+    return response.data;
   },
 
   detail: async (id: string): Promise<BehaviorEvent> => {
     const response = await apiClient.get(endpoints.behavior.detail(id));
-    return response.data.data;
+    return response.data;
   },
 
   stats: async (): Promise<BehaviorStats> => {
     const response = await apiClient.get(endpoints.behavior.stats);
-    return response.data.data;
+    return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
@@ -105,26 +105,26 @@ export const behaviorService = {
 
   dailyMetrics: async (date?: string): Promise<DailyMetrics> => {
     const response = await apiClient.get(endpoints.behavior.dailyMetrics(date));
-    return response.data.data;
+    return response.data;
   },
 
   weeklyMetrics: async (weekStart?: string): Promise<WeeklyMetrics> => {
     const response = await apiClient.get(endpoints.behavior.weeklyMetrics(weekStart));
-    return response.data.data;
+    return response.data;
   },
 
   indicators: async (days?: number): Promise<BehaviorIndicators> => {
     const response = await apiClient.get(endpoints.behavior.indicators(days));
-    return response.data.data;
+    return response.data;
   },
 
   burnout: async (): Promise<BurnoutRisk> => {
     const response = await apiClient.get(endpoints.behavior.burnout);
-    return response.data.data;
+    return response.data;
   },
 
   procrastination: async (): Promise<ProcrastinationProfile> => {
     const response = await apiClient.get(endpoints.behavior.procrastination);
-    return response.data.data;
+    return response.data;
   },
 };
