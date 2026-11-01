@@ -1,17 +1,10 @@
-import { useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTractionTheme, type TractionTheme } from '@/theme';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/feedback/Toast';
 import { useFeedback } from '@/hooks/useFeedback';
-import { useCurrentRoute } from '@/hooks/useCurrentRoute';
 
 type FeedbackType = 'bug' | 'feature' | 'general';
 
@@ -23,22 +16,31 @@ const FEEDBACK_TYPES: { value: FeedbackType; label: string }[] = [
 
 export function FeedbackWidget() {
   const theme = useTractionTheme();
-  const styles = createStyles(theme);
-  const { submitFeedback } = useFeedback();
-  const currentRoute = useCurrentRoute();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const { submitFeedback, currentRoute } = useFeedback();
 
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState<FeedbackType>('general');
   const [message, setMessage] = useState('');
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!message.trim()) return;
-    await submitFeedback(type, message.trim());
+    if (!message.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      const result = await submitFeedback(type, message.trim());
+      setToast(
+        result === 'sent'
+          ? { message: 'Thanks for your feedback!', type: 'success' }
+          : { message: "Saved — we'll send it when you're back online.", type: 'info' },
+      );
+    } finally {
+      setSubmitting(false);
+    }
     setMessage('');
     setType('general');
     setVisible(false);
-    setToast('Thanks for your feedback!');
   };
 
   const handleCancel = () => {
@@ -65,7 +67,13 @@ export function FeedbackWidget() {
         footer={
           <View style={styles.footerRow}>
             <Button variant="ghost" size="md" onPress={handleCancel} title="Cancel" />
-            <Button variant="primary" size="md" onPress={handleSubmit} title="Submit" disabled={!message.trim()} />
+            <Button
+              variant="primary"
+              size="md"
+              onPress={handleSubmit}
+              title="Submit"
+              disabled={!message.trim() || submitting}
+            />
           </View>
         }
       >
@@ -100,7 +108,9 @@ export function FeedbackWidget() {
         </View>
       </Modal>
 
-      {toast && <Toast message={toast} type="success" onDismiss={() => setToast(null)} />}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
+      )}
     </>
   );
 }

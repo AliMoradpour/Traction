@@ -1,21 +1,6 @@
-import { useNavigation } from 'expo-router';
-import { useState, useEffect } from 'react';
+import { usePathname } from 'expo-router';
 
+/** The full route path of the focused screen (e.g. "/goals"), not the layout group name. */
 export function useCurrentRoute(): string {
-  const navigation = useNavigation();
-  const [route, setRoute] = useState(navigation.getState()?.routes?.[navigation.getState()?.index ?? 0]?.name ?? 'unknown');
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('state', () => {
-      const state = navigation.getState();
-      if (state) {
-        const current = state.routes[state.index];
-        setRoute(current.name);
-      }
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  return route;
+  return usePathname() || 'unknown';
 }
