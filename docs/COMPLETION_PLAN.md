@@ -12,12 +12,15 @@ Status legend: ✅ done · 🔄 in progress · ⏳ planned · 🙋 needs owner i
 
 ## Plan
 
+Also fixed along the way: the app read every API response as `response.data.data` (always undefined), and new users were redirected past onboarding.
+
+
 | # | Part | What "done" means | Status |
 |---|------|-------------------|--------|
 | 1 | Mobile lint | `npm run lint` runs with 0 errors | ✅ |
-| 2 | Onboarding answers saved | Onboarding answers persist on the server, survive reinstall; app knows if onboarding is complete | ⏳ |
-| 3 | Profile preferences saved | Profile screen reads/writes `/users/me/preferences` (AI personality, deep work, notifications) | ⏳ |
-| 4 | Password reset (real) | Single-use, expiring, hashed reset tokens; reset changes the password and signs out other sessions; email sent via SMTP when configured, link logged in development | ⏳ 🙋 SMTP credentials for production |
+| 2 | Onboarding answers saved | Onboarding answers persist on the server, survive reinstall; app knows if onboarding is complete | ✅ |
+| 3 | Profile preferences saved | Profile screen reads/writes `/users/me/preferences` (AI personality, deep work, notifications) | ✅ |
+| 4 | Password reset (real) | Single-use, expiring, hashed reset tokens; reset changes the password and signs out other sessions; email sent via SMTP when configured, link logged in development | ✅ 🙋 SMTP credentials for production |
 | 5 | Goal feasibility from data | Probability/timeline computed from progress velocity vs. time left, not hardcoded | ⏳ |
 | 6 | Unreachable screens | Resistance / simplify screens reachable from the task & focus flows | ⏳ |
 | 7 | UI polish | Admin analytics follows the app theme; restored session loads the user profile | ⏳ |
