@@ -11,14 +11,15 @@ function EngagementCard({ label, value, color }: { label: string; value: string 
   );
 }
 
-function RetentionBar({ label, percentage }: { label: string; percentage: number }) {
+/** percentage is null when no user is old enough to measure this day yet. */
+function RetentionBar({ label, percentage }: { label: string; percentage: number | null }) {
   return (
     <View style={styles.retentionRow}>
       <Text style={styles.retentionLabel}>{label}</Text>
       <View style={styles.retentionBarContainer}>
-        <View style={[styles.retentionBar, { width: `${percentage}%` }]} />
+        {percentage !== null && <View style={[styles.retentionBar, { width: `${percentage}%` }]} />}
       </View>
-      <Text style={styles.retentionValue}>{percentage}%</Text>
+      <Text style={styles.retentionValue}>{percentage === null ? '—' : `${percentage}%`}</Text>
     </View>
   );
 }
@@ -74,6 +75,7 @@ export default function AnalyticsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Engagement</Text>
+          <Text style={styles.sectionNote}>Active = any task, goal, focus, AI or session activity. Days in UTC.</Text>
           <View style={styles.engagementGrid}>
             <EngagementCard label="Active Today" value={engagement.activeToday || 0} color="#6c63ff" />
             <EngagementCard label="Active This Week" value={engagement.activeThisWeek || 0} color="#22c55e" />
@@ -86,9 +88,12 @@ export default function AnalyticsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Retention</Text>
           <View style={[styles.retentionCard, { backgroundColor: '#1a1a2e' }]}>
-            <RetentionBar label="Day 1" percentage={retention.day1 || 0} />
-            <RetentionBar label="Day 3" percentage={retention.day3 || 0} />
-            <RetentionBar label="Day 7" percentage={retention.day7 || 0} />
+            <RetentionBar label="Day 1" percentage={retention.day1 ?? null} />
+            <RetentionBar label="Day 3" percentage={retention.day3 ?? null} />
+            <RetentionBar label="Day 7" percentage={retention.day7 ?? null} />
+            <Text style={styles.retentionNote}>
+              Users who came back N+ days after signing up. — means no one has been signed up that long yet.
+            </Text>
           </View>
         </View>
 
@@ -192,6 +197,17 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#6c63ff',
     borderRadius: 4,
+  },
+  retentionNote: {
+    fontSize: 12,
+    color: '#8888aa',
+    marginTop: 4,
+  },
+  sectionNote: {
+    fontSize: 12,
+    color: '#8888aa',
+    marginTop: -6,
+    marginBottom: 12,
   },
   retentionValue: {
     width: 45,
