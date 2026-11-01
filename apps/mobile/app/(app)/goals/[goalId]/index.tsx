@@ -368,6 +368,11 @@ export default function GoalDetailScreen() {
           />
           <Button
             variant="secondary"
+            onPress={() => router.push(`/(app)/goals/feasibility?goalId=${goalId}` as any)}
+            title="Feasibility"
+          />
+          <Button
+            variant="secondary"
             onPress={() => router.push(`/(app)/goals/${goalId}/projection` as any)}
             title="View Projection"
           />

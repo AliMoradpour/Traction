@@ -4,13 +4,25 @@ import { Animated,StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { useOnboardingStore } from '@/store/onboarding.store';
 import { useTractionTheme } from '@/theme';
 
 const TOTAL_STEPS = 6;
 
+const FOCUS_LABELS: Record<string, string> = {
+  productivity: 'Daily Productivity',
+  fitness: 'Health & Fitness',
+  learning: 'Learning & Growth',
+  creative: 'Creative Projects',
+  career: 'Career Advancement',
+  custom: 'Custom Goal',
+};
+
 export default function OnboardingGoalFeasibilityScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const goalTemplate = useOnboardingStore((state) => state.goalTemplate);
+  const focusLabel = (goalTemplate && FOCUS_LABELS[goalTemplate]) || 'Your goal';
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
 
@@ -73,29 +85,29 @@ export default function OnboardingGoalFeasibilityScreen() {
           <Text style={[styles.title, { color: theme.colors.text }]}>Great Choice!</Text>
 
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-            We've analyzed your goal and created a personalized roadmap to help you succeed.
+            Once you add your goal with a deadline, Traction forecasts your chance of finishing on time from the progress you actually log.
           </Text>
 
           <View style={[styles.analysisCard, { backgroundColor: theme.colors.surfaceElevated }]}>
             <View style={styles.analysisRow}>
               <Text style={[styles.analysisLabel, { color: theme.colors.textMuted }]}>
-                Feasibility
+                Focus
               </Text>
-              <Text style={[styles.analysisValue, { color: theme.colors.success }]}>High</Text>
+              <Text style={[styles.analysisValue, { color: theme.colors.text }]}>{focusLabel}</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
             <View style={styles.analysisRow}>
               <Text style={[styles.analysisLabel, { color: theme.colors.textMuted }]}>
-                Estimated Timeline
+                Next step
               </Text>
-              <Text style={[styles.analysisValue, { color: theme.colors.text }]}>8-12 weeks</Text>
+              <Text style={[styles.analysisValue, { color: theme.colors.text }]}>Set a deadline</Text>
             </View>
             <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
             <View style={styles.analysisRow}>
               <Text style={[styles.analysisLabel, { color: theme.colors.textMuted }]}>
-                Daily Commitment
+                First forecast
               </Text>
-              <Text style={[styles.analysisValue, { color: theme.colors.text }]}>30 min</Text>
+              <Text style={[styles.analysisValue, { color: theme.colors.text }]}>After a week of progress</Text>
             </View>
           </View>
         </View>

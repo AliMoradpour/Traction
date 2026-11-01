@@ -102,7 +102,7 @@ export class GoalsController {
   @ApiOperation({ summary: 'Get goal feasibility analysis' })
   @ApiParam({ name: 'id', description: 'Goal ID' })
   @ApiResponse({ status: 200, description: 'Goal feasibility' })
-  async getFeasibility(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any> {
+  async getFeasibility(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.goalsService.getFeasibility(userId, id);
   }
 
@@ -110,7 +110,7 @@ export class GoalsController {
   @ApiOperation({ summary: 'Get goal health projection' })
   @ApiParam({ name: 'id', description: 'Goal ID' })
   @ApiResponse({ status: 200, description: 'Goal projection' })
-  async getProjection(@CurrentUser('id') userId: string, @Param('id') id: string): Promise<any> {
+  async getProjection(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.goalsService.getProjection(userId, id);
   }
 

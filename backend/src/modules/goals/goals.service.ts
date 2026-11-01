@@ -13,6 +13,7 @@ import {
   PlanResponseDto,
 } from './dto/goals.dto';
 import { GoalStatus, PlanStatus } from '@prisma/client';
+import { computeGoalForecast } from './goal-forecast';
 
 @Injectable()
 export class GoalsService {
@@ -93,43 +94,49 @@ export class GoalsService {
     return { message: 'Goal deleted successfully' };
   }
 
-  async getFeasibility(userId: string, goalId: string): Promise<any> {
-    const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
-    if (!goal) throw new NotFoundException('Goal not found');
-    if (goal.userId !== userId) throw new ForbiddenException('Access denied');
-
-    const daysRemaining = goal.targetDate
-      ? Math.ceil((goal.targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-      : null;
+  async getFeasibility(userId: string, goalId: string) {
+    const goal = await this.findOne(userId, goalId);
+    const f = computeGoalForecast(goal);
 
     return {
       goalId: goal.id,
-      probability: goal.progress > 50 ? 0.8 : goal.progress > 25 ? 0.6 : 0.4,
-      timeline: daysRemaining ? `${daysRemaining} days remaining` : 'No deadline set',
-      readiness: goal.progress > 75 ? 'high' : goal.progress > 50 ? 'medium' : 'low',
-      recommendation: 'Continue working on this goal consistently.',
+      probability: f.probability,
+      confidence: f.confidence,
+      readiness: f.readiness,
+      onTrack: f.onTrack,
+      timeline: f.timeline,
+      recommendation: f.recommendation,
+      progress: f.progress,
+      daysElapsed: f.daysElapsed,
+      daysRemaining: f.daysRemaining,
+      currentPace: f.currentPace,
+      requiredPace: f.requiredPace,
+      projectedDaysToFinish: f.projectedDaysToFinish,
+      projectedCompletionDate: f.projectedCompletionDate,
     };
   }
 
-  async getProjection(userId: string, goalId: string): Promise<any> {
-    const goal = await this.prisma.goal.findUnique({ where: { id: goalId } });
-    if (!goal) throw new NotFoundException('Goal not found');
-    if (goal.userId !== userId) throw new ForbiddenException('Access denied');
+  async getProjection(userId: string, goalId: string) {
+    const goal = await this.findOne(userId, goalId);
+    const f = computeGoalForecast(goal);
 
-    const daysRemaining = goal.targetDate
-      ? Math.ceil((goal.targetDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-      : null;
+    let forecast: string;
+    if (f.progress >= 100) forecast = 'Completed';
+    else if (f.onTrack === null) forecast = 'No deadline set';
+    else forecast = f.onTrack ? 'On track' : 'Needs attention';
 
     return {
       goalId: goal.id,
       health: goal.health,
-      progress: goal.progress,
+      progress: f.progress,
       velocity: goal.velocity,
       targetDate: goal.targetDate,
-      daysRemaining,
-      forecast: goal.progress > 50 ? 'On track' : 'Needs attention',
-      alternativeScenario:
-        'If you increase daily progress by 20%, you can complete this goal earlier.',
+      daysRemaining: f.daysRemaining,
+      currentPace: f.currentPace,
+      requiredPace: f.requiredPace,
+      projectedCompletionDate: f.projectedCompletionDate,
+      forecast,
+      alternativeScenario: f.recommendation,
     };
   }
 

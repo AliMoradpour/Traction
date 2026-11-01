@@ -70,10 +70,21 @@ export interface GoalPlan {
 
 export interface GoalFeasibility {
   goalId: string;
-  probability: number;
+  /** 0-1 chance of finishing by the target date; null when the goal has no target date. */
+  probability: number | null;
+  confidence: 'low' | 'medium' | 'high';
+  readiness: 'low' | 'medium' | 'high';
+  onTrack: boolean | null;
   timeline: string;
-  readiness: string;
   recommendation: string;
+  progress: number;
+  daysElapsed: number;
+  daysRemaining: number | null;
+  /** Percentage points of progress per day. */
+  currentPace: number;
+  requiredPace: number | null;
+  projectedDaysToFinish: number | null;
+  projectedCompletionDate: string | null;
 }
 
 export interface GoalProjection {
@@ -82,7 +93,10 @@ export interface GoalProjection {
   progress: number;
   velocity?: string;
   targetDate?: string;
-  daysRemaining?: number;
+  daysRemaining: number | null;
+  currentPace: number;
+  requiredPace: number | null;
+  projectedCompletionDate: string | null;
   forecast: string;
   alternativeScenario: string;
 }
