@@ -3,12 +3,14 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import { createHash, randomBytes, randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from './mail.service';
 import { UserRole } from '@prisma/client';
 import {
   RegisterDto,
@@ -19,12 +21,18 @@ import {
   AuthResponseDto,
 } from './dto/auth.dto';
 
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+const hashToken = (token: string) => createHash('sha256').update(token).digest('hex');
+
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
@@ -201,23 +209,71 @@ export class AuthService {
   }
 
   async forgotPassword(dto: ForgotPasswordDto): Promise<{ message: string }> {
+    // Same response whether or not the account exists, to prevent email enumeration.
+    const response = { message: 'If the email exists, a reset link has been sent' };
+
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
+    if (!user) return response;
 
-    // Always return success to prevent email enumeration
-    if (!user) {
-      return { message: 'If the email exists, a reset link has been sent' };
+    const token = randomBytes(32).toString('base64url');
+    const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+
+    await this.prisma.$transaction([
+      // Only the newest link works.
+      this.prisma.passwordResetToken.deleteMany({ where: { userId: user.id, usedAt: null } }),
+      this.prisma.passwordResetToken.create({
+        data: { userId: user.id, tokenHash: hashToken(token), expiresAt },
+      }),
+    ]);
+
+    const base = this.configService.get<string>('PASSWORD_RESET_URL', 'traction://reset-password');
+    const link = `${base}${base.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+    try {
+      await this.mailService.send(
+        user.email,
+        'Reset your Traction password',
+        `Someone asked to reset the password for your Traction account.\n\n` +
+          `Open this link on your phone to choose a new password (valid for 1 hour):\n${link}\n\n` +
+          `If this wasn't you, you can ignore this email.`,
+      );
+    } catch (error) {
+      // Don't reveal delivery failures to the caller; they'd leak whether the account exists.
+      this.logger.error('Failed to send password reset email', error);
     }
 
-    // In production, send email with reset link
-    // For now, just return success message
-    return { message: 'If the email exists, a reset link has been sent' };
+    return response;
   }
 
-  async resetPassword(_dto: ResetPasswordDto): Promise<{ message: string }> {
-    // In production, verify token and update password
-    // For now, just return success message
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    const record = await this.prisma.passwordResetToken.findUnique({
+      where: { tokenHash: hashToken(dto.token) },
+    });
+
+    if (!record || record.usedAt || record.expiresAt < new Date()) {
+      throw new BadRequestException('This reset link is invalid or has expired');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
+
+    await this.prisma.$transaction(async (tx) => {
+      // Claim the token atomically so two concurrent requests can't both use it.
+      const claimed = await tx.passwordResetToken.updateMany({
+        where: { id: record.id, usedAt: null },
+        data: { usedAt: new Date() },
+      });
+      if (claimed.count !== 1) {
+        throw new BadRequestException('This reset link is invalid or has expired');
+      }
+      await tx.user.update({ where: { id: record.userId }, data: { password: hashedPassword } });
+      // Sign out every existing session.
+      await tx.refreshToken.updateMany({
+        where: { userId: record.userId, revoked: false },
+        data: { revoked: true },
+      });
+    });
+
     return { message: 'Password reset successful' };
   }
 

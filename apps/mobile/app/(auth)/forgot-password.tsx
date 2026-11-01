@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { getErrorMessage } from '@/api/errors';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useForgotPassword } from '@/hooks/useAuth';
@@ -31,7 +32,7 @@ export default function ForgotPasswordScreen() {
     forgotPassword.mutate(data, {
       onSuccess: () => setIsSuccess(true),
       onError: (error) => {
-        Alert.alert('Error', error instanceof Error ? error.message : 'Failed to send reset email. Please try again.');
+        Alert.alert('Error', getErrorMessage(error) || 'Failed to send reset email. Please try again.');
       },
     });
   };
