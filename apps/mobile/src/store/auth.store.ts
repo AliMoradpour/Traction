@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { tokenStorage } from '@/api/interceptors';
+import { userService } from '@/services/user.service';
 
 interface User {
   id: string;
@@ -49,6 +50,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (accessToken && refreshToken) {
         set({ isAuthenticated: true, isLoading: false });
+        // Only tokens are stored on the device, so fetch the profile (name,
+        // role) in the background; startup doesn't wait on the network.
+        void refreshProfile(get, set);
       } else {
         set({ isLoading: false });
       }
@@ -57,3 +61,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 }));
+
+async function refreshProfile(
+  get: () => AuthState,
+  set: (partial: Partial<AuthState>) => void,
+): Promise<void> {
+  try {
+    const profile = await userService.getProfile();
+    // The user may have signed out while the request was in flight.
+    if (!get().isAuthenticated) return;
+    set({
+      user: {
+        id: profile.id,
+        email: profile.email,
+        firstName: profile.firstName ?? null,
+        lastName: profile.lastName ?? null,
+        role: profile.role,
+      },
+    });
+  } catch {
+    // Offline or token refresh failed; a failed refresh already signs the user out.
+  }
+}
