@@ -12,7 +12,7 @@ Status legend: ✅ done · 🔄 in progress · ⏳ planned · 🙋 needs owner i
 
 ## Plan
 
-Also fixed along the way: the app read every API response as `response.data.data` (always undefined), and new users were redirected past onboarding. Later: app requests missed the backend's `/api` prefix; pausing/resuming an older focus session jumped to recovery; the mobile lockfile needed legacy peer deps for `npm ci`.
+Also fixed along the way: the app read every API response as `response.data.data` (always undefined), and new users were redirected past onboarding. Later: app requests missed the backend's `/api` prefix; pausing/resuming an older focus session jumped to recovery; the mobile lockfile needed legacy peer deps for `npm ci`. The final run found that tasks, goals, milestones and plans accepted empty titles.
 
 
 | # | Part | What "done" means | Status |
@@ -26,7 +26,7 @@ Also fixed along the way: the app read every API response as `response.data.data
 | 7 | UI polish | Admin analytics follows the app theme; restored session loads the user profile | ✅ |
 | 8 | CI | GitHub Actions: backend (migrate on Postgres, typecheck, lint, test, build) + mobile (typecheck, lint, test) on every push/PR | ✅ |
 | 9 | Docs | Known-issues table, RUN.md, CHANGELOG reflect reality | ✅ |
-| 10 | Final verification | Full end-to-end API run against real Postgres; open PR `dev → main` | ⏳ 🙋 approve merge |
+| 10 | Final verification | Full end-to-end API run against real Postgres; open PR `dev → main` | ✅ 102/102 API checks pass (2026-11-02) · 🙋 approve merge |
 
 ## Needs the owner
 - **SMTP credentials** (host/port/user/pass, from-address) to send real reset emails in production. Until then the reset link is printed in the server log in development.
