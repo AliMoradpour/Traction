@@ -12,6 +12,7 @@ All notable changes to Traction will be documented in this file.
 - GitHub Actions CI for backend (migrations on Postgres, typecheck, lint, test, build) and mobile (typecheck, lint, test).
 
 ### Fixed
+- Tasks, goals, milestones and plans could be created or renamed with an empty title.
 - The app read API responses from a nonexistent `data` envelope, and requests missed the backend's `/api` prefix.
 - New users were sent past onboarding.
 - Pausing or resuming a focus session older than five minutes jumped to the recovery screen.

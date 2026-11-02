@@ -1,10 +1,20 @@
-import { IsString, IsOptional, IsEnum, IsInt, Min, Max, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  Min,
+  Max,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TaskPriority, TaskStatus, EnergyLevel } from '@prisma/client';
 
 export class CreateTaskDto {
   @ApiProperty({ example: 'Review design mockups' })
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiPropertyOptional({ example: 'Review the latest design mockups for the landing page' })
@@ -59,6 +69,7 @@ export class CreateTaskDto {
 export class UpdateTaskDto {
   @ApiPropertyOptional({ example: 'Review design mockups - Updated' })
   @IsString()
+  @IsNotEmpty()
   @IsOptional()
   title?: string | null;
 

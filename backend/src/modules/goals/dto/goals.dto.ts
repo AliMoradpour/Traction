@@ -1,10 +1,20 @@
-import { IsString, IsOptional, IsEnum, IsInt, Min, Max, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsInt,
+  Min,
+  Max,
+  IsDateString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GoalType, GoalStatus, GoalHealth, MilestoneStatus, PlanStatus } from '@prisma/client';
 
 export class CreateGoalDto {
   @ApiProperty({ example: 'Complete IELTS with band 7+' })
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiPropertyOptional({ example: 'Prepare and take IELTS exam' })
@@ -30,6 +40,7 @@ export class CreateGoalDto {
 export class UpdateGoalDto {
   @ApiPropertyOptional({ example: 'Updated goal title' })
   @IsString()
+  @IsNotEmpty()
   @IsOptional()
   title?: string | null;
 
@@ -143,6 +154,7 @@ export class GoalResponseDto {
 export class CreateMilestoneDto {
   @ApiProperty({ example: 'Complete Practice Test 1' })
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiPropertyOptional({ example: 'Score 6.5+ on practice test' })
@@ -159,6 +171,7 @@ export class CreateMilestoneDto {
 export class UpdateMilestoneDto {
   @ApiPropertyOptional({ example: 'Updated milestone title' })
   @IsString()
+  @IsNotEmpty()
   @IsOptional()
   title?: string | null;
 
@@ -220,6 +233,7 @@ export class MilestoneResponseDto {
 export class CreatePlanDto {
   @ApiProperty({ example: 'Study Plan for IELTS' })
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @ApiPropertyOptional({ example: 'A structured plan to prepare for IELTS' })
@@ -236,6 +250,7 @@ export class CreatePlanDto {
 export class UpdatePlanDto {
   @ApiPropertyOptional({ example: 'Updated plan title' })
   @IsString()
+  @IsNotEmpty()
   @IsOptional()
   title?: string | null;
 
