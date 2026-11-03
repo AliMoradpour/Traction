@@ -11,7 +11,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { type TractionTheme,useTractionTheme } from '../../theme';
+import { type TractionTheme, useTractionTheme } from '../../theme';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -55,10 +55,14 @@ export function Button({
     ghost: styles.ghostText,
     danger: styles.dangerText,
   }[variant];
+  // Plain-text children (<Button>Sign In</Button>) must be wrapped in <Text> on native.
+  const label =
+    title ??
+    (typeof children === 'string' || typeof children === 'number' ? String(children) : undefined);
 
   return (
     <Pressable
-      accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityRole="button"
       disabled={isDisabled}
       style={({ pressed }) => [
@@ -73,7 +77,11 @@ export function Button({
       {...pressableProps}
     >
       {loading ? <ActivityIndicator color={contentColor} size="small" /> : iconLeft}
-      {title ? <Text style={[styles.text, variantTextStyle, textStyle]}>{title}</Text> : children}
+      {label !== undefined ? (
+        <Text style={[styles.text, variantTextStyle, textStyle]}>{label}</Text>
+      ) : (
+        children
+      )}
       {!loading ? iconRight : null}
     </Pressable>
   );
