@@ -1,9 +1,8 @@
 import { type Href, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useUpdatePreferences,useUpdateProfile } from '../../src/hooks/useProfile';
-import { useAuthStore } from '../../src/store/auth.store';
+import { useUpdatePreferences } from '../../src/hooks/useProfile';
 
 const GOALS = ['Productivity', 'Focus', 'Health', 'Learning', 'Career', 'Personal', 'Other'];
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
@@ -11,24 +10,18 @@ const TIME_OPTIONS = ['30 min', '1 hour', '2 hours', '3+ hours'];
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
-  const updateProfile = useUpdateProfile();
   const updatePreferences = useUpdatePreferences();
   const [step, setStep] = useState(0);
-  const [firstName, setFirstName] = useState(user?.firstName || '');
-  const [lastName, setLastName] = useState(user?.lastName || '');
   const [goal, setGoal] = useState('');
   const [level, setLevel] = useState('');
   const [dailyTime, setDailyTime] = useState('');
 
-  const canProceed = step === 0 ? firstName.trim().length > 0 : step === 1 ? !!goal : step === 2 ? !!level : !!dailyTime;
+  // The name is collected at sign-up, so onboarding starts with the goal.
+  const lastStep = 2;
+  const canProceed = step === 0 ? !!goal : step === 1 ? !!level : !!dailyTime;
 
   const handleComplete = async () => {
     try {
-      await updateProfile.mutateAsync({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-      });
       await updatePreferences.mutateAsync({
         primaryGoal: goal,
         experienceLevel: level,
@@ -44,7 +37,7 @@ export default function OnboardingScreen() {
 
   const stepIndicator = (
     <View style={styles.stepIndicator}>
-      {[0, 1, 2, 3].map((i) => (
+      {[0, 1, 2].map((i) => (
         <View key={i} style={[styles.dot, i <= step && styles.dotActive]} />
       ))}
     </View>
@@ -55,14 +48,6 @@ export default function OnboardingScreen() {
       {stepIndicator}
 
       {step === 0 && (
-        <>
-          <Text style={styles.title}>What's your name?</Text>
-          <TextInput style={styles.input} placeholder="First name" placeholderTextColor="#555" value={firstName} onChangeText={setFirstName} />
-          <TextInput style={styles.input} placeholder="Last name (optional)" placeholderTextColor="#555" value={lastName} onChangeText={setLastName} />
-        </>
-      )}
-
-      {step === 1 && (
         <>
           <Text style={styles.title}>What's your primary goal?</Text>
           <View style={styles.optionsGrid}>
@@ -75,7 +60,7 @@ export default function OnboardingScreen() {
         </>
       )}
 
-      {step === 2 && (
+      {step === 1 && (
         <>
           <Text style={styles.title}>Your experience level?</Text>
           <View style={styles.optionsGrid}>
@@ -88,7 +73,7 @@ export default function OnboardingScreen() {
         </>
       )}
 
-      {step === 3 && (
+      {step === 2 && (
         <>
           <Text style={styles.title}>Daily time for tasks?</Text>
           <View style={styles.optionsGrid}>
@@ -109,13 +94,13 @@ export default function OnboardingScreen() {
         )}
         <TouchableOpacity
           style={[styles.nextButton, !canProceed && styles.nextButtonDisabled]}
-          disabled={!canProceed || updateProfile.isPending || updatePreferences.isPending}
-          onPress={() => (step < 3 ? setStep(step + 1) : handleComplete())}
+          disabled={!canProceed || updatePreferences.isPending}
+          onPress={() => (step < lastStep ? setStep(step + 1) : handleComplete())}
         >
-          {updateProfile.isPending || updatePreferences.isPending ? (
+          {updatePreferences.isPending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.nextButtonText}>{step < 3 ? 'Continue' : "Let's Go!"}</Text>
+            <Text style={styles.nextButtonText}>{step < lastStep ? 'Continue' : "Let's Go!"}</Text>
           )}
         </TouchableOpacity>
       </View>
