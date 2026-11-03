@@ -22,23 +22,18 @@ export default function RegisterScreen() {
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
   });
 
+  // The name is asked during onboarding, right after sign-up.
   const onSubmit = (data: RegisterFormData) => {
-    const [firstName, ...rest] = data.name.split(' ');
-    const lastName = rest.join(' ') || undefined;
-
     registerMutation.mutate(
       {
         email: data.email,
         password: data.password,
-        firstName,
-        lastName,
       },
       {
         onError: (error: any) => {
@@ -64,17 +59,6 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.form}>
-            <Input
-              control={control}
-              name="name"
-              label="Name"
-              placeholder="Enter your name"
-              autoCapitalize="words"
-              autoComplete="name"
-              textContentType="name"
-              error={errors.name?.message}
-            />
-
             <Input
               control={control}
               name="email"

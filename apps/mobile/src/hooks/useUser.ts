@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { cacheConfig } from '@/lib/cacheConfig';
 import { queryKeys } from '@/lib/queryKeys';
 import { UpdatePreferencesInput, UserPreferences, userService } from '@/services/user.service';
+import { useAuthStore } from '@/store/auth.store';
 
 export function useUserProfile() {
   return useQuery({
@@ -18,8 +19,10 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (data: { firstName?: string; lastName?: string; avatar?: string }) =>
       userService.updateProfile(data),
-    onSuccess: () => {
+    onSuccess: (_profile, data) => {
+      useAuthStore.getState().updateUser(data);
       queryClient.invalidateQueries({ queryKey: queryKeys.users.profile() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() });
     },
   });
 }
