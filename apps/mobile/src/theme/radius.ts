@@ -1,11 +1,11 @@
 export const radius = {
   none: 0,
   xs: 2,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
+  sm: 8,
+  md: 14,
+  lg: 20,
+  xl: 24,
+  xxl: 28,
   sheet: 32,
   full: 9999,
 } as const;

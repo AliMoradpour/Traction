@@ -149,7 +149,7 @@ export default function TaskDetailsScreen() {
           <View style={{ width: 60 }} />
         </View>
         <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.error || theme.colors.danger }]}>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
             Task not found
           </Text>
         </View>
@@ -167,7 +167,7 @@ export default function TaskDetailsScreen() {
         </Pressable>
         <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Task Details</Text>
         <Pressable onPress={handleDelete}>
-          <Text style={[styles.deleteButton, { color: theme.colors.error || theme.colors.danger }]}>Delete</Text>
+          <Text style={[styles.deleteButton, { color: theme.colors.error }]}>Delete</Text>
         </Pressable>
       </View>
 

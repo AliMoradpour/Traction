@@ -2,6 +2,9 @@ import type { TextStyle } from 'react-native';
 
 export const fontFamily = {
   sans: 'Inter',
+  // Friendly rounded headings; loaded in ThemeProvider.
+  heading: 'Nunito-ExtraBold',
+  headingBold: 'Nunito-Bold',
 } as const;
 
 export const fontWeight = {
@@ -13,28 +16,28 @@ export const fontWeight = {
 
 export const typography = {
   displayLg: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.heading,
     fontSize: 34,
     fontWeight: fontWeight.bold,
     lineHeight: 41,
     letterSpacing: 0,
   },
   displayLgMobile: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.heading,
     fontSize: 28,
     fontWeight: fontWeight.bold,
     lineHeight: 34,
     letterSpacing: 0,
   },
   headlineMd: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.heading,
     fontSize: 22,
     fontWeight: fontWeight.semibold,
     lineHeight: 28,
     letterSpacing: 0,
   },
   titleMd: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.headingBold,
     fontSize: 18,
     fontWeight: fontWeight.semibold,
     lineHeight: 24,
@@ -77,7 +80,7 @@ export const typography = {
     textTransform: 'uppercase',
   },
   timer: {
-    fontFamily: fontFamily.sans,
+    fontFamily: fontFamily.heading,
     fontSize: 64,
     fontWeight: fontWeight.bold,
     lineHeight: 64,

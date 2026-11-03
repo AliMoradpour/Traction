@@ -29,8 +29,8 @@ function getGreeting(user: any): string {
 
 function getPriorityColor(theme: any, priority: Task['priority']): string {
   switch (priority) {
-    case 'URGENT': return theme.colors.error || theme.colors.danger;
-    case 'HIGH': return theme.colors.warning || theme.colors.accent;
+    case 'URGENT': return theme.colors.error;
+    case 'HIGH': return theme.colors.warning;
     case 'MEDIUM': return theme.colors.primary;
     case 'LOW': return theme.colors.textMuted;
     default: return theme.colors.textMuted;
@@ -191,7 +191,7 @@ export default function TodayScreen() {
         </View>
       ) : isError ? (
         <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.error || theme.colors.danger }]}>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
             Failed to load tasks
           </Text>
           <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
@@ -218,7 +218,7 @@ export default function TodayScreen() {
                 <View style={styles.headerButtons}>
                   {isBehindSchedule && (
                     <Pressable
-                      style={[styles.replanButton, { backgroundColor: theme.colors.warning || theme.colors.accent }]}
+                      style={[styles.replanButton, { backgroundColor: theme.colors.warning }]}
                       onPress={() => router.push('/(app)/today/replan' as any)}
                     >
                       <Text style={styles.replanButtonText}>Replan Day</Text>

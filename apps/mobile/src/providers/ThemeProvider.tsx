@@ -1,3 +1,4 @@
+import { Nunito_700Bold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -36,6 +37,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       await Font.loadAsync({
         Inter: require('../assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf'),
         'Inter-Italic': require('../assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf'),
+        'Nunito-Bold': Nunito_700Bold,
+        'Nunito-ExtraBold': Nunito_800ExtraBold,
       });
       setFontsLoaded(true);
       await SplashScreen.hideAsync();

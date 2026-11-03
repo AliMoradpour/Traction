@@ -11,28 +11,28 @@ export const shadows = {
     elevation: 0,
   },
   hairline: {
-    shadowColor: '#000000',
+    shadowColor: '#3C2814',
     shadowOpacity: 0.05,
     shadowRadius: 2,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
   card: {
-    shadowColor: '#0F172A',
+    shadowColor: '#3C2814',
     shadowOpacity: 0.03,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
   raised: {
-    shadowColor: '#000000',
+    shadowColor: '#3C2814',
     shadowOpacity: 0.1,
     shadowRadius: 15,
     shadowOffset: { width: 0, height: 10 },
     elevation: 6,
   },
   modal: {
-    shadowColor: '#0F172A',
+    shadowColor: '#3C2814',
     shadowOpacity: 0.08,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 12 },
@@ -42,10 +42,10 @@ export const shadows = {
 
 export const glass = {
   light: {
-    backgroundColor: withOpacity('#FCF8FA', 0.88),
+    backgroundColor: withOpacity('#FAF6F0', 0.96),
   },
   dark: {
-    backgroundColor: withOpacity('#0F172A', 0.9),
+    backgroundColor: withOpacity('#191714', 0.96),
   },
 } as const;
 

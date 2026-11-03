@@ -97,7 +97,7 @@ export default function TaskDetailScreen() {
           <View style={{ width: 60 }} />
         </View>
         <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.error || theme.colors.danger }]}>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
             Task not found
           </Text>
         </View>
