@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { useUser } from '@/hooks/useAuth';
 import { useReadinessScore } from '@/hooks/useExecution';
 import { useCompleteTask,useTasks } from '@/hooks/useTasks';
+import { localDayStartISO } from '@/lib/dates';
 import { Task } from '@/services/task.service';
 import { useTractionTheme } from '@/theme';
 
@@ -116,8 +117,7 @@ export default function TodayScreen() {
   const router = useRouter();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const today = new Date().toISOString().split('T')[0];
-  const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: today });
+  const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: localDayStartISO() });
   const { data: readiness } = useReadinessScore();
   const { data: user } = useUser();
   const completeTask = useCompleteTask();
