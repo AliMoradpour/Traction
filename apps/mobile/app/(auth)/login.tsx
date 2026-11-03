@@ -72,7 +72,7 @@ export default function LoginScreen() {
             />
 
             <Link href="/(auth)/forgot-password" asChild>
-              <Text style={[styles.forgotPassword, { color: theme.colors.primary }]}>
+              <Text style={StyleSheet.flatten([styles.forgotPassword, { color: theme.colors.primary }])}>
                 Forgot Password?
               </Text>
             </Link>
@@ -94,7 +94,7 @@ export default function LoginScreen() {
               Don't have an account?{' '}
             </Text>
             <Link href="/(auth)/register" asChild>
-              <Text style={[styles.footerLink, { color: theme.colors.primary }]}>Sign Up</Text>
+              <Text style={StyleSheet.flatten([styles.footerLink, { color: theme.colors.primary }])}>Sign Up</Text>
             </Link>
           </View>
         </ScrollView>

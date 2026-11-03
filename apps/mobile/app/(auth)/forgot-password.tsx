@@ -99,7 +99,7 @@ export default function ForgotPasswordScreen() {
               Remember your password?{' '}
             </Text>
             <Link href="/(auth)/login" asChild>
-              <Text style={[styles.footerLink, { color: theme.colors.primary }]}>Sign In</Text>
+              <Text style={StyleSheet.flatten([styles.footerLink, { color: theme.colors.primary }])}>Sign In</Text>
             </Link>
           </View>
         </ScrollView>
