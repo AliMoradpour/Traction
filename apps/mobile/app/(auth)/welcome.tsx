@@ -48,32 +48,6 @@ export default function WelcomeScreen() {
             </Button>
           </Link>
         </View>
-
-        <View style={styles.features}>
-          <View style={styles.feature}>
-            <Text style={[styles.featureIcon, { color: theme.colors.accent }]}>🎯</Text>
-            <Text style={[styles.featureTitle, { color: theme.colors.text }]}>Focus Mode</Text>
-            <Text style={[styles.featureDescription, { color: theme.colors.textMuted }]}>
-              Intelligent distraction filtering powered by your biological rhythm.
-            </Text>
-          </View>
-
-          <View style={styles.feature}>
-            <Text style={[styles.featureIcon, { color: theme.colors.accent }]}>📊</Text>
-            <Text style={[styles.featureTitle, { color: theme.colors.text }]}>Deep Metrics</Text>
-            <Text style={[styles.featureDescription, { color: theme.colors.textMuted }]}>
-              Beyond productivity. Track flow state, energy, and velocity.
-            </Text>
-          </View>
-
-          <View style={styles.feature}>
-            <Text style={[styles.featureIcon, { color: theme.colors.accent }]}>✨</Text>
-            <Text style={[styles.featureTitle, { color: theme.colors.text }]}>AI Priority</Text>
-            <Text style={[styles.featureDescription, { color: theme.colors.textMuted }]}>
-              Dynamic re-prioritization of your stack based on intent.
-            </Text>
-          </View>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -112,29 +86,5 @@ const styles = StyleSheet.create({
   },
   actions: {
     gap: 12,
-    marginBottom: 48,
-  },
-  features: {
-    gap: 24,
-  },
-  feature: {
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  featureIcon: {
-    fontSize: 24,
-    marginBottom: 8,
-  },
-  featureTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-    marginBottom: 4,
-  },
-  featureDescription: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 20,
   },
 });
