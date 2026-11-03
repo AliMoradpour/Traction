@@ -49,7 +49,7 @@ export default function OnboardingScreen() {
 
       {step === 0 && (
         <>
-          <Text style={styles.title}>What's your primary goal?</Text>
+          <Text style={styles.title}>What do you mainly want to use Traction for?</Text>
           <View style={styles.optionsGrid}>
             {GOALS.map((g) => (
               <TouchableOpacity key={g} style={[styles.option, goal === g && styles.optionSelected]} onPress={() => setGoal(g)}>
@@ -62,7 +62,7 @@ export default function OnboardingScreen() {
 
       {step === 1 && (
         <>
-          <Text style={styles.title}>Your experience level?</Text>
+          <Text style={styles.title}>How experienced are you with planning your work?</Text>
           <View style={styles.optionsGrid}>
             {LEVELS.map((l) => (
               <TouchableOpacity key={l} style={[styles.option, level === l && styles.optionSelected]} onPress={() => setLevel(l)}>
@@ -75,7 +75,10 @@ export default function OnboardingScreen() {
 
       {step === 2 && (
         <>
-          <Text style={styles.title}>Daily time for tasks?</Text>
+          <Text style={styles.title}>How much focused time do you have on a typical day?</Text>
+          <Text style={styles.subtitle}>
+            Across all your work, not one task. We use it to keep each day&apos;s plan realistic.
+          </Text>
           <View style={styles.optionsGrid}>
             {TIME_OPTIONS.map((t) => (
               <TouchableOpacity key={t} style={[styles.option, dailyTime === t && styles.optionSelected]} onPress={() => setDailyTime(t)}>
@@ -115,6 +118,7 @@ const styles = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2a2a3e' },
   dotActive: { backgroundColor: '#6c63ff' },
   title: { fontSize: 28, fontWeight: '700', color: '#f5f5f5', marginBottom: 32, textAlign: 'center' },
+  subtitle: { fontSize: 15, color: '#888', marginTop: -20, marginBottom: 28, textAlign: 'center', lineHeight: 21 },
   input: { backgroundColor: '#1a1a2e', borderRadius: 12, padding: 16, fontSize: 16, color: '#f5f5f5', marginBottom: 16, borderWidth: 1, borderColor: '#2a2a3e' },
   optionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' },
   option: { paddingVertical: 14, paddingHorizontal: 20, borderRadius: 12, backgroundColor: '#1a1a2e', borderWidth: 1, borderColor: '#2a2a3e', minWidth: '45%' },
