@@ -87,7 +87,7 @@ export default function ForgotPasswordScreen() {
           <Button
             variant="primary"
             size="lg"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => void handleSubmit(onSubmit)()}
             loading={forgotPassword.isPending}
             style={styles.sendButton}
           >

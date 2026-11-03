@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  type TextInputInstance,
   type TextInputProps,
   View,
   type ViewStyle,
@@ -36,7 +37,7 @@ export type InputProps = InputWithControlProps | InputWithoutControlProps;
 
 function InputComponent(
   props: InputProps,
-  ref: React.Ref<TextInput>
+  ref: React.Ref<TextInputInstance>
 ) {
   const {
     control,
@@ -105,7 +106,7 @@ function InputComponent(
   );
 }
 
-const InputInner = forwardRef<TextInput, BaseInputProps>(function InputInner(
+const InputInner = forwardRef<TextInputInstance, BaseInputProps>(function InputInner(
   {
     label,
     error,
@@ -166,7 +167,7 @@ const InputInner = forwardRef<TextInput, BaseInputProps>(function InputInner(
 // Export for backward compatibility - accepts both with and without control/name
 export const Input = forwardRef(function Input(
   props: InputProps,
-  ref: React.Ref<TextInput>
+  ref: React.Ref<TextInputInstance>
 ) {
   return <InputInner {...props} ref={ref} />;
 });

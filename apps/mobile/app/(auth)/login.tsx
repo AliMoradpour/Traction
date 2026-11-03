@@ -81,7 +81,7 @@ export default function LoginScreen() {
           <Button
             variant="primary"
             size="lg"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => void handleSubmit(onSubmit)()}
             loading={loginMutation.isPending}
             disabled={loginMutation.isPending}
             style={styles.loginButton}

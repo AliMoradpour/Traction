@@ -88,7 +88,7 @@ export default function GoalsScreen() {
 
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} />}
       >
         <View style={styles.summarySection}>
           <Text style={[styles.summaryLabel, { color: theme.colors.primary }]}>ACTIVE FOCUS</Text>

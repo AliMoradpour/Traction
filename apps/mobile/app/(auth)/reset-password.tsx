@@ -108,7 +108,7 @@ export default function ResetPasswordScreen() {
           <Button
             variant="primary"
             size="lg"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => void handleSubmit(onSubmit)()}
             loading={resetPassword.isPending}
             style={styles.resetButton}
           >

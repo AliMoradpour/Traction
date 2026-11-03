@@ -70,7 +70,7 @@ export default function ResistanceScreen() {
         <ScrollView
           contentContainerStyle={styles.content}
           refreshControl={
-            <RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={theme.colors.primary} />
+            <RefreshControl refreshing={false} onRefresh={() => void refetch()} tintColor={theme.colors.primary} />
           }
         >
           <Animated.View style={{ opacity: fadeAnim }}>

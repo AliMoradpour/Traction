@@ -19,7 +19,13 @@ const config: ExpoConfig = {
     },
     package: 'com.traction.app',
   },
-  plugins: ['expo-router', 'expo-font'],
+  plugins: [
+    'expo-router',
+    'expo-font',
+    'expo-secure-store',
+    'expo-splash-screen',
+    'expo-status-bar',
+  ],
   experiments: {
     typedRoutes: true,
   },

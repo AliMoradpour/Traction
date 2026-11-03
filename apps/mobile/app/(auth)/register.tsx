@@ -105,7 +105,7 @@ export default function RegisterScreen() {
           <Button
             variant="primary"
             size="lg"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => void handleSubmit(onSubmit)()}
             loading={registerMutation.isPending}
             disabled={registerMutation.isPending}
             style={styles.registerButton}

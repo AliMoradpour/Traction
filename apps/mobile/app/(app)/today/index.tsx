@@ -250,7 +250,7 @@ export default function TodayScreen() {
             </View>
           }
           contentContainerStyle={styles.content}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} tintColor={theme.colors.primary} />}
+          refreshControl={<RefreshControl refreshing={false} onRefresh={() => void refetch()} tintColor={theme.colors.primary} />}
         />
       )}
 
