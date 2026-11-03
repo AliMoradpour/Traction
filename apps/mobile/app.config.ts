@@ -15,7 +15,7 @@ const config: ExpoConfig = {
   android: {
     adaptiveIcon: {
       foregroundImage: './src/assets/logos/adaptive-icon.png',
-      backgroundColor: '#0F172A',
+      backgroundColor: '#101729',
     },
     package: 'com.traction.app',
   },

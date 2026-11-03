@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
-import { Animated,StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 
 import { useTractionTheme } from '@/theme';
 
@@ -43,11 +43,8 @@ export default function SplashScreen() {
           },
         ]}
       >
-        <View style={styles.logoMark}>
-          <View style={styles.logoShape}>
-            <View style={styles.logoInner} />
-          </View>
-        </View>
+        <Image source={require('@/assets/logos/logo-mark.png')} style={styles.logoMark} />
+
         <Text style={styles.brandName}>Traction</Text>
       </Animated.View>
 
@@ -69,25 +66,8 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   logoMark: {
-    width: 48,
-    height: 48,
-  },
-  logoShape: {
-    width: '100%',
-    height: '100%',
-    borderWidth: 3.5,
-    borderColor: '#FFFFFF',
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  logoInner: {
-    position: 'absolute',
-    bottom: -2,
-    left: -2,
-    width: '60%',
-    height: '60%',
-    backgroundColor: '#3B82F6',
-    borderTopRightRadius: 8,
+    width: 88,
+    height: 88,
   },
   brandName: {
     fontSize: 34,

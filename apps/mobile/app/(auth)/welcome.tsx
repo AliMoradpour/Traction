@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
-import { useEffect,useRef } from 'react';
-import { Animated, Pressable,StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
@@ -22,15 +22,13 @@ export default function WelcomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.content}>
         <Animated.View style={[styles.header, { opacity: fadeAnim }]}>
-          <View style={[styles.brandMark, { backgroundColor: theme.colors.primary }]}>
-            <View style={styles.logoShape}>
-              <View style={styles.logoInner} />
-            </View>
-          </View>
+          <Image
+            source={require('@/assets/logos/logo-mark.png')}
+            style={styles.brandMark}
+            accessibilityLabel="Traction"
+          />
 
-          <Text style={[styles.title, { color: theme.colors.text }]}>
-            Execute with intent.
-          </Text>
+          <Text style={[styles.title, { color: theme.colors.text }]}>Execute with intent.</Text>
 
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
             The behavioral operating system for meaningful work.
@@ -95,29 +93,9 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   brandMark: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 72,
+    height: 72,
     marginBottom: 24,
-  },
-  logoShape: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  logoInner: {
-    position: 'absolute',
-    bottom: -1,
-    left: -1,
-    width: '60%',
-    height: '60%',
-    backgroundColor: '#3B82F6',
-    borderTopRightRadius: 4,
   },
   title: {
     fontSize: 32,
