@@ -29,6 +29,18 @@ export interface ExecutionStats {
   planningAccuracy: number;
 }
 
+interface ExecutionStatsResponse {
+  totalTasksCompleted: number;
+  weeklyTasksCompleted: number;
+  dailyTasksCompleted: number;
+  totalFocusTime: number;
+  weeklyFocusTime: number;
+  dailyFocusTime: number;
+  averageSessionDuration: number;
+  completionReliability: number;
+  planningAccuracy: number;
+}
+
 export const executionService = {
   getReadiness: async (): Promise<ReadinessScore> => {
     const response = await apiClient.get(endpoints.execution.readiness);
@@ -46,7 +58,19 @@ export const executionService = {
   },
 
   getStats: async (): Promise<ExecutionStats> => {
-    const response = await apiClient.get(endpoints.execution.stats);
-    return response.data;
+    const response = await apiClient.get<ExecutionStatsResponse>(endpoints.execution.stats);
+    const s = response.data;
+    // The API returns flat totals (focus time in minutes, average session in seconds).
+    return {
+      tasksCompleted: {
+        allTime: s.totalTasksCompleted,
+        thisWeek: s.weeklyTasksCompleted,
+        today: s.dailyTasksCompleted,
+      },
+      focusTime: { allTime: s.totalFocusTime, thisWeek: s.weeklyFocusTime, today: s.dailyFocusTime },
+      averageFocusDuration: Math.round(s.averageSessionDuration / 60),
+      completionReliability: s.completionReliability,
+      planningAccuracy: s.planningAccuracy,
+    };
   },
 };
