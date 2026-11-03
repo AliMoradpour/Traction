@@ -164,13 +164,8 @@ const InputInner = forwardRef<TextInputInstance, BaseInputProps>(function InputI
   );
 });
 
-// Export for backward compatibility - accepts both with and without control/name
-export const Input = forwardRef(function Input(
-  props: InputProps,
-  ref: React.Ref<TextInputInstance>
-) {
-  return <InputInner {...props} ref={ref} />;
-});
+// Accepts both with and without control/name; with them, the field is bound to react-hook-form.
+export const Input = forwardRef(InputComponent);
 
 function createStyles(theme: TractionTheme) {
   return StyleSheet.create({
