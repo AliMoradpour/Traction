@@ -59,6 +59,9 @@ export default function LoginScreen() {
               placeholder="alex@traction.ai"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="username"
               error={errors.email?.message}
             />
 
@@ -68,6 +71,8 @@ export default function LoginScreen() {
               label="Password"
               placeholder="••••••••"
               secureTextEntry
+              autoComplete="current-password"
+              textContentType="password"
               error={errors.password?.message}
             />
 

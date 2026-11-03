@@ -80,6 +80,9 @@ export default function ForgotPasswordScreen() {
               placeholder="alex@traction.ai"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="username"
               error={errors.email?.message}
             />
           </View>

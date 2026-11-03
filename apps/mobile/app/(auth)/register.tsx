@@ -70,6 +70,8 @@ export default function RegisterScreen() {
               label="Name"
               placeholder="Enter your name"
               autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
               error={errors.name?.message}
             />
 
@@ -80,6 +82,9 @@ export default function RegisterScreen() {
               placeholder="alex@traction.ai"
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="username"
               error={errors.email?.message}
             />
 
@@ -89,6 +94,8 @@ export default function RegisterScreen() {
               label="Password"
               placeholder="Create a password"
               secureTextEntry
+              autoComplete="new-password"
+              textContentType="newPassword"
               error={errors.password?.message}
             />
 
@@ -98,6 +105,8 @@ export default function RegisterScreen() {
               label="Confirm Password"
               placeholder="Confirm your password"
               secureTextEntry
+              autoComplete="new-password"
+              textContentType="newPassword"
               error={errors.confirmPassword?.message}
             />
           </View>

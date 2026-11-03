@@ -92,6 +92,8 @@ export default function ResetPasswordScreen() {
               label="New Password"
               placeholder="Create a new password"
               secureTextEntry
+              autoComplete="new-password"
+              textContentType="newPassword"
               error={errors.password?.message}
             />
 
@@ -101,6 +103,8 @@ export default function ResetPasswordScreen() {
               label="Confirm New Password"
               placeholder="Confirm your new password"
               secureTextEntry
+              autoComplete="new-password"
+              textContentType="newPassword"
               error={errors.confirmPassword?.message}
             />
           </View>
