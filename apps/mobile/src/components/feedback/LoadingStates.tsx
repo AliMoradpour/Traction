@@ -1,12 +1,16 @@
 import { ActivityIndicator, StyleSheet,Text, View } from 'react-native';
 
+import { useTractionTheme } from '@/theme';
+
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
   color?: string;
   message?: string;
 }
 
-export function LoadingSpinner({ size = 'large', color = '#6366F1', message }: LoadingSpinnerProps) {
+export function LoadingSpinner({ size = 'large', color: colorProp, message }: LoadingSpinnerProps) {
+  const theme = useTractionTheme();
+  const color = colorProp ?? theme.colors.accent;
   return (
     <View style={styles.container}>
       <ActivityIndicator size={size} color={color} />
@@ -20,11 +24,12 @@ interface LoadingOverlayProps {
 }
 
 export function LoadingOverlay({ message = 'Loading...' }: LoadingOverlayProps) {
+  const theme = useTractionTheme();
   return (
-    <View style={styles.overlay}>
-      <View style={styles.overlayContent}>
-        <ActivityIndicator size="large" color="#FFFFFF" />
-        <Text style={styles.overlayMessage}>{message}</Text>
+    <View style={[styles.overlay, { backgroundColor: theme.colors.scrim }]}>
+      <View style={[styles.overlayContent, { backgroundColor: theme.colors.surface }]}>
+        <ActivityIndicator size="large" color={theme.colors.accent} />
+        <Text style={[styles.overlayMessage, { color: theme.colors.text }]}>{message}</Text>
       </View>
     </View>
   );
@@ -64,8 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   overlayContent: {
-    backgroundColor: '#1E293B',
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 24,
     alignItems: 'center',
   },

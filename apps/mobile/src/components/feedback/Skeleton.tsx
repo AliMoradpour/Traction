@@ -1,5 +1,13 @@
 import { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { Animated, StyleSheet,View } from 'react-native';
+
+import { useTractionTheme } from '@/theme';
+
+function SkeletonCard({ children }: { children: ReactNode }) {
+  const theme = useTractionTheme();
+  return <View style={[styles.card, { backgroundColor: theme.colors.surface }]}>{children}</View>;
+}
 
 interface SkeletonProps {
   width?: number | string;
@@ -9,6 +17,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width = '100%', height = 20, borderRadius = 4, style }: SkeletonProps) {
+  const theme = useTractionTheme();
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -37,7 +46,7 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 4, style 
           width,
           height,
           borderRadius,
-          backgroundColor: '#E2E8F0',
+          backgroundColor: theme.colors.surfaceMuted,
           opacity,
         },
         style,
@@ -48,7 +57,7 @@ export function Skeleton({ width = '100%', height = 20, borderRadius = 4, style 
 
 export function TaskCardSkeleton() {
   return (
-    <View style={styles.card}>
+    <SkeletonCard>
       <View style={styles.cardHeader}>
         <Skeleton width={40} height={40} borderRadius={20} />
         <View style={styles.cardContent}>
@@ -60,13 +69,13 @@ export function TaskCardSkeleton() {
         <Skeleton width={60} height={24} borderRadius={12} />
         <Skeleton width={80} height={24} borderRadius={12} />
       </View>
-    </View>
+    </SkeletonCard>
   );
 }
 
 export function GoalCardSkeleton() {
   return (
-    <View style={styles.card}>
+    <SkeletonCard>
       <Skeleton width="100%" height={16} />
       <Skeleton width="60%" height={12} style={{ marginTop: 8 }} />
       <View style={styles.progressBar}>
@@ -76,18 +85,18 @@ export function GoalCardSkeleton() {
         <Skeleton width={40} height={40} borderRadius={20} />
         <Skeleton width={100} height={12} />
       </View>
-    </View>
+    </SkeletonCard>
   );
 }
 
 export function InsightCardSkeleton() {
   return (
-    <View style={styles.card}>
+    <SkeletonCard>
       <Skeleton width={32} height={32} borderRadius={8} />
       <Skeleton width="80%" height={16} style={{ marginTop: 12 }} />
       <Skeleton width="100%" height={12} style={{ marginTop: 8 }} />
       <Skeleton width="90%" height={12} style={{ marginTop: 4 }} />
-    </View>
+    </SkeletonCard>
   );
 }
 
@@ -103,8 +112,7 @@ export function ListSkeleton({ count = 3 }: { count?: number }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
     marginBottom: 12,
   },

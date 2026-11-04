@@ -98,7 +98,7 @@ function createStyles(theme: TractionTheme) {
   return StyleSheet.create({
     base: {
       alignItems: 'center',
-      borderRadius: theme.radius.md,
+      borderRadius: theme.radius.full,
       flexDirection: 'row',
       gap: theme.spacing.sm,
       justifyContent: 'center',
@@ -113,7 +113,7 @@ function createStyles(theme: TractionTheme) {
       paddingVertical: theme.spacing.sm,
     },
     md: {
-      minHeight: theme.spacing.controlHeightMd,
+      minHeight: 52,
       paddingHorizontal: theme.spacing.lg,
       paddingVertical: 14,
     },
@@ -129,7 +129,7 @@ function createStyles(theme: TractionTheme) {
     },
     secondary: {
       backgroundColor: theme.colors.surfaceSoft,
-      borderColor: theme.colors.borderMuted,
+      borderColor: theme.colors.surfaceSoft,
       borderWidth: 1,
     },
     ghost: {
@@ -144,14 +144,16 @@ function createStyles(theme: TractionTheme) {
     },
     disabled: {
       backgroundColor: theme.colors.disabled,
-      borderColor: theme.colors.borderMuted,
-      opacity: 0.72,
+      borderColor: theme.colors.disabled,
     },
     pressed: {
+      opacity: 0.88,
       transform: [{ scale: 0.98 }],
     },
     text: {
-      ...theme.typography.labelSm,
+      ...theme.typography.bodyMd,
+      fontSize: 16,
+      fontWeight: '600',
       textAlign: 'center',
     },
     primaryText: {
