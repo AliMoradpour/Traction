@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import {
+  Platform,
   type StyleProp,
   StyleSheet,
   Text,
@@ -205,6 +206,8 @@ function createStyles(theme: TractionTheme) {
       flex: 1,
       minHeight: theme.spacing.controlHeightLg,
       paddingVertical: 0,
+      // The shell already shows focus; hide the browser's own outline on web.
+      ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : null),
     },
     accessory: {
       alignItems: 'center',

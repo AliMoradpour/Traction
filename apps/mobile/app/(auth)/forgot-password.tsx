@@ -1,19 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text } from 'react-native';
 
 import { getErrorMessage } from '@/api/errors';
+import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useForgotPassword } from '@/hooks/useAuth';
-import { type ForgotPasswordFormData,forgotPasswordSchema } from '@/lib/validations';
+import { type ForgotPasswordFormData, forgotPasswordSchema } from '@/lib/validations';
 import { useTractionTheme } from '@/theme';
 
 export default function ForgotPasswordScreen() {
   const theme = useTractionTheme();
+  const router = useRouter();
   const forgotPassword = useForgotPassword();
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -32,145 +33,65 @@ export default function ForgotPasswordScreen() {
     forgotPassword.mutate(data, {
       onSuccess: () => setIsSuccess(true),
       onError: (error) => {
-        Alert.alert('Error', getErrorMessage(error) || 'Failed to send reset email. Please try again.');
+        Alert.alert("Couldn't send the link", getErrorMessage(error) || 'Please try again in a moment.');
       },
     });
   };
 
   if (isSuccess) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.content}>
-          <View style={[styles.successIcon, { backgroundColor: theme.colors.successSurface }]}>
-            <Text style={{ fontSize: 32 }}>✉️</Text>
-          </View>
-          <Text style={[styles.title, { color: theme.colors.text }]}>Check Your Email</Text>
-          <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-            If an account exists with that email, you'll receive a password reset link shortly.
-          </Text>
-          <Link href="/(auth)/login" asChild>
-            <Button variant="primary" size="lg" style={styles.backButton}>
-              Back to Sign In
-            </Button>
-          </Link>
-        </View>
-      </SafeAreaView>
+      <AuthLayout
+        title="Check your email"
+        subtitle="If there's an account with that email, a reset link is on its way."
+      >
+        <Button variant="primary" size="lg" onPress={() => router.replace('/(auth)/login')}>
+          Back to sign in
+        </Button>
+      </AuthLayout>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <AuthLayout
+      title="Forgot your password?"
+      subtitle="No problem. We'll email you a link to set a new one."
+      footer={
+        <>
+          <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>Remembered it? </Text>
+          <Link href="/(auth)/login" asChild>
+            <Text style={StyleSheet.flatten([styles.link, { color: theme.colors.primary }])}>Sign in</Text>
+          </Link>
+        </>
+      }
+    >
+      <Input
+        control={control}
+        name="email"
+        label="Email"
+        placeholder="you@example.com"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        textContentType="username"
+        error={errors.email?.message}
+      />
+
+      <Button
+        variant="primary"
+        size="lg"
+        onPress={() => void handleSubmit(onSubmit)()}
+        loading={forgotPassword.isPending}
+        style={styles.submit}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>Reset Password</Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-              Enter your email and we'll send you a link to reset your password
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            <Input
-              control={control}
-              name="email"
-              label="Email"
-              placeholder="alex@traction.ai"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="email"
-              textContentType="username"
-              error={errors.email?.message}
-            />
-          </View>
-
-          <Button
-            variant="primary"
-            size="lg"
-            onPress={() => void handleSubmit(onSubmit)()}
-            loading={forgotPassword.isPending}
-            style={styles.sendButton}
-          >
-            Send Reset Link
-          </Button>
-
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
-              Remember your password?{' '}
-            </Text>
-            <Link href="/(auth)/login" asChild>
-              <Text style={StyleSheet.flatten([styles.footerLink, { color: theme.colors.primary }])}>Sign In</Text>
-            </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        Send reset link
+      </Button>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-    letterSpacing: -0.01,
-  },
-  subtitle: {
-    fontSize: 15,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  form: {
-    gap: 16,
-    marginBottom: 24,
-  },
-  sendButton: {
-    marginBottom: 32,
-  },
-  successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  backButton: {
-    marginTop: 24,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  footerText: {
-    fontSize: 15,
-  },
-  footerLink: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  link: { fontSize: 15, fontWeight: '600' },
+  submit: { marginTop: 8 },
+  footerText: { fontSize: 15 },
 });

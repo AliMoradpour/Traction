@@ -1,19 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { Link } from 'expo-router';
 import { useForm } from 'react-hook-form';
-import { Alert,KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, StyleSheet, Text } from 'react-native';
 
+import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useLogin } from '@/hooks/useAuth';
-import { type LoginFormData,loginSchema } from '@/lib/validations';
+import { type LoginFormData, loginSchema } from '@/lib/validations';
 import { useTractionTheme } from '@/theme';
 
 export default function LoginScreen() {
   const theme = useTractionTheme();
-  const router = useRouter();
   const loginMutation = useLogin();
 
   const {
@@ -31,131 +29,72 @@ export default function LoginScreen() {
   const onSubmit = (data: LoginFormData) => {
     loginMutation.mutate(data, {
       onError: (error: any) => {
-        const message = error?.error?.message || error?.message || 'Login failed';
-        Alert.alert('Login Failed', message);
+        const message = error?.error?.message || error?.message || 'Check your email and password and try again.';
+        Alert.alert("Couldn't sign in", message);
       },
     });
   };
 
+  const link = StyleSheet.flatten([styles.link, { color: theme.colors.primary }]);
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Good to see you again."
+      footer={
+        <>
+          <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>New to Traction? </Text>
+          <Link href="/(auth)/register" asChild>
+            <Text style={link}>Create an account</Text>
+          </Link>
+        </>
+      }
+    >
+      <Input
+        control={control}
+        name="email"
+        label="Email"
+        placeholder="you@example.com"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoComplete="email"
+        textContentType="username"
+        error={errors.email?.message}
+      />
+
+      <Input
+        control={control}
+        name="password"
+        label="Password"
+        placeholder="Your password"
+        secureTextEntry
+        autoComplete="current-password"
+        textContentType="password"
+        error={errors.password?.message}
+      />
+
+      <Link href="/(auth)/forgot-password" asChild>
+        <Text style={StyleSheet.flatten([link, styles.forgot])}>Forgot password?</Text>
+      </Link>
+
+      <Button
+        variant="primary"
+        size="lg"
+        onPress={() => void handleSubmit(onSubmit)()}
+        loading={loginMutation.isPending}
+        disabled={loginMutation.isPending}
+        style={styles.submit}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: theme.colors.text }]}>Welcome Back</Text>
-            <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
-              Reduce the noise. Reclaim your focus.
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            <Input
-              control={control}
-              name="email"
-              label="Email"
-              placeholder="alex@traction.ai"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="email"
-              textContentType="username"
-              error={errors.email?.message}
-            />
-
-            <Input
-              control={control}
-              name="password"
-              label="Password"
-              placeholder="••••••••"
-              secureTextEntry
-              autoComplete="current-password"
-              textContentType="password"
-              error={errors.password?.message}
-            />
-
-            <Link href="/(auth)/forgot-password" asChild>
-              <Text style={StyleSheet.flatten([styles.forgotPassword, { color: theme.colors.primary }])}>
-                Forgot Password?
-              </Text>
-            </Link>
-          </View>
-
-          <Button
-            variant="primary"
-            size="lg"
-            onPress={() => void handleSubmit(onSubmit)()}
-            loading={loginMutation.isPending}
-            disabled={loginMutation.isPending}
-            style={styles.loginButton}
-          >
-            Sign In
-          </Button>
-
-          <View style={styles.footer}>
-            <Text style={[styles.footerText, { color: theme.colors.textMuted }]}>
-              Don't have an account?{' '}
-            </Text>
-            <Link href="/(auth)/register" asChild>
-              <Text style={StyleSheet.flatten([styles.footerLink, { color: theme.colors.primary }])}>Sign Up</Text>
-            </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        Sign in
+      </Button>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 20,
-    justifyContent: 'center',
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    marginBottom: 8,
-    letterSpacing: -0.01,
-  },
-  subtitle: {
-    fontSize: 15,
-    textAlign: 'center',
-  },
-  form: {
-    gap: 16,
-    marginBottom: 24,
-  },
-  forgotPassword: {
-    fontSize: 13,
-    fontWeight: '500',
-    textAlign: 'right',
-    marginTop: 4,
-  },
-  loginButton: {
-    marginBottom: 32,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  footerText: {
-    fontSize: 15,
-  },
-  footerLink: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  link: { fontSize: 15, fontWeight: '600' },
+  forgot: { textAlign: 'right', fontSize: 14 },
+  submit: { marginTop: 8 },
+  footerText: { fontSize: 15 },
 });
