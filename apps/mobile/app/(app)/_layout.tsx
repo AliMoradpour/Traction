@@ -1,73 +1,55 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
-import { Text } from 'react-native';
 
 import { FeedbackWidget } from '@/components/FeedbackWidget';
-import { GoalsIcon, InsightsIcon, ProfileIcon,TodayIcon } from '@/components/icons';
+import { FocusIcon, GoalsIcon, ProfileIcon, ProgressIcon, TodayIcon } from '@/components/icons';
 import { useTractionTheme } from '@/theme';
 
 export default function AppLayout() {
   const theme = useTractionTheme();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: theme.colors.accent as string,
-          tabBarInactiveTintColor: theme.colors.textSubtle as string,
+          tabBarActiveTintColor: theme.colors.primary,
+          tabBarInactiveTintColor: theme.colors.textSubtle,
           tabBarStyle: {
-            backgroundColor: theme.colors.surfaceOverlay,
-            borderTopColor: theme.colors.borderMuted,
+            backgroundColor: theme.colors.background,
+            borderTopColor: theme.colors.border,
           },
           tabBarLabelStyle: {
             fontSize: 11,
             fontWeight: '600',
           },
+          sceneStyle: { backgroundColor: theme.colors.background },
         }}
       >
         <Tabs.Screen
           name="today"
-          options={{
-            title: 'Today',
-            tabBarIcon: ({ color, size }) => <TodayIcon color={color as string} size={size} />,
-          }}
+          options={{ title: 'Today', tabBarIcon: (props) => <TodayIcon {...props} /> }}
         />
         <Tabs.Screen
           name="goals"
-          options={{
-            title: 'Goals',
-            tabBarIcon: ({ color, size }) => <GoalsIcon color={color as string} size={size} />,
-          }}
+          options={{ title: 'Goals', tabBarIcon: (props) => <GoalsIcon {...props} /> }}
         />
         <Tabs.Screen
-          name="insights"
-          options={{
-            title: 'Insights',
-            tabBarIcon: ({ color, size }) => <InsightsIcon color={color as string} size={size} />,
-          }}
+          name="focus-start"
+          options={{ title: 'Focus', tabBarIcon: (props) => <FocusIcon {...props} /> }}
         />
         <Tabs.Screen
-          name="behavior"
-          options={{
-            title: 'Behavior',
-            tabBarIcon: ({ color, size }) => <Text style={{ fontSize: size, color }}>🧠</Text>,
-          }}
-        />
-        <Tabs.Screen
-          name="execution"
-          options={{
-            title: 'Execution',
-            tabBarIcon: ({ color, size }) => <Text style={{ fontSize: size, color }}>⚡</Text>,
-          }}
+          name="progress"
+          options={{ title: 'Progress', tabBarIcon: (props) => <ProgressIcon {...props} /> }}
         />
         <Tabs.Screen
           name="profile"
-          options={{
-            title: 'Profile',
-            tabBarIcon: ({ color, size }) => <ProfileIcon color={color as string} size={size} />,
-          }}
+          options={{ title: 'You', tabBarIcon: (props) => <ProfileIcon {...props} /> }}
         />
+        {/* Detail areas opened from Progress; kept as routes but not shown in the tab bar. */}
+        <Tabs.Screen name="insights" options={{ href: null }} />
+        <Tabs.Screen name="behavior" options={{ href: null }} />
+        <Tabs.Screen name="execution" options={{ href: null }} />
       </Tabs>
       <FeedbackWidget />
     </View>
