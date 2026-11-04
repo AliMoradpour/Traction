@@ -56,7 +56,6 @@ function RootLayoutNav() {
 
     const seg0 = segments[0] as string;
     const inAuthGroup = seg0?.startsWith('(auth)') ?? false;
-    const inOnboardingGroup = seg0?.startsWith('(onboarding)') ?? false;
     const isIndex = segments.length <= 1;
     // Post-signup screens live in (auth) but are shown to authenticated users; don't bounce them.
     // Register and login navigate on their own once signed in (register goes to onboarding),
@@ -65,7 +64,7 @@ function RootLayoutNav() {
       (s) => s === 'welcome-intro' || s === 'onboarding' || s === 'register' || s === 'login',
     );
 
-    if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup && !isIndex) {
+    if (!isAuthenticated && !inAuthGroup && !isIndex) {
       router.replace('/(auth)/login');
     } else if (isAuthenticated && inAuthGroup && !isPostSignupRoute) {
       router.replace('/(app)/today');
@@ -77,9 +76,6 @@ function RootLayoutNav() {
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(app)" options={{ headerShown: false }} />
       <Stack.Screen name="(admin)" options={{ headerShown: false, presentation: 'modal' }} />
-      <Stack.Screen name="(modals)" options={{ presentation: 'modal', headerShown: false }} />
-      <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-      <Stack.Screen name="tasks" options={{ headerShown: false }} />
       <Stack.Screen name="focus" options={{ headerShown: false }} />
       <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
