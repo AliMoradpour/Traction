@@ -59,8 +59,10 @@ function RootLayoutNav() {
     const inOnboardingGroup = seg0?.startsWith('(onboarding)') ?? false;
     const isIndex = segments.length <= 1;
     // Post-signup screens live in (auth) but are shown to authenticated users; don't bounce them.
+    // Register and login navigate on their own once signed in (register goes to onboarding),
+    // so redirecting from them here would race that navigation and skip onboarding.
     const isPostSignupRoute = (segments as string[]).some(
-      (s) => s === 'welcome-intro' || s === 'onboarding',
+      (s) => s === 'welcome-intro' || s === 'onboarding' || s === 'register' || s === 'login',
     );
 
     if (!isAuthenticated && !inAuthGroup && !inOnboardingGroup && !isIndex) {
