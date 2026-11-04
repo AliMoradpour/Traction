@@ -1,626 +1,230 @@
-import { useLocalSearchParams,useRouter } from 'expo-router';
-import { useState } from 'react';
-import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
-import { Button } from '@/components/ui/Button';
-import { ProgressBar } from '@/components/ui/ProgressBar';
+import {
+  BodyText,
+  Card,
+  EmptyHint,
+  Group,
+  IconButton,
+  Page,
+  Pill,
+  ProgressBar,
+  Row,
+  SectionTitle,
+} from '@/components/calm';
 import { useArchiveGoal, useDeleteGoal, useGoal, useGoalMilestones } from '@/hooks/useGoals';
-import { useCompleteTask,useTasks } from '@/hooks/useTasks';
+import { useCompleteTask, useTasks } from '@/hooks/useTasks';
+import { daysLeftLabel, GOAL_HEALTH, GOAL_TYPES } from '@/lib/goalLabels';
 import { useTractionTheme } from '@/theme';
 
-const HEALTH_COLORS: Record<string, string> = {
-  ON_TRACK: '#10B981',
-  SLIGHTLY_BEHIND: '#F59E0B',
-  BEHIND_SCHEDULE: '#F97316',
-  RECOVERY_NEEDED: '#EF4444',
-  AT_RISK: '#EF4444',
-};
-
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  ACTIVE: { bg: '#DBEAFE', text: '#1D4ED8' },
-  COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
-  PAUSED: { bg: '#FEF3C7', text: '#92400E' },
-  ARCHIVED: { bg: '#F3F4F6', text: '#374151' },
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  IELTS: '#3B82F6',
-  PROGRAMMING: '#8B5CF6',
-  FITNESS: '#10B981',
-  SAVINGS: '#F59E0B',
-  CUSTOM: '#6B7280',
-};
-
-function formatDate(dateString?: string): string {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-function getDaysRemaining(targetDate?: string): number | null {
-  if (!targetDate) return null;
-  const target = new Date(targetDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function getProgressTone(progress: number): 'accent' | 'success' | 'warning' | 'danger' {
-  if (progress >= 100) return 'success';
-  if (progress >= 70) return 'accent';
-  if (progress >= 40) return 'warning';
-  return 'danger';
+function formatDate(date?: string): string | null {
+  if (!date) return null;
+  return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 export default function GoalDetailScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
-
   const { data: goal, isLoading, isError } = useGoal(goalId || '');
-  const deleteGoal = useDeleteGoal();
-  const archiveGoal = useArchiveGoal();
   const { data: milestones } = useGoalMilestones(goalId || '');
   const { data: linkedTasks } = useTasks({ goalId: goalId || undefined });
+  const deleteGoal = useDeleteGoal();
+  const archiveGoal = useArchiveGoal();
   const completeTask = useCompleteTask();
 
-  const [showMilestones, setShowMilestones] = useState(false);
-  const [showLinkedTasks, setShowLinkedTasks] = useState(false);
+  const go = (path: string) => router.push(path as Href);
 
   const handleDelete = () => {
     if (!goalId) return;
-    Alert.alert('Delete Goal', 'Are you sure you want to delete this goal? This action cannot be undone.', [
+    Alert.alert('Delete this goal?', "Its steps stay in your task list. This can't be undone.", [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
+        onPress: () =>
           deleteGoal.mutate(goalId, {
-            onSuccess: () => router.back(),
-            onError: (error: any) => Alert.alert('Error', error?.message || 'Failed to delete goal'),
-          });
-        },
+            onSuccess: () => router.replace('/(app)/goals'),
+            onError: (error: any) => Alert.alert("Couldn't delete the goal", error?.message || 'Please try again.'),
+          }),
       },
     ]);
   };
 
   const handleArchive = () => {
     if (!goalId) return;
-    Alert.alert('Archive Goal', 'Are you sure you want to archive this goal?', [
+    Alert.alert('Archive this goal?', 'It moves out of your list but nothing is deleted.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Archive',
-        style: 'destructive',
-        onPress: () => {
+        onPress: () =>
           archiveGoal.mutate(goalId, {
-            onSuccess: () => Alert.alert('Success', 'Goal archived'),
-            onError: (error: any) => Alert.alert('Error', error?.message || 'Failed to archive goal'),
-          });
-        },
+            onSuccess: () => router.replace('/(app)/goals'),
+            onError: (error: any) => Alert.alert("Couldn't archive the goal", error?.message || 'Please try again.'),
+          }),
       },
     ]);
   };
 
-  if (isLoading) {
+  if (isLoading || isError || !goal) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
-      </SafeAreaView>
+      <Page title={isLoading ? '' : 'Goal'}>
+        {isLoading ? (
+          <ActivityIndicator color={theme.colors.accent} style={{ marginTop: 32 }} />
+        ) : (
+          <EmptyHint icon="cloud-offline-outline" title="We couldn't load this goal" text="Go back and try again." />
+        )}
+      </Page>
     );
   }
 
-  if (isError || !goal) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()}>
-            <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
-          </Pressable>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Goal Details</Text>
-          <View style={{ width: 60 }} />
-        </View>
-        <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.danger }]}>Goal not found</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const daysRemaining = getDaysRemaining(goal.targetDate);
-  const healthColor = HEALTH_COLORS[goal.health] || '#6B7280';
-  const statusStyle = STATUS_COLORS[goal.status] || STATUS_COLORS.ACTIVE;
-  const typeColor = TYPE_COLORS[goal.type] || TYPE_COLORS.CUSTOM;
-  const completedMilestones = milestones?.filter((m) => m.status === 'COMPLETED').length || 0;
-  const totalMilestones = milestones?.length || 0;
+  const type = GOAL_TYPES[goal.type] ?? GOAL_TYPES.CUSTOM;
+  const health = GOAL_HEALTH[goal.health] ?? GOAL_HEALTH.ON_TRACK;
+  const isBehind = health.tone !== 'sage';
+  const steps = [...(linkedTasks ?? [])].sort(
+    (a, b) => Number(a.status === 'COMPLETED') - Number(b.status === 'COMPLETED'),
+  );
+  const doneMilestones = milestones?.filter((m) => m.status === 'COMPLETED').length ?? 0;
+  const daysLeft = daysLeftLabel(goal.targetDate);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Goal Details</Text>
-        <Pressable onPress={() => router.push(`/(app)/goals/${goalId}/edit` as any)}>
-          <Text style={[styles.editButton, { color: theme.colors.primary }]}>Edit</Text>
-        </Pressable>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.titleSection}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>{goal.title}</Text>
-          <View style={[styles.typeBadge, { backgroundColor: typeColor }]}>
-            <Text style={styles.typeText}>{goal.type}</Text>
-          </View>
-        </View>
-
-        <View style={styles.progressSection}>
-          <View style={styles.progressHeader}>
-            <Text style={[styles.progressLabel, { color: theme.colors.textMuted }]}>Progress</Text>
-            <Text style={[styles.progressValue, { color: theme.colors.text }]}>{goal.progress}%</Text>
-          </View>
-          <ProgressBar value={goal.progress} tone={getProgressTone(goal.progress)} height={8} />
-        </View>
-
-        <View style={styles.badgesRow}>
-          <View style={[styles.badge, { backgroundColor: statusStyle.bg }]}>
-            <View style={[styles.badgeDot, { backgroundColor: statusStyle.text }]} />
-            <Text style={[styles.badgeText, { color: statusStyle.text }]}>{goal.status}</Text>
-          </View>
-          <View style={[styles.badge, { backgroundColor: healthColor + '20' }]}>
-            <View style={[styles.badgeDot, { backgroundColor: healthColor }]} />
-            <Text style={[styles.badgeText, { color: healthColor }]}>
-              {goal.health.replace(/_/g, ' ')}
+    <Page
+      title={goal.title}
+      action={
+        <IconButton icon="create-outline" label="Edit goal" onPress={() => go(`/(app)/goals/${goalId}/edit`)} />
+      }
+    >
+      <Card>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Ionicons name={type.icon} size={16} color={theme.colors.textMuted} />
+            <Text style={{ ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textMuted }}>
+              {type.label}
             </Text>
           </View>
+          <Pill label={health.label} tone={health.tone} />
         </View>
-
-        {goal.description ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>DESCRIPTION</Text>
-            <Text style={[styles.description, { color: theme.colors.text }]}>{goal.description}</Text>
-          </View>
-        ) : null}
-
-        {goal.category ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>CATEGORY</Text>
-            <Text style={[styles.categoryText, { color: theme.colors.text }]}>{goal.category}</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TIMELINE</Text>
-          <View style={styles.timelineRow}>
-            <View style={styles.timelineItem}>
-              <Text style={[styles.timelineLabel, { color: theme.colors.textSubtle }]}>Start</Text>
-              <Text style={[styles.timelineValue, { color: theme.colors.text }]}>
-                {formatDate(goal.startDate)}
-              </Text>
-            </View>
-            <Text style={[styles.timelineArrow, { color: theme.colors.textSubtle }]}>→</Text>
-            <View style={styles.timelineItem}>
-              <Text style={[styles.timelineLabel, { color: theme.colors.textSubtle }]}>Target</Text>
-              <Text style={[styles.timelineValue, { color: theme.colors.text }]}>
-                {formatDate(goal.targetDate) || 'No target'}
-              </Text>
-            </View>
-          </View>
-          {daysRemaining !== null && (
-            <Text
-              style={[
-                styles.daysRemaining,
-                { color: daysRemaining < 0 ? theme.colors.danger : theme.colors.textMuted },
-              ]}
-            >
-              {daysRemaining < 0
-                ? `${Math.abs(daysRemaining)} days overdue`
-                : `${daysRemaining} days remaining`}
-            </Text>
-          )}
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6, marginTop: 14 }}>
+          <Text style={{ ...theme.typography.displayLg, color: theme.colors.text }}>{Math.round(goal.progress)}%</Text>
+          <Text style={{ ...theme.typography.bodyMd, color: theme.colors.textMuted }}>complete</Text>
         </View>
+        <View style={{ marginTop: 10 }}>
+          <ProgressBar value={goal.progress} tone={isBehind ? 'clay' : 'sage'} />
+        </View>
+        <Text style={{ ...theme.typography.labelSm, color: theme.colors.textMuted, marginTop: 12 }}>
+          Started {formatDate(goal.startDate)}
+          {goal.targetDate ? ` · Target ${formatDate(goal.targetDate)}` : ' · No deadline'}
+          {daysLeft ? ` · ${daysLeft}` : ''}
+        </Text>
+      </Card>
 
-        {goal.velocity ? (
-          <View style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>VELOCITY</Text>
-            <View style={styles.velocityRow}>
-              <Text style={[styles.velocityIcon, { color: theme.colors.text }]}>
-                {goal.velocity === 'INCREASING' ? '↑' : goal.velocity === 'DECREASING' ? '↓' : '→'}
+      {isBehind ? (
+        <Card tint="clay" onPress={() => go(`/(app)/goals/${goalId}/recovery`)}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <Ionicons name="refresh-outline" size={22} color={theme.colors.warning} />
+            <View style={{ flex: 1 }}>
+              <Text style={{ ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.text }}>
+                Fallen behind? Let&apos;s reset gently
               </Text>
-              <Text style={[styles.velocityText, { color: theme.colors.text }]}>{goal.velocity}</Text>
+              <Text style={{ ...theme.typography.labelSm, color: theme.colors.textMuted }}>See a recovery plan</Text>
             </View>
+            <Ionicons name="chevron-forward" size={18} color={theme.colors.textSubtle} />
           </View>
-        ) : null}
+        </Card>
+      ) : null}
 
-        {totalMilestones > 0 ? (
-          <Pressable
-            style={[styles.section, styles.milestoneToggle]}
-            onPress={() => setShowMilestones(!showMilestones)}
-          >
-            <View style={styles.milestoneHeader}>
-              <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>MILESTONES</Text>
-              <Text style={[styles.milestoneCount, { color: theme.colors.primary }]}>
-                {completedMilestones}/{totalMilestones} completed
-              </Text>
-            </View>
-            <Text style={[styles.expandIcon, { color: theme.colors.textMuted }]}>
-              {showMilestones ? '▲' : '▼'}
-            </Text>
+      {goal.description ? (
+        <Card tint="sand">
+          <Text style={{ ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textSubtle, marginBottom: 4 }}>
+            Why it matters
+          </Text>
+          <BodyText>{goal.description}</BodyText>
+        </Card>
+      ) : null}
+
+      <SectionTitle
+        title="Next steps"
+        action={
+          <Pressable onPress={() => go(`/(app)/today/add-task?goalId=${goalId}`)} hitSlop={8} accessibilityRole="button">
+            <Text style={{ ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.accent }}>Add step</Text>
           </Pressable>
-        ) : null}
+        }
+      />
+      {steps.length === 0 ? (
+        <Card tint="sand">
+          <BodyText muted>Break this goal into small tasks. Each one you finish moves it forward.</BodyText>
+        </Card>
+      ) : (
+        <Group>
+          {steps.map((task, i) => {
+            const done = task.status === 'COMPLETED';
+            return (
+              <Row
+                key={task.id}
+                first={i === 0}
+                title={task.title}
+                detail={task.duration ? `${task.duration} min` : undefined}
+                onPress={() => go(`/(app)/today/task-details?taskId=${task.id}`)}
+                right={
+                  <Pressable
+                    onPress={() => !done && completeTask.mutate(task.id)}
+                    hitSlop={10}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: done }}
+                    accessibilityLabel={`Mark ${task.title} as done`}
+                  >
+                    <Ionicons
+                      name={done ? 'checkmark-circle' : 'ellipse-outline'}
+                      size={26}
+                      color={done ? theme.colors.success : theme.colors.textSubtle}
+                    />
+                  </Pressable>
+                }
+              />
+            );
+          })}
+        </Group>
+      )}
 
-        {showMilestones && milestones ? (
-          <View style={styles.milestonesList}>
-            {milestones.map((milestone) => {
-              const isCompleted = milestone.status === 'COMPLETED';
-              const milestoneProgress = milestone.progress;
-              return (
-                <View
-                  key={milestone.id}
-                  style={[
-                    styles.milestoneCard,
-                    { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
-                  ]}
-                >
-                  <View style={styles.milestoneTop}>
-                    <View style={[styles.milestoneStatusDot, { backgroundColor: isCompleted ? theme.colors.success : theme.colors.textSubtle }]} />
-                    <Text
-                      style={[
-                        styles.milestoneTitle,
-                        { color: theme.colors.text },
-                        isCompleted && styles.milestoneTitleCompleted,
-                      ]}
-                    >
-                      {milestone.title}
-                    </Text>
-                    <Text style={[styles.milestoneProgress, { color: theme.colors.textMuted }]}>
-                      {milestoneProgress}%
-                    </Text>
-                  </View>
-                  {milestone.targetDate ? (
-                    <Text style={[styles.milestoneDate, { color: theme.colors.textSubtle }]}>
-                      Due: {formatDate(milestone.targetDate)}
-                    </Text>
-                  ) : null}
-                  <ProgressBar value={milestoneProgress} tone={isCompleted ? 'success' : 'accent'} height={4} />
-                </View>
-              );
-            })}
-          </View>
-        ) : null}
+      <SectionTitle title="Plan and progress" />
+      <Group>
+        <Row
+          first
+          icon="git-commit-outline"
+          title="Milestones"
+          value={milestones?.length ? `${doneMilestones} of ${milestones.length}` : undefined}
+          detail={milestones?.length ? undefined : 'Mark the big checkpoints'}
+          onPress={() => go(`/(app)/goals/${goalId}/milestones`)}
+        />
+        <Row
+          icon="speedometer-outline"
+          iconTint="sage"
+          title="Chance of success"
+          detail="Based on your pace so far"
+          onPress={() => go(`/(app)/goals/feasibility?goalId=${goalId}`)}
+        />
+        <Row
+          icon="trending-up-outline"
+          iconTint="sage"
+          title="Forecast"
+          detail="When you'll likely finish"
+          onPress={() => go(`/(app)/goals/${goalId}/projection`)}
+        />
+        <Row
+          icon="stats-chart-outline"
+          iconTint="sand"
+          title="Activity"
+          detail="Focus time and finished steps"
+          onPress={() => go(`/(app)/goals/${goalId}/analytics`)}
+        />
+      </Group>
 
-        {linkedTasks && linkedTasks.length > 0 ? (
-          <Pressable
-            style={[styles.section, styles.milestoneToggle]}
-            onPress={() => setShowLinkedTasks(!showLinkedTasks)}
-          >
-            <View style={styles.milestoneHeader}>
-              <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>LINKED TASKS</Text>
-              <Text style={[styles.milestoneCount, { color: theme.colors.primary }]}>
-                {linkedTasks.filter((t) => t.status === 'COMPLETED').length}/{linkedTasks.length} completed
-              </Text>
-            </View>
-            <Text style={[styles.expandIcon, { color: theme.colors.textMuted }]}>
-              {showLinkedTasks ? '▲' : '▼'}
-            </Text>
-          </Pressable>
-        ) : null}
-
-        {showLinkedTasks && linkedTasks ? (
-          <View style={styles.milestonesList}>
-            {linkedTasks.map((task) => {
-              const isCompleted = task.status === 'COMPLETED';
-              return (
-                <Pressable
-                  key={task.id}
-                  style={[
-                    styles.milestoneCard,
-                    { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
-                  ]}
-                  onPress={() => router.push(`/(app)/today/task-details?taskId=${task.id}`)}
-                >
-                  <View style={styles.milestoneTop}>
-                    <Pressable
-                      onPress={() => {
-                        if (!isCompleted) {
-                          completeTask.mutate(task.id);
-                        }
-                      }}
-                      style={[styles.checkbox, { borderColor: isCompleted ? theme.colors.success : theme.colors.border }]}
-                    >
-                      {isCompleted && <View style={[styles.checkboxChecked, { backgroundColor: theme.colors.success }]} />}
-                    </Pressable>
-                    <Text
-                      style={[
-                        styles.milestoneTitle,
-                        { color: theme.colors.text },
-                        isCompleted && styles.milestoneTitleCompleted,
-                      ]}
-                    >
-                      {task.title}
-                    </Text>
-                    <Text style={[styles.milestoneProgress, { color: theme.colors.textMuted }]}>
-                      {task.priority}
-                    </Text>
-                  </View>
-                </Pressable>
-              );
-            })}
-          </View>
-        ) : null}
-
-        <View style={styles.actionsSection}>
-          <Button
-            variant="primary"
-            onPress={() => router.push(`/(app)/today/add-task?goalId=${goalId}` as any)}
-            title="Add Linked Task"
-          />
-          <Button
-            variant="secondary"
-            onPress={() => router.push(`/(app)/goals/${goalId}/milestones` as any)}
-            title="View Milestones"
-          />
-          <Button
-            variant="secondary"
-            onPress={() => router.push(`/(app)/goals/feasibility?goalId=${goalId}` as any)}
-            title="Feasibility"
-          />
-          <Button
-            variant="secondary"
-            onPress={() => router.push(`/(app)/goals/${goalId}/projection` as any)}
-            title="View Projection"
-          />
-          <Button
-            variant="secondary"
-            onPress={() => router.push(`/(app)/goals/${goalId}/analytics` as any)}
-            title="Analytics"
-          />
-          <Button
-            variant="secondary"
-            onPress={() => router.push(`/(app)/goals/${goalId}/recovery` as any)}
-            title="Recovery"
-          />
-          <Button variant="secondary" onPress={handleArchive} title="Archive Goal" />
-          <Button variant="danger" onPress={handleDelete} title="Delete Goal" />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      <Group>
+        <Row first icon="archive-outline" iconTint="sand" title="Archive goal" onPress={handleArchive} />
+        <Row icon="trash-outline" iconTint="clay" title="Delete goal" destructive onPress={handleDelete} />
+      </Group>
+    </Page>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  backButton: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  editButton: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  titleSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    flex: 1,
-    marginRight: 12,
-  },
-  typeBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  typeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  progressSection: {
-    marginBottom: 20,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  progressLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  progressValue: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  badgesRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 20,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-    gap: 6,
-  },
-  badgeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  categoryText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  timelineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 8,
-  },
-  timelineItem: {
-    flex: 1,
-  },
-  timelineLabel: {
-    fontSize: 11,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  timelineValue: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  timelineArrow: {
-    fontSize: 18,
-    marginTop: 12,
-  },
-  daysRemaining: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginTop: 4,
-  },
-  velocityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  velocityIcon: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  velocityText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  milestoneToggle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.05)',
-  },
-  milestoneHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  milestoneCount: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  expandIcon: {
-    fontSize: 12,
-  },
-  milestonesList: {
-    gap: 10,
-    marginBottom: 12,
-  },
-  milestoneCard: {
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 8,
-  },
-  milestoneTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  milestoneStatusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  milestoneTitle: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  milestoneTitleCompleted: {
-    textDecorationLine: 'line-through',
-    opacity: 0.6,
-  },
-  milestoneProgress: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  milestoneDate: {
-    fontSize: 12,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    width: 12,
-    height: 12,
-    borderRadius: 2,
-  },
-  actionsSection: {
-    marginTop: 20,
-    gap: 12,
-  },
-});
