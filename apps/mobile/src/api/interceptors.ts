@@ -1,10 +1,11 @@
 import type { AxiosInstance, AxiosResponse,InternalAxiosRequestConfig } from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
 
 // expo-secure-store has no web implementation; the web build keeps tokens in localStorage.
+// (Checked via `document` rather than Platform so this module loads outside React Native, e.g. in tests.)
+const isWeb = typeof document !== 'undefined';
 const secureStore =
-  Platform.OS === 'web'
+  isWeb
     ? {
         getItemAsync: async (key: string) => globalThis.localStorage?.getItem(key) ?? null,
         setItemAsync: async (key: string, value: string) => globalThis.localStorage?.setItem(key, value),
