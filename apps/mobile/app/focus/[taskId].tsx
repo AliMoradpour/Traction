@@ -1,7 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams,useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo,useRef, useState } from 'react';
 import { Alert,Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 
 import { Button } from '@/components/ui/Button';
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
@@ -17,7 +19,7 @@ import {
 import { useTask } from '@/hooks/useTasks';
 import { useCompleteTask } from '@/hooks/useTasks';
 import { behaviorService } from '@/services';
-import { useTractionTheme } from '@/theme';
+import { type TractionTheme, useTractionTheme } from '@/theme';
 
 const RESISTANCE_REASONS = [
   'Task feels too large',
@@ -199,7 +201,7 @@ export default function FocusSessionScreen() {
       if (taskId) {
         completeTask.mutate(taskId);
       }
-      Alert.alert('Session Complete', 'Great work! You completed the focus session.', [
+      Alert.alert('Nice work', 'You finished this session. Take a short break.', [
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error) {
@@ -252,160 +254,179 @@ export default function FocusSessionScreen() {
   };
 
   const taskTitle = task?.title ?? 'Loading...';
+  const styles = createStyles(theme);
+  const ringSize = 240;
+  const stroke = 14;
+  const radius = (ringSize - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const readinessNote =
+    readiness && readiness.score > 80
+      ? "You're well rested, so a longer session suits you."
+      : readiness && readiness.score > 60
+        ? 'A medium-length session suits you right now.'
+        : readiness && readiness.score > 40
+          ? 'A shorter session will feel easier to start.'
+          : "Let's keep it short and gentle today.";
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={[styles.closeButton, { backgroundColor: theme.colors.surfaceElevated }]}>
-          <Text style={[styles.closeIcon, { color: theme.colors.text }]}>✕</Text>
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.iconButton}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          hitSlop={8}
+        >
+          <Ionicons name="close" size={22} color={theme.colors.text} />
         </Pressable>
-        <View style={[styles.sessionBadge, { backgroundColor: theme.colors.surfaceElevated }]}>
-          <View style={[styles.pulseDot, { backgroundColor: theme.colors.error }]} />
-          <Text style={[styles.sessionLabel, { color: theme.colors.text }]}>FOCUS SESSION</Text>
+        <View style={[styles.badge, sessionId && isActive ? styles.badgeActive : null]}>
+          <Text style={[styles.badgeText, sessionId && isActive ? styles.badgeTextActive : null]}>
+            {!sessionId ? 'Ready when you are' : isActive ? 'Focusing' : 'Paused'}
+          </Text>
         </View>
         <View style={{ width: 40 }} />
       </View>
 
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-        {!sessionId ? (
-          <>
-            <View style={styles.objectiveSection}>
-              <Text style={[styles.objectiveLabel, { color: theme.colors.textMuted }]}>CURRENT OBJECTIVE</Text>
-              <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
-            </View>
+        <View style={styles.objective}>
+          <Text style={styles.objectiveLabel}>Working on</Text>
+          <Text style={styles.objectiveTitle}>{taskTitle}</Text>
+        </View>
 
-            {showDurationConfirm ? (
-              <View style={styles.durationConfirmContainer}>
-                <View style={[styles.durationCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                  <Text style={[styles.durationCardLabel, { color: theme.colors.textMuted }]}>ADAPTIVE SESSION LENGTH</Text>
-                  <Text style={[styles.durationCardValue, { color: theme.colors.text }]}>{confirmedDuration} min</Text>
-                  <Text style={[styles.durationCardReason, { color: theme.colors.textMuted }]}>
-                    {readiness && readiness.score > 80
-                      ? 'High readiness — longer session recommended'
-                      : readiness && readiness.score > 60
-                      ? 'Good readiness — moderate session'
-                      : readiness && readiness.score > 40
-                      ? 'Moderate readiness — shorter session'
-                      : 'Low readiness — brief session recommended'}
-                  </Text>
-                  <View style={styles.durationAdjust}>
-                    <Pressable
-                      style={[styles.durationButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                      onPress={() => setConfirmedDuration((prev) => Math.max(10, prev - 5))}
-                    >
-                      <Text style={[styles.durationButtonText, { color: theme.colors.text }]}>-5m</Text>
-                    </Pressable>
-                    <Text style={[styles.durationValue, { color: theme.colors.text }]}>{confirmedDuration}m</Text>
-                    <Pressable
-                      style={[styles.durationButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                      onPress={() => setConfirmedDuration((prev) => Math.min(60, prev + 5))}
-                    >
-                      <Text style={[styles.durationButtonText, { color: theme.colors.text }]}>+5m</Text>
-                    </Pressable>
+        {!sessionId ? (
+          showDurationConfirm ? (
+            <View style={styles.confirm}>
+              <View style={styles.card}>
+                <Text style={styles.cardLabel}>Session length</Text>
+                <View style={styles.durationRow}>
+                  <Pressable
+                    style={styles.stepper}
+                    onPress={() => setConfirmedDuration((prev) => Math.max(10, prev - 5))}
+                    accessibilityRole="button"
+                    accessibilityLabel="Five minutes less"
+                  >
+                    <Ionicons name="remove" size={22} color={theme.colors.text} />
+                  </Pressable>
+                  <View style={{ alignItems: 'center' }}>
+                    <Text style={styles.durationValue}>{confirmedDuration}</Text>
+                    <Text style={styles.durationUnit}>minutes</Text>
                   </View>
+                  <Pressable
+                    style={styles.stepper}
+                    onPress={() => setConfirmedDuration((prev) => Math.min(60, prev + 5))}
+                    accessibilityRole="button"
+                    accessibilityLabel="Five minutes more"
+                  >
+                    <Ionicons name="add" size={22} color={theme.colors.text} />
+                  </Pressable>
                 </View>
+                <Text style={styles.cardNote}>{readinessNote}</Text>
+              </View>
+              <View style={styles.footer}>
                 <Button
                   variant="primary"
+                  size="lg"
                   onPress={handleConfirmDuration}
-                  style={styles.startButton}
+                  loading={startSession.isPending}
                   disabled={startSession.isPending}
                 >
-                  {startSession.isPending ? 'Starting...' : `▶ START ${confirmedDuration} MIN SESSION`}
+                  {`Start ${confirmedDuration} minutes`}
                 </Button>
-                <Pressable onPress={() => setShowDurationConfirm(false)}>
-                  <Text style={[styles.cancelConfirmText, { color: theme.colors.textMuted }]}>Cancel</Text>
-                </Pressable>
+                <Button variant="ghost" onPress={() => setShowDurationConfirm(false)}>
+                  Not yet
+                </Button>
               </View>
-            ) : (
-              <Button
-                variant="primary"
-                onPress={handleStartSession}
-                style={styles.startButton}
-                disabled={startSession.isPending}
-              >
-                {startSession.isPending ? 'Starting...' : '▶ START FOCUS SESSION'}
-              </Button>
-            )}
-          </>
+            </View>
+          ) : (
+            <View style={styles.confirm}>
+              <View style={styles.startHint}>
+                <View style={styles.startHintIcon}>
+                  <Ionicons name="timer-outline" size={34} color={theme.colors.accent} />
+                </View>
+                <Text style={styles.cardNote}>Silence notifications, take a breath, and begin.</Text>
+              </View>
+              <View style={styles.footer}>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  onPress={handleStartSession}
+                  loading={startSession.isPending}
+                  disabled={startSession.isPending}
+                >
+                  Start focusing
+                </Button>
+              </View>
+            </View>
+          )
         ) : (
           <>
-            <View style={styles.objectiveSection}>
-              <Text style={[styles.objectiveLabel, { color: theme.colors.textMuted }]}>CURRENT OBJECTIVE</Text>
-              <Text style={[styles.objectiveTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
-            </View>
-
-            <View style={styles.timerContainer}>
-              <View style={[styles.timerRing, { borderColor: theme.colors.surfaceMuted }]}>
-                <View
-                  style={[
-                    styles.timerProgress,
-                    {
-                      borderColor: theme.colors.primary,
-                      transform: [{ rotate: `${getProgress() * 360 - 90}deg` }],
-                    },
-                  ]}
+            <Animated.View style={[styles.timer, { transform: [{ scale: pulseAnim }] }]}>
+              <Svg width={ringSize} height={ringSize}>
+                <Circle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={radius}
+                  stroke={theme.colors.surfaceMuted}
+                  strokeWidth={stroke}
+                  fill="none"
                 />
+                <Circle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={radius}
+                  stroke={isActive ? theme.colors.accent : theme.colors.textSubtle}
+                  strokeWidth={stroke}
+                  strokeLinecap="round"
+                  fill="none"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={circumference * (1 - getProgress())}
+                  transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+                />
+              </Svg>
+              <View style={styles.timerCenter}>
+                <Text style={styles.timerText}>{formatTime(timeLeft)}</Text>
+                <Text style={styles.timerLabel}>of {confirmedDuration} minutes</Text>
               </View>
-              <Animated.View style={[styles.timerInner, { transform: [{ scale: pulseAnim }] }]}>
-                <Text style={[styles.timerText, { color: theme.colors.text }]}>{formatTime(timeLeft)}</Text>
-                <Text style={[styles.timerLabel, { color: theme.colors.textMuted }]}>MINUTES LEFT</Text>
-              </Animated.View>
-            </View>
-
-            {!selectedReason && (
-              <Pressable
-                style={[styles.resistanceTrigger, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => setShowResistanceModal(true)}
-              >
-                <Text style={[styles.resistanceTriggerText, { color: theme.colors.text }]}>Why am I stuck?</Text>
-              </Pressable>
-            )}
+            </Animated.View>
 
             {aiInsight ? (
-              <View style={[styles.aiCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <View style={styles.aiHeader}>
-                  <Text style={styles.aiIcon}>✨</Text>
-                  <Text style={[styles.aiTitle, { color: theme.colors.text }]}>
-                    {selectedReason ? 'Intervention Recommendation' : 'AI Assistant'}
-                  </Text>
-                </View>
-                <Text style={[styles.aiContent, { color: theme.colors.textMuted }]}>{aiInsight}</Text>
+              <View style={styles.card}>
+                <Text style={styles.cardLabel}>A small suggestion</Text>
+                <Text style={styles.insight}>{aiInsight}</Text>
                 {selectedReason === 'Task feels too large' ? (
                   <Pressable onPress={() => openHelp('simplify')} accessibilityRole="button">
-                    <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
-                      Break it down now ›
-                    </Text>
+                    <Text style={styles.link}>Break it into steps</Text>
                   </Pressable>
                 ) : null}
               </View>
             ) : null}
 
-            <View style={styles.actions}>
-              <Button
-                variant="primary"
-                onPress={handleComplete}
-                style={styles.completeButton}
-                disabled={completeSession.isPending}
-              >
-                {completeSession.isPending ? 'Completing...' : '✓ COMPLETE'}
-              </Button>
-              <View style={styles.secondaryActions}>
-                <Pressable
-                  style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+            <View style={styles.footer}>
+              <View style={styles.row}>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  style={{ flex: 1 }}
                   onPress={isActive ? handlePause : handleResume}
                   disabled={pauseSession.isPending || resumeSession.isPending}
                 >
-                  <Text style={[styles.secondaryButtonText, { color: theme.colors.text }]}>
-                    {isActive ? '⏸ Pause' : '▶ Resume'}
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.secondaryButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                  onPress={() => setShowResistanceModal(true)}
+                  {isActive ? 'Pause' : 'Resume'}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  style={{ flex: 1 }}
+                  onPress={handleComplete}
+                  loading={completeSession.isPending}
+                  disabled={completeSession.isPending}
                 >
-                  <Text style={[styles.secondaryButtonText, { color: theme.colors.error }]}>⚠ Too Difficult</Text>
-                </Pressable>
+                  I&apos;m done
+                </Button>
               </View>
+              <Button variant="ghost" onPress={() => setShowResistanceModal(true)}>
+                Feeling stuck?
+              </Button>
             </View>
           </>
         )}
@@ -413,56 +434,44 @@ export default function FocusSessionScreen() {
 
       <Modal visible={showResistanceModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: theme.colors.background }]}>
-            <View style={[styles.modalHandle, { backgroundColor: theme.colors.surfaceMuted }]} />
-            <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Identify the friction</Text>
-            <Text style={[styles.modalSubtitle, { color: theme.colors.textMuted }]}>
-              What's preventing you from moving forward?
-            </Text>
-            <View style={styles.reasonList}>
+          <View style={styles.sheet}>
+            <View style={styles.sheetHandle} />
+            <Text style={styles.sheetTitle}>What&apos;s getting in the way?</Text>
+            <Text style={styles.sheetSubtitle}>It&apos;s normal to get stuck. Pick what feels closest.</Text>
+            <View style={styles.reasons}>
               {RESISTANCE_REASONS.map((reason) => (
                 <Pressable
                   key={reason}
-                  style={[styles.reasonItem, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
+                  style={({ pressed }) => [styles.reason, pressed && { opacity: 0.7 }]}
                   onPress={() => handleResistance(reason)}
+                  accessibilityRole="button"
                 >
-                  <Text style={[styles.reasonText, { color: theme.colors.text }]}>{reason}</Text>
-                  <Text style={[styles.reasonArrow, { color: theme.colors.textSubtle }]}>›</Text>
+                  <Text style={styles.reasonText}>{reason}</Text>
+                  <Ionicons name="chevron-forward" size={18} color={theme.colors.textSubtle} />
                 </Pressable>
               ))}
             </View>
-            <View style={styles.deeperHelp}>
-              <Pressable
-                style={styles.deeperHelpLink}
-                onPress={() => openHelp('simplify')}
-                accessibilityRole="button"
-              >
-                <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
-                  Break this task into steps ›
-                </Text>
+            <View style={styles.sheetLinks}>
+              <Pressable onPress={() => openHelp('simplify')} accessibilityRole="button">
+                <Text style={styles.link}>Break this task into steps</Text>
               </Pressable>
-              <Pressable
-                style={styles.deeperHelpLink}
-                onPress={() => openHelp('resistance')}
-                accessibilityRole="button"
-              >
-                <Text style={[styles.deeperHelpText, { color: theme.colors.primary }]}>
-                  Get a personalized plan ›
-                </Text>
+              <Pressable onPress={() => openHelp('resistance')} accessibilityRole="button">
+                <Text style={styles.link}>Get a plan for getting unstuck</Text>
               </Pressable>
             </View>
-            {selectedReason && (
-              <Pressable
-                style={[styles.modalActionButton, { backgroundColor: theme.colors.error }]}
+            {selectedReason ? (
+              <Button
+                variant="secondary"
                 onPress={handleCancelSession}
                 disabled={cancelSession.isPending}
+                textStyle={{ color: theme.colors.dangerText }}
               >
-                <Text style={styles.modalActionText}>Abandon Session</Text>
-              </Pressable>
-            )}
-            <Pressable style={styles.cancelButton} onPress={() => setShowResistanceModal(false)}>
-              <Text style={[styles.cancelText, { color: theme.colors.textMuted }]}>Cancel</Text>
-            </Pressable>
+                End this session
+              </Button>
+            ) : null}
+            <Button variant="ghost" onPress={() => setShowResistanceModal(false)}>
+              Close
+            </Button>
           </View>
         </View>
       </Modal>
@@ -470,305 +479,114 @@ export default function FocusSessionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  deeperHelp: {
-    marginTop: 12,
-    gap: 4,
-  },
-  deeperHelpLink: {
-    paddingVertical: 10,
-  },
-  deeperHelpText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeIcon: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  sessionBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 8,
-  },
-  pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  sessionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  objectiveSection: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  objectiveLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.05,
-    marginBottom: 8,
-  },
-  objectiveTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: -0.01,
-  },
-  startButton: {
-    width: '100%',
-    maxWidth: 320,
-  },
-  durationConfirmContainer: {
-    width: '100%',
-    maxWidth: 320,
-    alignItems: 'center',
-    gap: 16,
-  },
-  durationCard: {
-    width: '100%',
-    padding: 24,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  durationCardLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.05,
-    marginBottom: 8,
-  },
-  durationCardValue: {
-    fontSize: 48,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  durationCardReason: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  durationAdjust: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 20,
-  },
-  durationButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-  },
-  durationButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  durationValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    minWidth: 60,
-    textAlign: 'center',
-  },
-  cancelConfirmText: {
-    fontSize: 13,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-  timerContainer: {
-    position: 'relative',
-    width: 280,
-    height: 280,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  timerRing: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 140,
-    borderWidth: 2,
-  },
-  timerProgress: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 140,
-    borderWidth: 3,
-    borderRightColor: 'transparent',
-    borderBottomColor: 'transparent',
-  },
-  timerInner: {
-    alignItems: 'center',
-  },
-  timerText: {
-    fontSize: 64,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
-  },
-  timerLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.2,
-    marginTop: 8,
-    opacity: 0.6,
-  },
-  resistanceTrigger: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 24,
-    borderWidth: 1,
-    marginBottom: 24,
-  },
-  resistanceTriggerText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  aiCard: {
-    width: '100%',
-    maxWidth: 320,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 32,
-  },
-  aiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  },
-  aiIcon: {
-    fontSize: 18,
-  },
-  aiTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  aiContent: {
-    fontSize: 15,
-    lineHeight: 20,
-  },
-  actions: {
-    width: '100%',
-    gap: 12,
-  },
-  completeButton: {
-    width: '100%',
-  },
-  secondaryActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  secondaryButton: {
-    flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.2)',
-  },
-  modalContent: {
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    paddingBottom: 40,
-  },
-  modalHandle: {
-    width: 48,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 24,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  modalSubtitle: {
-    fontSize: 15,
-    textAlign: 'center',
-    marginBottom: 24,
-  },
-  reasonList: {
-    gap: 8,
-  },
-  reasonItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  reasonText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  reasonArrow: {
-    fontSize: 20,
-  },
-  modalActionButton: {
-    marginTop: 16,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  modalActionText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  cancelButton: {
-    marginTop: 16,
-    padding: 16,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 13,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-});
+function createStyles(theme: TractionTheme) {
+  const card =
+    theme.mode === 'light' ? theme.shadows.card : { borderWidth: 1, borderColor: theme.colors.border };
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+      paddingTop: 8,
+    },
+    iconButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: theme.colors.surfaceSoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    badge: {
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surfaceSoft,
+    },
+    badgeActive: { backgroundColor: theme.colors.successSurface },
+    badgeText: { ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textMuted },
+    badgeTextActive: { color: theme.colors.successText },
+    content: { flex: 1, paddingHorizontal: 24 },
+    objective: { alignItems: 'center', marginTop: 28 },
+    objectiveLabel: { ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textSubtle },
+    objectiveTitle: {
+      ...theme.typography.headlineMd,
+      color: theme.colors.text,
+      textAlign: 'center',
+      marginTop: 6,
+    },
+    confirm: { flex: 1, justifyContent: 'space-between', marginTop: 32 },
+    card: {
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
+      padding: 20,
+      marginTop: 24,
+      ...card,
+    },
+    cardLabel: { ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textSubtle },
+    cardNote: { ...theme.typography.bodyMd, color: theme.colors.textMuted, textAlign: 'center', marginTop: 12 },
+    durationRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 },
+    stepper: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: theme.colors.surfaceSoft,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    durationValue: { ...theme.typography.displayLg, fontSize: 48, lineHeight: 54, color: theme.colors.text },
+    durationUnit: { ...theme.typography.labelSm, color: theme.colors.textMuted },
+    startHint: { alignItems: 'center', marginTop: 24 },
+    startHintIcon: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      backgroundColor: theme.colors.accentMuted,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    timer: { alignSelf: 'center', marginTop: 32, alignItems: 'center', justifyContent: 'center' },
+    timerCenter: { position: 'absolute', alignItems: 'center' },
+    timerText: { ...theme.typography.timer, fontSize: 52, lineHeight: 58, color: theme.colors.text },
+    timerLabel: { ...theme.typography.labelSm, color: theme.colors.textSubtle, marginTop: 2 },
+    insight: { ...theme.typography.bodyMd, color: theme.colors.text, marginTop: 6, lineHeight: 21 },
+    link: { ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.accent, marginTop: 10 },
+    footer: { marginTop: 'auto', paddingBottom: 12, gap: 6 },
+    row: { flexDirection: 'row', gap: 10 },
+    modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: theme.colors.scrim },
+    sheet: {
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: theme.radius.sheet,
+      borderTopRightRadius: theme.radius.sheet,
+      paddingHorizontal: 24,
+      paddingTop: 12,
+      paddingBottom: 32,
+      gap: 4,
+    },
+    sheetHandle: {
+      alignSelf: 'center',
+      width: 40,
+      height: 5,
+      borderRadius: 3,
+      backgroundColor: theme.colors.surfaceMuted,
+      marginBottom: 16,
+    },
+    sheetTitle: { ...theme.typography.headlineMd, color: theme.colors.text },
+    sheetSubtitle: { ...theme.typography.bodyMd, color: theme.colors.textMuted, marginBottom: 12 },
+    reasons: { gap: 8 },
+    reason: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 15,
+      paddingHorizontal: 16,
+      borderRadius: theme.radius.md,
+      backgroundColor: theme.colors.surface,
+      ...card,
+    },
+    reasonText: { ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.text },
+    sheetLinks: { gap: 2, marginVertical: 10 },
+  });
+}
