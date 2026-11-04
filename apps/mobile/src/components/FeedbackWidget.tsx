@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Toast } from '@/components/feedback/Toast';
@@ -15,7 +15,12 @@ const FEEDBACK_TYPES: { value: FeedbackType; label: string }[] = [
   { value: 'general', label: 'General' },
 ];
 
-export function FeedbackWidget() {
+interface FeedbackWidgetProps {
+  /** Custom opener (e.g. a list row). Without it, a floating "?" button is shown. */
+  renderTrigger?: (open: () => void) => ReactNode;
+}
+
+export function FeedbackWidget({ renderTrigger }: FeedbackWidgetProps = {}) {
   const theme = useTractionTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { submitFeedback, currentRoute } = useFeedback();
@@ -52,18 +57,22 @@ export function FeedbackWidget() {
 
   return (
     <>
-      <Pressable
-        style={styles.fab}
-        onPress={() => setVisible(true)}
-        accessibilityLabel="Send feedback"
-        accessibilityRole="button"
-      >
-        <Text style={styles.fabText}>?</Text>
-      </Pressable>
+      {renderTrigger ? (
+        renderTrigger(() => setVisible(true))
+      ) : (
+        <Pressable
+          style={styles.fab}
+          onPress={() => setVisible(true)}
+          accessibilityLabel="Send feedback"
+          accessibilityRole="button"
+        >
+          <Text style={styles.fabText}>?</Text>
+        </Pressable>
+      )}
 
       <Modal
         visible={visible}
-        title="Send Feedback"
+        title="Send feedback"
         onClose={handleCancel}
         footer={
           <View style={styles.footerRow}>

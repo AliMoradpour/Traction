@@ -1,18 +1,19 @@
-import { useRouter } from 'expo-router';
+import { type Href, useRouter } from 'expo-router';
 import { useCallback, useRef } from 'react';
-import { Alert,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Pressable, Text, View } from 'react-native';
 
+import { Group, Page, Row, SectionTitle } from '@/components/calm';
+import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { useLogout, useUser } from '@/hooks/useAuth';
 import { useUpdatePreferences, useUserPreferences } from '@/hooks/useUser';
 import config from '@/lib/config';
 import type { UpdatePreferencesInput, UserPreferences } from '@/services/user.service';
 import { useTractionTheme } from '@/theme';
 
-const AI_PERSONALITIES: { id: UserPreferences['aiPersonality']; label: string; icon: string }[] = [
-  { id: 'DIRECT', label: 'Direct', icon: '⚡' },
-  { id: 'BALANCED', label: 'Balanced', icon: '⚖️' },
-  { id: 'GENTLE', label: 'Gentle', icon: '🧘' },
+const AI_PERSONALITIES: { id: UserPreferences['aiPersonality']; label: string; hint: string }[] = [
+  { id: 'GENTLE', label: 'Gentle', hint: 'Encouraging' },
+  { id: 'BALANCED', label: 'Balanced', hint: 'Kind and clear' },
+  { id: 'DIRECT', label: 'Direct', hint: 'To the point' },
 ];
 
 const DEEP_WORK: UserPreferences['deepWorkMode'][] = ['INTENSE', 'MODERATE', 'RELAXED'];
@@ -29,8 +30,7 @@ const DAY_LABELS: Record<string, string> = {
 };
 
 const titleCase = (v: string) => v.charAt(0) + v.slice(1).toLowerCase();
-const nextOf = <T,>(list: readonly T[], current: T) =>
-  list[(list.indexOf(current) + 1) % list.length];
+const nextOf = <T,>(list: readonly T[], current: T) => list[(list.indexOf(current) + 1) % list.length];
 const hh = (h: number) => `${String(h).padStart(2, '0')}:00`;
 
 function describeDays(workDays: string): string {
@@ -38,25 +38,20 @@ function describeDays(workDays: string): string {
     .split(',')
     .map((d) => d.trim())
     .filter(Boolean);
-  if (days.join(',') === 'mon,tue,wed,thu,fri') return 'Monday - Friday';
+  if (days.join(',') === 'mon,tue,wed,thu,fri') return 'Monday to Friday';
   if (days.length === 7) return 'Every day';
   return days.map((d) => DAY_LABELS[d] ?? d).join(', ');
 }
 
-const AI_SETTINGS = [
-  { id: 'usage', label: 'AI Usage', value: null, icon: '📊', route: '/profile/usage' },
-];
-
-const ADMIN_ACTIONS = [
-  { id: 'invites', label: 'Manage Invites', value: null, icon: '🎟️', route: '/profile/invites' },
-];
-
 export default function ProfileScreen() {
   const theme = useTractionTheme();
   const router = useRouter();
+  const { data: user } = useUser();
   const { data: prefs } = useUserPreferences();
   const updatePrefs = useUpdatePreferences();
-  const selectedPersonality = prefs?.aiPersonality ?? 'BALANCED';
+  const logout = useLogout();
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const savePrefs = useCallback(
     (patch: UpdatePreferencesInput) => {
@@ -67,562 +62,175 @@ export default function ProfileScreen() {
     [updatePrefs],
   );
 
-  const preferenceRows = [
-    {
-      id: 'deep-work',
-      label: 'Deep Work Mode',
-      icon: '🧠',
-      value: titleCase(prefs?.deepWorkMode ?? 'INTENSE'),
-      onPress: () => prefs && savePrefs({ deepWorkMode: nextOf(DEEP_WORK, prefs.deepWorkMode) }),
-    },
-    {
-      id: 'notifications',
-      label: 'Notification Density',
-      icon: '🔔',
-      value: titleCase(prefs?.notificationDensity ?? 'LOW'),
-      onPress: () =>
-        prefs && savePrefs({ notificationDensity: nextOf(DENSITY, prefs.notificationDensity) }),
-    },
-    {
-      id: 'auto-schedule',
-      label: 'AI Auto-Scheduling',
-      icon: '✨',
-      value: prefs?.aiAutoScheduling === false ? 'Disabled' : 'Enabled',
-      onPress: () => prefs && savePrefs({ aiAutoScheduling: !prefs.aiAutoScheduling }),
-    },
-  ];
-
-  const energyRows = [
-    {
-      id: 'sleep',
-      label: 'Sleep Sync',
-      icon: '🌙',
-      value: prefs?.sleepSync ? 'On' : 'Off',
-      onPress: () => prefs && savePrefs({ sleepSync: !prefs.sleepSync }),
-    },
-    {
-      id: 'breaks',
-      label: 'Focus Breaks',
-      icon: '☕',
-      value: `Every ${prefs?.focusBreakInterval ?? 90}m`,
-      onPress: () =>
-        prefs &&
-        savePrefs({
-          focusBreakInterval: nextOf(
-            BREAK_INTERVALS,
-            BREAK_INTERVALS.includes(prefs.focusBreakInterval) ? prefs.focusBreakInterval : 90,
-          ),
-        }),
-    },
-  ];
-
-  const workStart = prefs?.workStartHour ?? 9;
-  const workEnd = prefs?.workEndHour ?? 18;
-  const peakStart = prefs?.energyPeakStart ?? 10;
-  const peakEnd = prefs?.energyPeakEnd ?? 13;
-  const workSpanPct = `${Math.round((Math.max(0, workEnd - workStart) / 24) * 100)}%` as const;
-  const logout = useLogout();
-  const { data: user } = useUser();
-  const tapCountRef = useRef(0);
-  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  // Five quick taps on the version opens the hidden developer screen.
   const handleVersionTap = useCallback(() => {
     tapCountRef.current += 1;
-
-    if (tapTimerRef.current) {
-      clearTimeout(tapTimerRef.current);
-    }
-
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
     tapTimerRef.current = setTimeout(() => {
       tapCountRef.current = 0;
     }, 2000);
-
     if (tapCountRef.current >= 5) {
       tapCountRef.current = 0;
-      if (tapTimerRef.current) {
-        clearTimeout(tapTimerRef.current);
-      }
-      router.push('/profile/developer' as any);
+      router.push('/profile/developer' as Href);
     }
   }, [router]);
 
   const handleSignOut = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+    Alert.alert('Sign out?', "You can sign back in any time. Your data stays safe.", [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => logout.mutate() },
+      { text: 'Sign out', style: 'destructive', onPress: () => logout.mutate() },
     ]);
   };
 
-  const userName = user ? [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email : 'User';
-  const userInitials = user ? [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join('').toUpperCase() || user.email?.[0]?.toUpperCase() || 'U' : 'U';
+  const name = user ? [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Your account' : '';
+  const initials =
+    user
+      ? [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join('').toUpperCase() ||
+        user.email?.[0]?.toUpperCase() ||
+        '?'
+      : '';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const personality = prefs?.aiPersonality ?? 'BALANCED';
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
-            <View style={[styles.avatar, { backgroundColor: theme.colors.surfaceMuted }]}>
-              <Text style={[styles.avatarText, { color: theme.colors.text }]}>{userInitials}</Text>
-            </View>
-            <View style={[styles.editBadge, { backgroundColor: theme.colors.primaryContainer }]}>
-              <Text style={styles.editIcon}>✏️</Text>
-            </View>
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={[styles.profileName, { color: theme.colors.text }]}>{userName}</Text>
-            <Text style={[styles.profileRole, { color: theme.colors.textMuted }]}>{user?.email || ''}</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>AI PERSONALITY</Text>
-          <View style={[styles.personalitySelector, { backgroundColor: theme.colors.surfaceMuted }]}>
-            {AI_PERSONALITIES.map((personality) => (
-              <Pressable
-                key={personality.id}
-                style={[
-                  styles.personalityButton,
-                  selectedPersonality === personality.id && {
-                    backgroundColor: theme.colors.surfaceElevated,
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.05,
-                    shadowRadius: 4,
-                  },
-                ]}
-                onPress={() => savePrefs({ aiPersonality: personality.id })}
-              >
-                <Text style={styles.personalityIcon}>{personality.icon}</Text>
-                <Text
-                  style={[
-                    styles.personalityLabel,
-                    {
-                      color: selectedPersonality === personality.id ? theme.colors.text : theme.colors.textMuted,
-                      fontWeight: selectedPersonality === personality.id ? '600' : '500',
-                    },
-                  ]}
-                >
-                  {personality.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>PRODUCTIVITY PREFERENCES</Text>
-          <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            {preferenceRows.map((pref, index) => (
-              <View key={pref.id}>
-                <Pressable
-                  style={styles.settingsItem}
-                  onPress={pref.onPress}
-                  disabled={!prefs}
-                  accessibilityRole="button"
-                  accessibilityHint="Tap to change"
-                >
-                  <View style={styles.settingsLeft}>
-                    <Text style={styles.settingsIcon}>{pref.icon}</Text>
-                    <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{pref.label}</Text>
-                  </View>
-                  <View style={styles.settingsRight}>
-                    <Text style={[styles.settingsValue, { color: theme.colors.textMuted }]}>{pref.value}</Text>
-                    <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-                  </View>
-                </Pressable>
-                {index < preferenceRows.length - 1 && (
-                  <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>WORKING HOURS & ENERGY</Text>
-          <View style={styles.energyGrid}>
-            <View style={[styles.energyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <View style={styles.energyHeader}>
-                <Text style={styles.energyIcon}>📅</Text>
-                <Text style={[styles.energyTitle, { color: theme.colors.primary }]}>Working Hours</Text>
-              </View>
-              <View style={styles.energyContent}>
-                <View style={styles.energyRow}>
-                  <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>{describeDays(prefs?.workDays ?? 'mon,tue,wed,thu,fri')}</Text>
-                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>{hh(workStart)} — {hh(workEnd)}</Text>
-                </View>
-                <View style={[styles.energyTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-                  <View style={[styles.energyFill, { backgroundColor: theme.colors.primaryContainer, width: workSpanPct }]} />
-                </View>
-              </View>
-            </View>
-
-            <View style={[styles.energyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <View style={styles.energyHeader}>
-                <Text style={styles.energyIcon}>⚡</Text>
-                <Text style={[styles.energyTitle, { color: theme.colors.primary }]}>Energy Peak</Text>
-              </View>
-              <View style={styles.energyContent}>
-                <View style={styles.energyRow}>
-                  <Text style={[styles.energyLabel, { color: theme.colors.textMuted }]}>Daily Window</Text>
-                  <Text style={[styles.energyValue, { color: theme.colors.primary }]}>{hh(peakStart)} — {hh(peakEnd)}</Text>
-                </View>
-                <View style={styles.miniChart}>
-                  {[20, 40, 90, 100, 80, 50, 30].map((value, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        styles.miniBar,
-                        {
-                          backgroundColor: index >= 2 && index <= 4 ? theme.colors.primaryContainer : theme.colors.surfaceMuted,
-                          height: `${value}%`,
-                        },
-                      ]}
-                    />
-                  ))}
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>ENERGY SETTINGS</Text>
-          <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            {energyRows.map((setting, index) => (
-              <View key={setting.id}>
-                <Pressable
-                  style={styles.settingsItem}
-                  onPress={setting.onPress}
-                  disabled={!prefs}
-                  accessibilityRole="button"
-                  accessibilityHint="Tap to change"
-                >
-                  <View style={styles.settingsLeft}>
-                    <Text style={styles.settingsIcon}>{setting.icon}</Text>
-                    <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{setting.label}</Text>
-                  </View>
-                  <View style={styles.settingsRight}>
-                    {setting.value && (
-                      <Text style={[styles.settingsValue, { color: theme.colors.textMuted }]}>{setting.value}</Text>
-                    )}
-                    <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-                  </View>
-                </Pressable>
-                {index < energyRows.length - 1 && (
-                  <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>AI SETTINGS</Text>
-          <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            {AI_SETTINGS.map((setting, index) => (
-              <View key={setting.id}>
-                <Pressable
-                  style={styles.settingsItem}
-                  onPress={() => router.push(setting.route as any)}
-                >
-                  <View style={styles.settingsLeft}>
-                    <Text style={styles.settingsIcon}>{setting.icon}</Text>
-                    <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{setting.label}</Text>
-                  </View>
-                  <View style={styles.settingsRight}>
-                    {setting.value && (
-                      <Text style={[styles.settingsValue, { color: theme.colors.textMuted }]}>{setting.value}</Text>
-                    )}
-                    <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-                  </View>
-                </Pressable>
-                {index < AI_SETTINGS.length - 1 && (
-                  <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
-          <View style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>ADMIN</Text>
-            <View style={[styles.settingsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              {ADMIN_ACTIONS.map((action, index) => (
-                <View key={action.id}>
-                  <Pressable
-                    style={styles.settingsItem}
-                    onPress={() => router.push(action.route as any)}
-                  >
-                    <View style={styles.settingsLeft}>
-                      <Text style={styles.settingsIcon}>{action.icon}</Text>
-                      <Text style={[styles.settingsLabel, { color: theme.colors.text }]}>{action.label}</Text>
-                    </View>
-                    <View style={styles.settingsRight}>
-                      <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-                    </View>
-                  </Pressable>
-                  {index < ADMIN_ACTIONS.length - 1 && (
-                    <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
-                  )}
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-
-        <Pressable
-          style={[styles.signOutButton, { backgroundColor: theme.colors.errorMuted, borderColor: theme.colors.error }]}
-          onPress={handleSignOut}
-          disabled={logout.isPending}
+    <Page title="You" back={false}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 30,
+            backgroundColor: theme.colors.accentMuted,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-          <Text style={[styles.signOutText, { color: theme.colors.error }]}>
-            {logout.isPending ? 'Signing Out...' : 'Sign Out'}
-          </Text>
-        </Pressable>
+          <Text style={{ ...theme.typography.headlineMd, color: theme.colors.accentText }}>{initials}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ ...theme.typography.titleMd, color: theme.colors.text }}>{name}</Text>
+          <Text style={{ ...theme.typography.bodyMd, color: theme.colors.textMuted }}>{user?.email ?? ''}</Text>
+        </View>
+      </View>
 
-        {user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN' ? (
-          <Pressable
-            style={[styles.adminButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-            onPress={() => router.push('/(admin)' as any)}
-          >
-            <Text style={styles.adminIcon}>🛡️</Text>
-            <View style={styles.adminInfo}>
-              <Text style={[styles.adminTitle, { color: theme.colors.text }]}>Admin Panel</Text>
-              <Text style={[styles.adminSubtitle, { color: theme.colors.textMuted }]}>Manage users and system settings</Text>
-            </View>
-            <Text style={[styles.chevron, { color: theme.colors.textSubtle }]}>›</Text>
-          </Pressable>
+      <SectionTitle title="Coaching tone" />
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        {AI_PERSONALITIES.map((p) => {
+          const selected = p.id === personality;
+          return (
+            <Pressable
+              key={p.id}
+              onPress={() => savePrefs({ aiPersonality: p.id })}
+              accessibilityRole="radio"
+              accessibilityState={{ selected }}
+              style={{
+                flex: 1,
+                paddingVertical: 12,
+                paddingHorizontal: 10,
+                borderRadius: theme.radius.md,
+                borderWidth: 1.5,
+                borderColor: selected ? theme.colors.accent : theme.colors.border,
+                backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surface,
+              }}
+            >
+              <Text
+                style={{
+                  ...theme.typography.bodyMd,
+                  fontWeight: '600',
+                  color: selected ? theme.colors.accentText : theme.colors.text,
+                }}
+              >
+                {p.label}
+              </Text>
+              <Text style={{ ...theme.typography.labelSm, fontSize: 12, color: theme.colors.textMuted }}>{p.hint}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <SectionTitle title="Your rhythm" detail="Tap to change" />
+      <Group>
+        <Row
+          first
+          icon="calendar-outline"
+          title="Working hours"
+          detail={describeDays(prefs?.workDays ?? 'mon,tue,wed,thu,fri')}
+          value={`${hh(prefs?.workStartHour ?? 9)}–${hh(prefs?.workEndHour ?? 18)}`}
+        />
+        <Row
+          icon="sunny-outline"
+          iconTint="clay"
+          title="Best energy"
+          value={`${hh(prefs?.energyPeakStart ?? 10)}–${hh(prefs?.energyPeakEnd ?? 13)}`}
+        />
+        <Row
+          icon="hourglass-outline"
+          title="Deep work"
+          value={titleCase(prefs?.deepWorkMode ?? 'MODERATE')}
+          onPress={() => prefs && savePrefs({ deepWorkMode: nextOf(DEEP_WORK, prefs.deepWorkMode) })}
+        />
+        <Row
+          icon="cafe-outline"
+          iconTint="sage"
+          title="Breaks"
+          value={`Every ${prefs?.focusBreakInterval ?? 90} min`}
+          onPress={() =>
+            prefs &&
+            savePrefs({
+              focusBreakInterval: nextOf(
+                BREAK_INTERVALS,
+                BREAK_INTERVALS.includes(prefs.focusBreakInterval) ? prefs.focusBreakInterval : 90,
+              ),
+            })
+          }
+        />
+        <Row
+          icon="moon-outline"
+          iconTint="sand"
+          title="Sleep sync"
+          value={prefs?.sleepSync ? 'On' : 'Off'}
+          onPress={() => prefs && savePrefs({ sleepSync: !prefs.sleepSync })}
+        />
+      </Group>
+
+      <SectionTitle title="Notifications and AI" />
+      <Group>
+        <Row
+          first
+          icon="notifications-outline"
+          title="Reminders"
+          value={titleCase(prefs?.notificationDensity ?? 'LOW')}
+          onPress={() => prefs && savePrefs({ notificationDensity: nextOf(DENSITY, prefs.notificationDensity) })}
+        />
+        <Row
+          icon="sparkles-outline"
+          title="Plan my day automatically"
+          value={prefs?.aiAutoScheduling === false ? 'Off' : 'On'}
+          onPress={() => prefs && savePrefs({ aiAutoScheduling: !prefs.aiAutoScheduling })}
+        />
+        <Row icon="pie-chart-outline" iconTint="sand" title="AI usage" onPress={() => router.push('/profile/usage' as Href)} />
+      </Group>
+
+      <Group>
+        <FeedbackWidget
+          renderTrigger={(open) => (
+            <Row first icon="chatbubble-ellipses-outline" iconTint="sage" title="Send feedback" onPress={open} />
+          )}
+        />
+        {isAdmin ? (
+          <>
+            <Row icon="ticket-outline" iconTint="sand" title="Invites" onPress={() => router.push('/profile/invites' as Href)} />
+            <Row icon="shield-outline" iconTint="sand" title="Admin" onPress={() => router.push('/(admin)' as Href)} />
+          </>
         ) : null}
+        <Row icon="log-out-outline" iconTint="clay" title={logout.isPending ? 'Signing out…' : 'Sign out'} destructive onPress={handleSignOut} />
+      </Group>
 
-        <Pressable style={styles.versionContainer} onPress={handleVersionTap}>
-          <Text style={[styles.versionText, { color: theme.colors.textSubtle }]}>
-            Traction v{config.appEnv === 'production' ? '1.0.0' : '1.0.0-dev'}
-          </Text>
-        </Pressable>
-      </ScrollView>
-    </SafeAreaView>
+      <Pressable onPress={handleVersionTap} style={{ alignItems: 'center', paddingVertical: 8 }}>
+        <Text style={{ ...theme.typography.labelSm, color: theme.colors.textSubtle }}>
+          Traction {config.appEnv === 'production' ? '1.0.0' : '1.0.0 (development)'}
+        </Text>
+      </Pressable>
+    </Page>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 100,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: 36,
-    fontWeight: '600',
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  editIcon: {
-    fontSize: 14,
-  },
-  profileInfo: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  profileName: {
-    fontSize: 22,
-    fontWeight: '600',
-  },
-  profileRole: {
-    fontSize: 15,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.1,
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  personalitySelector: {
-    flexDirection: 'row',
-    padding: 4,
-    borderRadius: 12,
-  },
-  personalityButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 8,
-  },
-  personalityIcon: {
-    fontSize: 20,
-    marginBottom: 4,
-  },
-  personalityLabel: {
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  settingsCard: {
-    borderRadius: 12,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  settingsItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  settingsLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  settingsIcon: {
-    fontSize: 20,
-  },
-  settingsLabel: {
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  settingsRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  settingsValue: {
-    fontSize: 15,
-  },
-  chevron: {
-    fontSize: 20,
-    fontWeight: '300',
-  },
-  divider: {
-    height: 1,
-    marginLeft: 48,
-  },
-  energyGrid: {
-    gap: 12,
-  },
-  energyCard: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  energyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  energyIcon: {
-    fontSize: 18,
-  },
-  energyTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  energyContent: {
-    gap: 8,
-  },
-  energyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  energyLabel: {
-    fontSize: 15,
-  },
-  energyValue: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  energyTrack: {
-    height: 4,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  energyFill: {
-    height: '100%',
-    borderRadius: 2,
-  },
-  miniChart: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 4,
-    height: 24,
-  },
-  miniBar: {
-    flex: 1,
-    borderRadius: 2,
-  },
-  signOutButton: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  signOutText: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  versionContainer: {
-    alignItems: 'center',
-    paddingVertical: 24,
-  },
-  versionText: {
-    fontSize: 13,
-  },
-  adminButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginTop: 8,
-  },
-  adminIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  adminInfo: {
-    flex: 1,
-  },
-  adminTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  adminSubtitle: {
-    fontSize: 13,
-    marginTop: 2,
-  },
-});

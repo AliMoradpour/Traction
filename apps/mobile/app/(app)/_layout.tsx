@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
 import { View } from 'react-native';
 
-import { FeedbackWidget } from '@/components/FeedbackWidget';
 import { FocusIcon, GoalsIcon, ProfileIcon, ProgressIcon, TodayIcon } from '@/components/icons';
 import { useTractionTheme } from '@/theme';
 
@@ -51,7 +50,6 @@ export default function AppLayout() {
         <Tabs.Screen name="behavior" options={{ href: null }} />
         <Tabs.Screen name="execution" options={{ href: null }} />
       </Tabs>
-      <FeedbackWidget />
     </View>
   );
 }
