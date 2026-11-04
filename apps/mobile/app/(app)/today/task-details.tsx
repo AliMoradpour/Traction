@@ -1,44 +1,25 @@
-import { useLocalSearchParams,useRouter } from 'expo-router';
-import { useEffect,useState } from 'react';
-import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
 
+import { Card, EmptyHint, Group, Page, Pill, Row, SectionTitle } from '@/components/calm';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useGoals } from '@/hooks/useGoals';
-import { useCompleteTask,useDeleteTask, useTask, useUpdateTask } from '@/hooks/useTasks';
+import { useCompleteTask, useDeleteTask, useTask, useUpdateTask } from '@/hooks/useTasks';
 import { useTractionTheme } from '@/theme';
 
-const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
-  { label: 'Low', value: 'LOW' },
-  { label: 'Medium', value: 'MEDIUM' },
-  { label: 'High', value: 'HIGH' },
+type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
+const DURATIONS = [10, 25, 45, 60, 90];
+const PRIORITIES: { label: string; value: Priority }[] = [
+  { label: 'Can wait', value: 'LOW' },
+  { label: 'Normal', value: 'MEDIUM' },
+  { label: 'Important', value: 'HIGH' },
   { label: 'Urgent', value: 'URGENT' },
 ];
 
-function formatDuration(minutes?: number): string {
-  if (!minutes) return '';
-  if (minutes < 60) return `${minutes}`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
-}
-
-function parseDuration(input: string): number | undefined {
-  const trimmed = input.trim().toLowerCase();
-  if (!trimmed) return undefined;
-
-  const hMatch = trimmed.match(/^(\d+)h\s*(\d*)m?$/);
-  if (hMatch) {
-    const h = parseInt(hMatch[1], 10);
-    const m = hMatch[2] ? parseInt(hMatch[2], 10) : 0;
-    return h * 60 + m;
-  }
-
-  const mMatch = trimmed.match(/^(\d+)m?$/);
-  if (mMatch) return parseInt(mMatch[1], 10);
-
-  return undefined;
-}
+const durationLabel = (m: number) => (m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m / 60} h`);
 
 export default function TaskDetailsScreen() {
   const theme = useTractionTheme();
@@ -49,35 +30,36 @@ export default function TaskDetailsScreen() {
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const completeTask = useCompleteTask();
+  const { data: goals } = useGoals({ status: 'ACTIVE' });
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
-  const [duration, setDuration] = useState('');
-  const [category, setCategory] = useState('');
+  const [priority, setPriority] = useState<Priority>('MEDIUM');
+  const [duration, setDuration] = useState<number | null>(null);
   const [goalId, setGoalId] = useState<string | undefined>();
   const [initialized, setInitialized] = useState(false);
-  const { data: goals } = useGoals({ status: 'ACTIVE' });
 
   useEffect(() => {
     if (task && !initialized) {
       setTitle(task.title || '');
       setDescription(task.description || '');
       setPriority(task.priority || 'MEDIUM');
-      setDuration(task.duration ? formatDuration(task.duration) : '');
-      setCategory(task.category || '');
+      setDuration(task.duration ?? null);
       setGoalId(task.goalId);
       setInitialized(true);
     }
   }, [task, initialized]);
 
+  const changed =
+    !!task &&
+    (title.trim() !== (task.title || '') ||
+      description.trim() !== (task.description || '') ||
+      priority !== (task.priority || 'MEDIUM') ||
+      duration !== (task.duration ?? null) ||
+      goalId !== task.goalId);
+
   const handleSave = () => {
     if (!taskId) return;
-    if (!title.trim()) {
-      Alert.alert('Validation', 'Task name is required');
-      return;
-    }
-
     updateTask.mutate(
       {
         id: taskId,
@@ -85,380 +67,172 @@ export default function TaskDetailsScreen() {
           title: title.trim(),
           description: description.trim() || undefined,
           priority,
-          duration: parseDuration(duration),
-          category: category.trim() || undefined,
+          duration: duration ?? undefined,
           goalId: goalId || undefined,
         },
       },
       {
-        onSuccess: () => {
-          router.back();
-        },
-        onError: (error: any) => {
-          Alert.alert('Error', error?.message || 'Failed to save task');
-        },
-      }
+        onSuccess: () => router.back(),
+        onError: (error: any) => Alert.alert("Couldn't save your changes", error?.message || 'Please try again.'),
+      },
     );
   };
 
   const handleDelete = () => {
     if (!taskId) return;
-    Alert.alert('Delete Task', 'Are you sure you want to delete this task?', [
+    Alert.alert('Delete this task?', "This can't be undone.", [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
+        onPress: () =>
           deleteTask.mutate(taskId, {
-            onSuccess: () => {
-              router.back();
-            },
-            onError: (error: any) => {
-              Alert.alert('Error', error?.message || 'Failed to delete task');
-            },
-          });
-        },
+            onSuccess: () => router.back(),
+            onError: (error: any) => Alert.alert("Couldn't delete the task", error?.message || 'Please try again.'),
+          }),
       },
     ]);
   };
 
-  const handleToggleComplete = () => {
-    if (!taskId || !task) return;
-    if (task.status === 'COMPLETED') return;
-    completeTask.mutate(taskId);
-  };
-
-  if (isLoading) {
+  if (isLoading || isError || !task) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        </View>
-      </SafeAreaView>
+      <Page title={isLoading ? '' : 'Task'}>
+        {isLoading ? (
+          <ActivityIndicator color={theme.colors.accent} style={{ marginTop: 32 }} />
+        ) : (
+          <EmptyHint icon="cloud-offline-outline" title="We couldn't load this task" text="Go back and try again." />
+        )}
+      </Page>
     );
   }
 
-  if (isError || !task) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()}>
-            <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
+  const isDone = task.status === 'COMPLETED';
+  const durationOptions = Array.from(new Set([...DURATIONS, ...(task.duration ? [task.duration] : [])])).sort(
+    (a, b) => a - b,
+  );
+
+  const chip = (selected: boolean) => ({
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.full,
+    borderWidth: 1.5,
+    borderColor: selected ? theme.colors.accent : theme.colors.border,
+    backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surface,
+  });
+  const chipText = (selected: boolean) => ({
+    ...theme.typography.bodyMd,
+    fontWeight: '600' as const,
+    color: selected ? theme.colors.accentText : theme.colors.text,
+  });
+  const chips = <T,>(options: { label: string; value: T }[], selected: T | null | undefined, onSelect: (v: T) => void) => (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      {options.map((o) => {
+        const isSelected = o.value === selected;
+        return (
+          <Pressable
+            key={o.label}
+            onPress={() => onSelect(o.value)}
+            style={chip(isSelected)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: isSelected }}
+          >
+            <Text style={chipText(isSelected)}>{o.label}</Text>
           </Pressable>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Task Details</Text>
-          <View style={{ width: 60 }} />
-        </View>
-        <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.error }]}>
-            Task not found
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const isCompleted = task.status === 'COMPLETED';
+        );
+      })}
+    </View>
+  );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backButton, { color: theme.colors.primary }]}>← Back</Text>
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Task Details</Text>
-        <Pressable onPress={handleDelete}>
-          <Text style={[styles.deleteButton, { color: theme.colors.error }]}>Delete</Text>
-        </Pressable>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>TASK NAME</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Task name"
-            placeholderTextColor={theme.colors.textSubtle}
-            editable={!isCompleted}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>DESCRIPTION</Text>
-          <TextInput
-            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Add details..."
-            placeholderTextColor={theme.colors.textSubtle}
-            multiline
-            numberOfLines={3}
-            editable={!isCompleted}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>PRIORITY</Text>
-          <View style={styles.chipGroup}>
-            {PRIORITIES.map((p) => (
-              <Pressable
-                key={p.value}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: priority === p.value ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: priority === p.value ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => !isCompleted && setPriority(p.value)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: priority === p.value ? '#FFFFFF' : theme.colors.text },
-                  ]}
-                >
-                  {p.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>CATEGORY</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={category}
-            onChangeText={setCategory}
-            placeholder="e.g. Design, Dev, Ops"
-            placeholderTextColor={theme.colors.textSubtle}
-            editable={!isCompleted}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>ESTIMATED DURATION</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={duration}
-            onChangeText={setDuration}
-            placeholder="e.g. 30m, 1h"
-            placeholderTextColor={theme.colors.textSubtle}
-            editable={!isCompleted}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>LINK TO GOAL</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipGroup}>
-            <Pressable
-              style={[
-                styles.chip,
-                {
-                  backgroundColor: !goalId ? theme.colors.primary : theme.colors.surfaceElevated,
-                  borderColor: !goalId ? theme.colors.primary : theme.colors.border,
-                },
-              ]}
-              onPress={() => !isCompleted && setGoalId(undefined)}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  { color: !goalId ? '#FFFFFF' : theme.colors.text },
-                ]}
-              >
-                None
-              </Text>
-            </Pressable>
-            {goals?.map((goal) => (
-              <Pressable
-                key={goal.id}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: goalId === goal.id ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: goalId === goal.id ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => !isCompleted && setGoalId(goal.id)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: goalId === goal.id ? '#FFFFFF' : theme.colors.text },
-                  ]}
-                >
-                  {goal.title}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {task.friction != null && (
-          <View style={styles.field}>
-            <Text style={[styles.label, { color: theme.colors.textMuted }]}>RESISTANCE METER</Text>
-            <View style={[styles.resistanceCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <View style={styles.resistanceHeader}>
-                <Text style={[styles.resistanceLabel, { color: theme.colors.text }]}>Friction Score</Text>
-                <Text style={[styles.resistanceValue, { color: theme.colors.warning }]}>{task.friction}</Text>
-              </View>
-              <View style={[styles.resistanceTrack, { backgroundColor: theme.colors.surfaceMuted }]}>
-                <View style={[styles.resistanceFill, { backgroundColor: theme.colors.warning, width: `${Math.min(task.friction, 100)}%` }]} />
-              </View>
-            </View>
-          </View>
-        )}
-
-        {!isCompleted && (
-          <View style={styles.field}>
-            <Button variant="secondary" onPress={handleToggleComplete} loading={completeTask.isPending}>
-              Mark as Completed
-            </Button>
-            <View style={styles.helpRow}>
-              <Button
-                variant="ghost"
-                onPress={() => router.push(`/focus/${taskId}/simplify`)}
-                style={styles.helpButton}
-              >
-                Break It Down
-              </Button>
-              <Button
-                variant="ghost"
-                onPress={() => router.push(`/focus/${taskId}/resistance`)}
-                style={styles.helpButton}
-              >
-                I'm Stuck
-              </Button>
-            </View>
-          </View>
-        )}
-      </ScrollView>
-
-      {!isCompleted && (
-        <View style={styles.footer}>
-          <Button variant="primary" onPress={handleSave} loading={updateTask.isPending} disabled={updateTask.isPending}>
-            {updateTask.isPending ? 'Saving...' : 'Save Changes'}
+    <Page
+      title={task.title}
+      footer={
+        changed ? (
+          <Button
+            variant="primary"
+            size="lg"
+            onPress={handleSave}
+            disabled={!title.trim() || updateTask.isPending}
+            loading={updateTask.isPending}
+          >
+            Save changes
           </Button>
-        </View>
+        ) : undefined
+      }
+    >
+      <Card tint={isDone ? 'sage' : 'blue'}>
+        {isDone ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Pill label="Done" tone="sage" />
+            <Text style={{ ...theme.typography.bodyMd, color: theme.colors.text }}>Nice work. This one is finished.</Text>
+          </View>
+        ) : (
+          <View style={{ gap: 8 }}>
+            <Button variant="primary" onPress={() => router.push(`/focus/${taskId}`)}>
+              Start focusing
+            </Button>
+            <Button variant="secondary" onPress={() => completeTask.mutate(taskId)} loading={completeTask.isPending}>
+              Mark as done
+            </Button>
+          </View>
+        )}
+      </Card>
+
+      {!isDone ? (
+        <Group>
+          <Row
+            first
+            icon="git-branch-outline"
+            title="Break it into steps"
+            detail="Make it smaller and easier to start"
+            onPress={() => router.push(`/focus/${taskId}/simplify` as Href)}
+          />
+          <Row
+            icon="help-buoy-outline"
+            iconTint="clay"
+            title="I'm stuck on this"
+            detail="Find out what's in the way"
+            onPress={() => router.push(`/focus/${taskId}/resistance` as Href)}
+          />
+        </Group>
+      ) : null}
+
+      <SectionTitle title="Details" />
+      <Input label="Task" value={title} onChangeText={setTitle} placeholder="What needs doing?" />
+
+      <SectionTitle title="How long will it take?" />
+      {chips(
+        durationOptions.map((m) => ({ label: durationLabel(m), value: m })),
+        duration,
+        (m) => setDuration(m === duration ? null : m),
       )}
-    </SafeAreaView>
+
+      <SectionTitle title="How important is it?" />
+      {chips(PRIORITIES, priority, setPriority)}
+
+      {goals && goals.length > 0 ? (
+        <>
+          <SectionTitle title="Part of a goal?" />
+          {chips(
+            goals.map((g) => ({ label: g.title, value: g.id })),
+            goalId,
+            (id) => setGoalId(id === goalId ? undefined : id),
+          )}
+        </>
+      ) : null}
+
+      <Input
+        label="Notes"
+        placeholder="Anything that will help you start"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        style={{ minHeight: 80, paddingTop: 14, textAlignVertical: 'top' }}
+      />
+
+      <Group>
+        <Row first icon="trash-outline" iconTint="clay" title="Delete task" destructive onPress={handleDelete} />
+      </Group>
+    </Page>
   );
 }
-
-const styles = StyleSheet.create({
-  helpRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
-  },
-  helpButton: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  backButton: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  deleteButton: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  field: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 17,
-  },
-  textArea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  chipGroup: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  resistanceCard: {
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  resistanceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  resistanceLabel: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  resistanceValue: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  resistanceTrack: {
-    height: 6,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  resistanceFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 17,
-    fontWeight: '500',
-  },
-});

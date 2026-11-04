@@ -1,29 +1,29 @@
-import { useLocalSearchParams,useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert,Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Alert, Pressable, Text, View } from 'react-native';
 
+import { Page, SectionTitle } from '@/components/calm';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useGoals } from '@/hooks/useGoals';
 import { useCreateTask } from '@/hooks/useTasks';
 import { useTractionTheme } from '@/theme';
 
-const CATEGORIES = ['Design', 'Dev', 'Ops', 'Admin', 'Personal', 'Learning'];
-const PRIORITIES: { label: string; value: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' }[] = [
-  { label: 'Low', value: 'LOW' },
-  { label: 'Medium', value: 'MEDIUM' },
-  { label: 'High', value: 'HIGH' },
+type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+
+const DURATIONS = [10, 25, 45, 60, 90];
+const PRIORITIES: { label: string; value: Priority }[] = [
+  { label: 'Can wait', value: 'LOW' },
+  { label: 'Normal', value: 'MEDIUM' },
+  { label: 'Important', value: 'HIGH' },
   { label: 'Urgent', value: 'URGENT' },
 ];
 
-function parseDuration(input: string): number | undefined {
-  const trimmed = input.trim().toLowerCase();
-  if (!trimmed) return undefined;
-  const match = trimmed.match(/^(\d+)(m|h)?$/);
-  if (!match) return undefined;
-  const num = parseInt(match[1], 10);
-  if (match[2] === 'h') return num * 60;
-  return num;
+/** Midday of the user's local today, so the task lands on their day in any time zone. */
+function todayLocalNoonISO(): string {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  return d.toISOString();
 }
 
 export default function AddTaskScreen() {
@@ -32,275 +32,120 @@ export default function AddTaskScreen() {
   const { goalId: preselectedGoalId } = useLocalSearchParams<{ goalId?: string }>();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [priority, setPriority] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'>('MEDIUM');
-  const [duration, setDuration] = useState('');
+  const [priority, setPriority] = useState<Priority>('MEDIUM');
+  const [duration, setDuration] = useState<number | null>(25);
   const [goalId, setGoalId] = useState<string | undefined>(preselectedGoalId);
   const createTask = useCreateTask();
   const { data: goals } = useGoals({ status: 'ACTIVE' });
 
   const handleSubmit = () => {
-    if (!title.trim()) {
-      Alert.alert('Validation', 'Task name is required');
-      return;
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-
     createTask.mutate(
       {
         title: title.trim(),
         description: description.trim() || undefined,
-        category: category || undefined,
         priority,
-        duration: parseDuration(duration),
+        duration: duration ?? undefined,
         goalId: goalId || undefined,
-        scheduledAt: today,
+        scheduledAt: todayLocalNoonISO(),
       },
       {
-        onSuccess: () => {
-          setTitle('');
-          setDescription('');
-          setCategory('');
-          setPriority('MEDIUM');
-          setDuration('');
-          setGoalId(preselectedGoalId);
-          router.back();
-        },
-        onError: (error: any) => {
-          Alert.alert('Error', error?.message || 'Failed to create task');
-        },
-      }
+        onSuccess: () => router.back(),
+        onError: (error: any) => Alert.alert("Couldn't add the task", error?.message || 'Please try again.'),
+      },
     );
   };
 
+  const chip = (selected: boolean) => ({
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.full,
+    borderWidth: 1.5,
+    borderColor: selected ? theme.colors.accent : theme.colors.border,
+    backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surface,
+  });
+  const chipText = (selected: boolean) => ({
+    ...theme.typography.bodyMd,
+    fontWeight: '600' as const,
+    color: selected ? theme.colors.accentText : theme.colors.text,
+  });
+
+  const chips = <T,>(
+    options: { label: string; value: T }[],
+    selected: T | null | undefined,
+    onSelect: (value: T) => void,
+  ) => (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      {options.map((o) => {
+        const isSelected = o.value === selected;
+        return (
+          <Pressable
+            key={String(o.label)}
+            onPress={() => onSelect(o.value)}
+            style={chip(isSelected)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: isSelected }}
+          >
+            <Text style={chipText(isSelected)}>{o.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backButton, { color: theme.colors.primary }]}>Cancel</Text>
-        </Pressable>
-        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Add Task</Text>
-        <View style={{ width: 60 }} />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>TASK NAME *</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={title}
-            onChangeText={setTitle}
-            placeholder="What do you need to do?"
-            placeholderTextColor={theme.colors.textSubtle}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>DESCRIPTION</Text>
-          <TextInput
-            style={[styles.input, styles.textArea, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Add details..."
-            placeholderTextColor={theme.colors.textSubtle}
-            multiline
-            numberOfLines={3}
-          />
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>CATEGORY</Text>
-          <View style={styles.chipGroup}>
-            {CATEGORIES.map((cat) => (
-              <Pressable
-                key={cat}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: category === cat ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: category === cat ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setCategory(cat)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: category === cat ? '#FFFFFF' : theme.colors.text },
-                  ]}
-                >
-                  {cat}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>LINK TO GOAL</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipGroup}>
-            <Pressable
-              style={[
-                styles.chip,
-                {
-                  backgroundColor: !goalId ? theme.colors.primary : theme.colors.surfaceElevated,
-                  borderColor: !goalId ? theme.colors.primary : theme.colors.border,
-                },
-              ]}
-              onPress={() => setGoalId(undefined)}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  { color: !goalId ? '#FFFFFF' : theme.colors.text },
-                ]}
-              >
-                None
-              </Text>
-            </Pressable>
-            {goals?.map((goal) => (
-              <Pressable
-                key={goal.id}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: goalId === goal.id ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: goalId === goal.id ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setGoalId(goal.id)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: goalId === goal.id ? '#FFFFFF' : theme.colors.text },
-                  ]}
-                >
-                  {goal.title}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>PRIORITY</Text>
-          <View style={styles.chipGroup}>
-            {PRIORITIES.map((p) => (
-              <Pressable
-                key={p.value}
-                style={[
-                  styles.chip,
-                  {
-                    backgroundColor: priority === p.value ? theme.colors.primary : theme.colors.surfaceElevated,
-                    borderColor: priority === p.value ? theme.colors.primary : theme.colors.border,
-                  },
-                ]}
-                onPress={() => setPriority(p.value)}
-              >
-                <Text
-                  style={[
-                    styles.chipText,
-                    { color: priority === p.value ? '#FFFFFF' : theme.colors.text },
-                  ]}
-                >
-                  {p.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>ESTIMATED DURATION</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border, color: theme.colors.text }]}
-            value={duration}
-            onChangeText={setDuration}
-            placeholder="e.g. 30m, 1h, 2h"
-            placeholderTextColor={theme.colors.textSubtle}
-            keyboardType="default"
-          />
-        </View>
-      </ScrollView>
-
-      <View style={styles.footer}>
+    <Page
+      title="New task"
+      subtitle="Small and specific works best."
+      footer={
         <Button
           variant="primary"
+          size="lg"
           onPress={handleSubmit}
           disabled={!title.trim() || createTask.isPending}
           loading={createTask.isPending}
         >
-          {createTask.isPending ? 'Creating...' : 'Add Task'}
+          Add to today
         </Button>
-      </View>
-    </SafeAreaView>
+      }
+    >
+      <Input
+        label="What do you need to do?"
+        placeholder="Write the intro paragraph"
+        value={title}
+        onChangeText={setTitle}
+        autoFocus
+        returnKeyType="done"
+      />
+
+      <SectionTitle title="How long will it take?" />
+      {chips(
+        DURATIONS.map((m) => ({ label: m < 60 ? `${m} min` : `${m / 60} h`.replace('1.5 h', '1½ h'), value: m })),
+        duration,
+        (m) => setDuration(m === duration ? null : m),
+      )}
+
+      <SectionTitle title="How important is it?" />
+      {chips(PRIORITIES, priority, setPriority)}
+
+      {goals && goals.length > 0 ? (
+        <>
+          <SectionTitle title="Part of a goal?" />
+          {chips(
+            goals.map((g) => ({ label: g.title, value: g.id })),
+            goalId,
+            (id) => setGoalId(id === goalId ? undefined : id),
+          )}
+        </>
+      ) : null}
+
+      <Input
+        label="Notes (optional)"
+        placeholder="Anything that will help you start"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        style={{ minHeight: 80, paddingTop: 14, textAlignVertical: 'top' }}
+      />
+    </Page>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  backButton: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  field: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 17,
-  },
-  textArea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  chipGroup: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-  },
-});
