@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet,View } from 'react-native';
 
 import { useTractionTheme } from '@/theme';
