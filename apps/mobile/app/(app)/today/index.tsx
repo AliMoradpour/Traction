@@ -1,476 +1,405 @@
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect,useMemo, useRef } from 'react';
-import { ActivityIndicator, Alert,Animated, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { type Href, useRouter } from 'expo-router';
+import type { ComponentProps } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { useUser } from '@/hooks/useAuth';
 import { useReadinessScore } from '@/hooks/useExecution';
-import { useCompleteTask,useTasks } from '@/hooks/useTasks';
+import { useCompleteTask, useTasks } from '@/hooks/useTasks';
 import { localDayStartISO } from '@/lib/dates';
-import { Task } from '@/services/task.service';
-import { useTractionTheme } from '@/theme';
+import type { Task } from '@/services/task.service';
+import { type TractionTheme, useTractionTheme } from '@/theme';
 
-function formatDuration(minutes?: number): string {
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
+function formatDuration(minutes?: number | null): string {
   if (!minutes) return '';
-  if (minutes < 60) return `${minutes}m`;
+  if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  return m > 0 ? `${h} h ${m} min` : `${h} h`;
 }
 
-function getGreeting(user: any): string {
+function getGreeting(firstName?: string | null): string {
   const hour = new Date().getHours();
-  const name = user?.firstName || 'there';
-  if (hour < 12) return `Good morning, ${name}`;
-  if (hour < 17) return `Good afternoon, ${name}`;
-  return `Good evening, ${name}`;
+  const name = firstName ? `, ${firstName}` : '';
+  if (hour < 12) return `Good morning${name}`;
+  if (hour < 17) return `Good afternoon${name}`;
+  return `Good evening${name}`;
 }
 
-function getPriorityColor(theme: any, priority: Task['priority']): string {
-  switch (priority) {
-    case 'URGENT': return theme.colors.error;
-    case 'HIGH': return theme.colors.warning;
-    case 'MEDIUM': return theme.colors.primary;
-    case 'LOW': return theme.colors.textMuted;
-    default: return theme.colors.textMuted;
-  }
+function readinessMessage(score: number): { title: string; tone: 'calm' | 'steady' | 'gentle' } {
+  if (score >= 70) return { title: 'Good energy for focused work', tone: 'calm' };
+  if (score >= 40) return { title: 'A steady day. Start small', tone: 'steady' };
+  return { title: 'Take it gently today', tone: 'gentle' };
 }
 
 const TaskCard = React.memo(function TaskCard({
   task,
+  styles,
   theme,
   onComplete,
   onStartSession,
   onPress,
 }: {
   task: Task;
-  theme: any;
+  styles: ReturnType<typeof createStyles>;
+  theme: TractionTheme;
   onComplete: (id: string) => void;
   onStartSession: (id: string) => void;
   onPress: (id: string) => void;
 }) {
   const isCompleted = task.status === 'COMPLETED';
+  const isImportant = task.priority === 'HIGH' || task.priority === 'URGENT';
+
+  // The card is a plain View with three sibling buttons (check, details, start) so no button nests in another.
   return (
-    <Pressable
-      style={[
-        styles.taskCard,
-        { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border },
-        isCompleted && styles.taskCardCompleted,
-      ]}
-      onPress={() => onPress(task.id)}
-    >
+    <View style={[styles.task, isCompleted && styles.taskDone]}>
       <Pressable
-        style={[
-          styles.checkbox,
-          { borderColor: getPriorityColor(theme, task.priority) },
-          isCompleted && { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
-        ]}
-        onPress={(e) => {
-          e.stopPropagation();
+        style={[styles.check, isCompleted && styles.checkDone]}
+        onPress={() => {
           if (!isCompleted) onComplete(task.id);
         }}
+        hitSlop={10}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: isCompleted }}
+        accessibilityLabel={`Mark ${task.title} as done`}
       >
-        {isCompleted && <Text style={styles.checkmark}>✓</Text>}
+        {isCompleted ? <Ionicons name="checkmark" size={15} color={theme.colors.textInverse} /> : null}
       </Pressable>
-      <View style={styles.taskContent}>
-        <Text
-          style={[
-            styles.taskTitle,
-            { color: theme.colors.text },
-            isCompleted && { textDecorationLine: 'line-through', color: theme.colors.textMuted },
-          ]}
-        >
+
+      <Pressable
+        style={({ pressed }) => [{ flex: 1 }, pressed && { opacity: 0.7 }]}
+        onPress={() => onPress(task.id)}
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${task.title}`}
+      >
+        <Text style={[styles.taskTitle, isCompleted && styles.taskTitleDone]} numberOfLines={2}>
           {task.title}
         </Text>
-        <View style={styles.taskMeta}>
-          {task.duration ? (
-            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-              ⏱ {formatDuration(task.duration)}
-            </Text>
-          ) : null}
-          {task.category ? (
-            <Text style={[styles.taskMetaText, { color: theme.colors.textMuted }]}>
-              📁 {task.category}
-            </Text>
-          ) : null}
-          <View style={[styles.priorityDot, { backgroundColor: getPriorityColor(theme, task.priority) }]} />
-        </View>
-      </View>
-      {!isCompleted && (
+        {!isCompleted && (task.duration || isImportant) ? (
+          <View style={styles.pills}>
+            {task.duration ? (
+              <Text style={[styles.pill, styles.pillBlue]}>{formatDuration(task.duration)}</Text>
+            ) : null}
+            {isImportant ? <Text style={[styles.pill, styles.pillClay]}>Important</Text> : null}
+          </View>
+        ) : null}
+      </Pressable>
+
+      {!isCompleted ? (
         <Pressable
-          style={[styles.focusButton, { backgroundColor: theme.colors.primary }]}
-          onPress={(e) => {
-            e.stopPropagation();
-            onStartSession(task.id);
-          }}
+          style={styles.play}
+          onPress={() => onStartSession(task.id)}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={`Start focusing on ${task.title}`}
         >
-          <Text style={styles.focusButtonText}>▶</Text>
+          <Ionicons name="play" size={16} color={theme.colors.accent} />
         </Pressable>
-      )}
-    </Pressable>
+      ) : null}
+    </View>
   );
 });
 
 export default function TodayScreen() {
   const theme = useTractionTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const router = useRouter();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: tasks, isLoading, isError, refetch } = useTasks({ scheduledDate: localDayStartISO() });
+  const { data: tasks, isLoading, isError, refetch, isRefetching } = useTasks({ scheduledDate: localDayStartISO() });
   const { data: readiness } = useReadinessScore();
   const { data: user } = useUser();
   const completeTask = useCompleteTask();
 
-  const isBehindSchedule = useMemo(() => {
-    if (!tasks || !readiness) return false;
-    const incomplete = tasks.filter((t) => t.status !== 'COMPLETED');
-    const hour = new Date().getHours();
-    return incomplete.length > 2 && hour >= 14;
-  }, [tasks, readiness]);
+  // Open tasks first, finished ones at the bottom.
+  const sorted = useMemo(
+    () =>
+      [...(tasks ?? [])].sort(
+        (a, b) => Number(a.status === 'COMPLETED') - Number(b.status === 'COMPLETED'),
+      ),
+    [tasks],
+  );
+  const doneCount = sorted.filter((t) => t.status === 'COMPLETED').length;
+  const openCount = sorted.length - doneCount;
+  const isBehindSchedule = openCount > 2 && new Date().getHours() >= 14;
 
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 600,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  const handleStartSession = (taskId?: string) => {
-    if (taskId) {
-      router.push(`/focus/${taskId}`);
-    } else {
-      Alert.alert('No task selected', 'Select a task to start a focus session.');
-    }
-  };
-
-  const handleTaskPress = (taskId: string) => {
-    router.push({ pathname: '/today/task-details', params: { taskId } });
-  };
-
-  const handleAddTask = () => {
-    router.push('/today/add-task');
-  };
-
-  const handleCompleteTask = useCallback(
-    (taskId: string) => {
-      completeTask.mutate(taskId);
-    },
-    [completeTask]
+  const handleComplete = useCallback((id: string) => completeTask.mutate(id), [completeTask]);
+  const handleStart = useCallback((id: string) => router.push(`/focus/${id}`), [router]);
+  const handlePress = useCallback(
+    (id: string) => router.push({ pathname: '/today/task-details', params: { taskId: id } }),
+    [router],
   );
 
-  const todayDate = new Date();
-  const dayName = todayDate.toLocaleDateString('en-US', { weekday: 'long' });
-  const monthDay = todayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const mood = readiness ? readinessMessage(readiness.score) : null;
+  const moodColors = mood
+    ? {
+        calm: { bg: theme.colors.successSurface, fg: theme.colors.success, icon: 'sunny-outline' as IconName },
+        steady: { bg: theme.colors.accentMuted, fg: theme.colors.accent, icon: 'partly-sunny-outline' as IconName },
+        gentle: { bg: theme.colors.warningSurface, fg: theme.colors.warning, icon: 'cafe-outline' as IconName },
+      }[mood.tone]
+    : null;
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.surfaceMuted }]}>
-            <Text style={styles.avatarText}>A</Text>
-          </View>
-          <View>
-            <Text style={[styles.greeting, { color: theme.colors.text }]}>{getGreeting(user)}</Text>
-            <Text style={[styles.date, { color: theme.colors.textMuted }]}>{dayName}, {monthDay}</Text>
-          </View>
+  const quickActions: { label: string; icon: IconName; href: Href }[] = [
+    { label: 'Smart start', icon: 'flash-outline', href: '/(app)/today/smart-start' as Href },
+    { label: 'Plan day', icon: 'list-outline', href: '/(app)/today/planner' as Href },
+    { label: 'Reflect', icon: 'moon-outline', href: '/(app)/today/reflection' as Href },
+  ];
+
+  const header = (
+    <View>
+      <View style={styles.headerRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.date}>{today}</Text>
+          <Text style={styles.greeting}>{getGreeting(user?.firstName)}</Text>
         </View>
         <Pressable
-          style={[styles.reflectionButton, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-          onPress={() => router.push('/(app)/today/reflection')}
+          style={styles.addButton}
+          onPress={() => router.push('/today/add-task')}
+          accessibilityRole="button"
+          accessibilityLabel="Add a task"
         >
-          <Text style={[styles.reflectionButtonText, { color: theme.colors.text }]}>Reflect</Text>
+          <Ionicons name="add" size={26} color={theme.colors.textInverse} />
         </Pressable>
       </View>
 
+      {mood && moodColors ? (
+        <View style={[styles.moodCard, { backgroundColor: moodColors.bg }]}>
+          <View style={styles.moodIcon}>
+            <Ionicons name={moodColors.icon} size={22} color={moodColors.fg} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.moodTitle}>{mood.title}</Text>
+            {readiness?.explanation ? (
+              <Text style={styles.moodText} numberOfLines={2}>
+                {readiness.explanation}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      ) : null}
+
+      {isBehindSchedule ? (
+        <Pressable
+          style={[styles.moodCard, { backgroundColor: theme.colors.warningSurface }]}
+          onPress={() => router.push('/(app)/today/replan' as Href)}
+          accessibilityRole="button"
+        >
+          <View style={styles.moodIcon}>
+            <Ionicons name="refresh-outline" size={22} color={theme.colors.warning} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.moodTitle}>Running behind? That&apos;s okay</Text>
+            <Text style={styles.moodText}>Re-plan the rest of your day</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSubtle} />
+        </Pressable>
+      ) : null}
+
+      <View style={styles.actions}>
+        {quickActions.map((a) => (
+          <Pressable
+            key={a.label}
+            style={({ pressed }) => [styles.action, pressed && { opacity: 0.7 }]}
+            onPress={() => router.push(a.href)}
+            accessibilityRole="button"
+          >
+            <Ionicons name={a.icon} size={16} color={theme.colors.text} />
+            <Text style={styles.actionText}>{a.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <View style={styles.sectionRow}>
+        <Text style={styles.sectionTitle}>Today</Text>
+        {sorted.length > 0 ? (
+          <Text style={styles.sectionMeta}>
+            {doneCount} of {sorted.length} done
+          </Text>
+        ) : null}
+      </View>
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
       {isLoading ? (
-        <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={[styles.loadingText, { color: theme.colors.textMuted }]}>Loading tasks...</Text>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={theme.colors.accent} />
         </View>
       ) : isError ? (
-        <View style={styles.centerContent}>
-          <Text style={[styles.errorText, { color: theme.colors.error }]}>
-            Failed to load tasks
-          </Text>
-          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 12 }}>
-            Retry
+        <View style={styles.center}>
+          <Text style={styles.emptyTitle}>We couldn&apos;t load your day</Text>
+          <Text style={styles.emptyText}>Check your connection and try again.</Text>
+          <Button variant="secondary" onPress={() => refetch()} style={{ marginTop: 16 }} fullWidth={false}>
+            Try again
           </Button>
         </View>
       ) : (
         <FlatList
-          data={tasks}
+          data={sorted}
           keyExtractor={(item) => item.id}
-          renderItem={({ item: task }) => (
+          renderItem={({ item }) => (
             <TaskCard
-              task={task}
+              task={item}
+              styles={styles}
               theme={theme}
-              onComplete={handleCompleteTask}
-              onStartSession={handleStartSession}
-              onPress={handleTaskPress}
+              onComplete={handleComplete}
+              onStartSession={handleStart}
+              onPress={handlePress}
             />
           )}
-          ListHeaderComponent={
-            <Animated.View style={[styles.section, { opacity: fadeAnim }]}>
-              <View style={styles.sectionHeader}>
-                <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>TODAY'S TASKS</Text>
-                <View style={styles.headerButtons}>
-                  {isBehindSchedule && (
-                    <Pressable
-                      style={[styles.replanButton, { backgroundColor: theme.colors.warning }]}
-                      onPress={() => router.push('/(app)/today/replan' as any)}
-                    >
-                      <Text style={styles.replanButtonText}>Replan Day</Text>
-                    </Pressable>
-                  )}
-                  <Pressable
-                    style={[styles.smartStartButton, { backgroundColor: theme.colors.primaryContainer }]}
-                    onPress={() => router.push('/(app)/today/smart-start' as any)}
-                  >
-                    <Text style={[styles.smartStartButtonText, { color: theme.colors.primary }]}>Smart Start</Text>
-                  </Pressable>
-                  <Pressable
-                    style={[styles.aiPlanButton, { backgroundColor: theme.colors.primary }]}
-                    onPress={() => router.push('/(app)/today/planner' as any)}
-                  >
-                    <Text style={styles.aiPlanButtonText}>View AI Plan</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </Animated.View>
-          }
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          ListHeaderComponent={header}
           ListEmptyComponent={
-            <View style={[styles.emptyState, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>📋</Text>
-              <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No tasks for today</Text>
-              <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
-                Tap + to add your first task
-              </Text>
+            <View style={styles.empty}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="leaf-outline" size={28} color={theme.colors.success} />
+              </View>
+              <Text style={styles.emptyTitle}>A clear day</Text>
+              <Text style={styles.emptyText}>Add one thing you&apos;d like to get done today.</Text>
+              <Button
+                variant="primary"
+                onPress={() => router.push('/today/add-task')}
+                style={{ marginTop: 16 }}
+                fullWidth={false}
+              >
+                Add a task
+              </Button>
             </View>
           }
           contentContainerStyle={styles.content}
-          refreshControl={<RefreshControl refreshing={false} onRefresh={() => void refetch()} tintColor={theme.colors.primary} />}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={() => void refetch()} tintColor={theme.colors.accent} />
+          }
         />
       )}
-
-      <Pressable style={[styles.fab, { backgroundColor: theme.colors.primary }]} onPress={handleAddTask}>
-        <Text style={styles.fabIcon}>+</Text>
-      </Pressable>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  greeting: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  date: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-  reflectionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  reflectionButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.05,
-  },
-  aiPlanButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  aiPlanButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  replanButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  replanButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  smartStartButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  smartStartButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  taskList: {
-    gap: 8,
-  },
-  taskCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 12,
-  },
-  taskCardCompleted: {
-    opacity: 0.6,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmark: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  taskContent: {
-    flex: 1,
-    gap: 4,
-  },
-  taskTitle: {
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  taskMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  taskMetaText: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  priorityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  focusButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  focusButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  emptyState: {
-    padding: 32,
-    borderRadius: 12,
-    borderWidth: 1,
-    alignItems: 'center',
-    gap: 8,
-  },
-  emptyIcon: {
-    fontSize: 32,
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  emptyText: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  fabIcon: {
-    fontSize: 28,
-    color: '#FFFFFF',
-    fontWeight: '300',
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 15,
-  },
-  errorText: {
-    fontSize: 17,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-});
+function createStyles(theme: TractionTheme) {
+  const card =
+    theme.mode === 'light' ? theme.shadows.card : { borderWidth: 1, borderColor: theme.colors.border };
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: theme.colors.background },
+    content: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 40 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
+    headerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+    date: { ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.textSubtle },
+    greeting: { ...theme.typography.displayLgMobile, color: theme.colors.text, marginTop: 2 },
+    addButton: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: theme.colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 4,
+    },
+    moodCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      padding: 16,
+      borderRadius: theme.radius.lg,
+      marginTop: 16,
+    },
+    moodIcon: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      backgroundColor: theme.colors.surface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    moodTitle: { ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.text },
+    moodText: { ...theme.typography.labelSm, color: theme.colors.textMuted, marginTop: 2 },
+    actions: { flexDirection: 'row', gap: 8, marginTop: 16 },
+    action: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingVertical: 9,
+      paddingHorizontal: 13,
+      borderRadius: theme.radius.full,
+      backgroundColor: theme.colors.surfaceSoft,
+    },
+    actionText: { ...theme.typography.labelSm, fontWeight: '600', color: theme.colors.text },
+    sectionRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'baseline',
+      marginTop: 24,
+      marginBottom: 12,
+      paddingHorizontal: 4,
+    },
+    sectionTitle: { ...theme.typography.titleMd, color: theme.colors.text },
+    sectionMeta: { ...theme.typography.labelSm, color: theme.colors.textSubtle },
+    task: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: theme.radius.lg,
+      backgroundColor: theme.colors.surface,
+      ...card,
+    },
+    taskDone: {
+      backgroundColor: 'transparent',
+      shadowOpacity: 0,
+      elevation: 0,
+      borderWidth: 0,
+    },
+    check: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      borderWidth: 2,
+      borderColor: theme.colors.textSubtle,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    checkDone: { backgroundColor: theme.colors.success, borderColor: theme.colors.success },
+    taskTitle: { ...theme.typography.bodyLg, fontWeight: '600', color: theme.colors.text },
+    taskTitleDone: { fontWeight: '400', color: theme.colors.textSubtle, textDecorationLine: 'line-through' },
+    pills: { flexDirection: 'row', gap: 6, marginTop: 6 },
+    pill: {
+      ...theme.typography.labelSm,
+      fontSize: 12,
+      fontWeight: '600',
+      paddingVertical: 3,
+      paddingHorizontal: 9,
+      borderRadius: theme.radius.full,
+      overflow: 'hidden',
+    },
+    pillBlue: { backgroundColor: theme.colors.accentMuted, color: theme.colors.accentText },
+    pillClay: { backgroundColor: theme.colors.warningSurface, color: theme.colors.warningText },
+    play: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: theme.colors.accentMuted,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingLeft: 2,
+    },
+    empty: { alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24 },
+    emptyIcon: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: theme.colors.successSurface,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 14,
+    },
+    emptyTitle: { ...theme.typography.titleMd, color: theme.colors.text, textAlign: 'center' },
+    emptyText: { ...theme.typography.bodyMd, color: theme.colors.textMuted, textAlign: 'center', marginTop: 4 },
+  });
+}
