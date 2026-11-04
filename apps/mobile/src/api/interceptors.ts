@@ -1,5 +1,16 @@
 import type { AxiosInstance, AxiosResponse,InternalAxiosRequestConfig } from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
+
+// expo-secure-store has no web implementation; the web build keeps tokens in localStorage.
+const secureStore =
+  Platform.OS === 'web'
+    ? {
+        getItemAsync: async (key: string) => globalThis.localStorage?.getItem(key) ?? null,
+        setItemAsync: async (key: string, value: string) => globalThis.localStorage?.setItem(key, value),
+        deleteItemAsync: async (key: string) => globalThis.localStorage?.removeItem(key),
+      }
+    : SecureStore;
 
 const ACCESS_TOKEN_KEY = 'traction_access_token';
 const REFRESH_TOKEN_KEY = 'traction_refresh_token';
@@ -101,7 +112,7 @@ const NO_REFRESH_PATHS = [
 export const tokenStorage = {
   async getAccessToken(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
+      return await secureStore.getItemAsync(ACCESS_TOKEN_KEY);
     } catch {
       return null;
     }
@@ -109,7 +120,7 @@ export const tokenStorage = {
 
   async setAccessToken(token: string): Promise<void> {
     try {
-      await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
+      await secureStore.setItemAsync(ACCESS_TOKEN_KEY, token);
     } catch {
       console.error('Failed to store access token');
     }
@@ -117,7 +128,7 @@ export const tokenStorage = {
 
   async getRefreshToken(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+      return await secureStore.getItemAsync(REFRESH_TOKEN_KEY);
     } catch {
       return null;
     }
@@ -125,7 +136,7 @@ export const tokenStorage = {
 
   async setRefreshToken(token: string): Promise<void> {
     try {
-      await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, token);
+      await secureStore.setItemAsync(REFRESH_TOKEN_KEY, token);
     } catch {
       console.error('Failed to store refresh token');
     }
@@ -133,8 +144,8 @@ export const tokenStorage = {
 
   async clearTokens(): Promise<void> {
     try {
-      await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
-      await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
+      await secureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+      await secureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
     } catch {
       console.error('Failed to clear tokens');
     }
