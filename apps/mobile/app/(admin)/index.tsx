@@ -18,11 +18,11 @@ import { useAdminDashboard, useAdminUsers, useUpdateUserRole } from '@/hooks/use
 import { useTractionTheme } from '@/theme';
 
 const ROLES = [
-  { value: 'SUPER_ADMIN', label: 'Super Admin', color: '#EF4444' },
-  { value: 'ADMIN', label: 'Admin', color: '#3B82F6' },
-  { value: 'BETA_TESTER', label: 'Beta Tester', color: '#22C55E' },
+  { value: 'SUPER_ADMIN', label: 'Super Admin', color: '#D0554A' },
+  { value: 'ADMIN', label: 'Admin', color: '#3D6BE0' },
+  { value: 'BETA_TESTER', label: 'Beta Tester', color: '#6E9E7E' },
   { value: 'PREMIUM_USER', label: 'Premium User', color: '#A855F7' },
-  { value: 'USER', label: 'User', color: '#6B7280' },
+  { value: 'USER', label: 'User', color: '#857C71' },
 ];
 
 function StatCard({ label, value, color }: { label: string; value: number | string; color: string }) {

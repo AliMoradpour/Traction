@@ -72,7 +72,7 @@ export default function InsightsScreen() {
                 <View key={rec.id} style={[styles.insightCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
                   <View style={styles.insightHeader}>
                     <Text style={styles.insightIcon}>💡</Text>
-                    <Text style={[styles.insightLabel, { color: theme.colors.primary }]}>WHAT WE LEARNED</Text>
+                    <Text style={[styles.insightLabel, { color: theme.colors.primary }]}>What we learned</Text>
                   </View>
                   <Text style={[styles.insightLearned, { color: theme.colors.text }]}>{rec.title}</Text>
                   <Text style={[styles.insightBody, { color: theme.colors.textMuted }]}>{rec.body}</Text>

@@ -33,7 +33,7 @@ export default function SplashScreen() {
   }, [fadeAnim, scaleAnim, router]);
 
   return (
-    <View style={[styles.container, { backgroundColor: '#0F172A' }]}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Animated.View
         style={[
           styles.content,
@@ -45,11 +45,11 @@ export default function SplashScreen() {
       >
         <Image source={require('@/assets/logos/logo-mark.png')} style={styles.logoMark} />
 
-        <Text style={styles.brandName}>Traction</Text>
+        <Text style={[styles.brandName, { color: theme.colors.text }]}>Traction</Text>
       </Animated.View>
 
       <View style={styles.indicator}>
-        <View style={styles.indicatorDot} />
+        <View style={[styles.indicatorDot, { backgroundColor: theme.colors.surfaceMuted }]} />
       </View>
     </View>
   );
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
   brandName: {
     fontSize: 34,
     fontWeight: '700',
-    color: '#FFFFFF',
     letterSpacing: -0.02,
   },
   indicator: {
@@ -83,6 +82,5 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
 });

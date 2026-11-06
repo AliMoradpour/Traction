@@ -81,7 +81,7 @@ export default function MomentumScreen() {
           <Animated.View style={{ opacity: fadeAnim }}>
             {/* Trend */}
             <View style={[styles.trendCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[styles.trendLabel, { color: theme.colors.textMuted }]}>OVERALL TREND</Text>
+              <Text style={[styles.trendLabel, { color: theme.colors.textMuted }]}>Overall trend</Text>
               <View style={styles.trendRow}>
                 <TrendArrow trend={momentum?.trend ?? 'stable'} theme={theme} />
                 <Text style={[styles.trendText, { color: theme.colors.text }]}>
@@ -93,17 +93,17 @@ export default function MomentumScreen() {
             {/* Streaks */}
             <View style={styles.streaksRow}>
               <View style={[styles.streakCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>CURRENT</Text>
+                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>Current</Text>
                 <Text style={[styles.streakValue, { color: theme.colors.text }]}>{momentum?.currentStreak ?? 0}</Text>
                 <Text style={[styles.streakUnit, { color: theme.colors.textMuted }]}>days</Text>
               </View>
               <View style={[styles.streakCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>EXECUTION</Text>
+                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>Execution</Text>
                 <Text style={[styles.streakValue, { color: theme.colors.success }]}>{momentum?.executionStreak ?? 0}</Text>
                 <Text style={[styles.streakUnit, { color: theme.colors.textMuted }]}>days</Text>
               </View>
               <View style={[styles.streakCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>RECOVERY</Text>
+                <Text style={[styles.streakLabel, { color: theme.colors.textMuted }]}>Recovery</Text>
                 <Text style={[styles.streakValue, { color: theme.colors.accent }]}>{momentum?.recoveryStreak ?? 0}</Text>
                 <Text style={[styles.streakUnit, { color: theme.colors.textMuted }]}>days</Text>
               </View>
@@ -112,11 +112,11 @@ export default function MomentumScreen() {
             {/* Weekly / Monthly */}
             <View style={styles.comparisonRow}>
               <View style={[styles.comparisonCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.comparisonLabel, { color: theme.colors.textMuted }]}>WEEKLY MOMENTUM</Text>
+                <Text style={[styles.comparisonLabel, { color: theme.colors.textMuted }]}>Weekly momentum</Text>
                 <Text style={[styles.comparisonValue, { color: theme.colors.text }]}>{momentum?.weeklyMomentum ?? 0}</Text>
               </View>
               <View style={[styles.comparisonCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.comparisonLabel, { color: theme.colors.textMuted }]}>MONTHLY MOMENTUM</Text>
+                <Text style={[styles.comparisonLabel, { color: theme.colors.textMuted }]}>Monthly momentum</Text>
                 <Text style={[styles.comparisonValue, { color: theme.colors.text }]}>{momentum?.monthlyMomentum ?? 0}</Text>
               </View>
             </View>
@@ -124,7 +124,7 @@ export default function MomentumScreen() {
             {/* Focus Time Stats */}
             {stats && (
               <View style={[styles.statsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statsLabel, { color: theme.colors.textMuted }]}>FOCUS TIME</Text>
+                <Text style={[styles.statsLabel, { color: theme.colors.textMuted }]}>Focus time</Text>
                 <View style={styles.statsRow}>
                   <View style={styles.statsItem}>
                     <Text style={[styles.statsValue, { color: theme.colors.text }]}>{stats.focusTime.today}m</Text>

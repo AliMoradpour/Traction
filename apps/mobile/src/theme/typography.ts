@@ -77,7 +77,6 @@ export const typography = {
     fontWeight: fontWeight.semibold,
     lineHeight: 13,
     letterSpacing: 0,
-    textTransform: 'uppercase',
   },
   timer: {
     fontFamily: fontFamily.heading,

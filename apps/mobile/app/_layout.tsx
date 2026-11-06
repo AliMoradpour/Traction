@@ -30,7 +30,7 @@ function OfflineBanner() {
 
 const offlineStyles = StyleSheet.create({
   banner: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: '#D9895A',
     paddingVertical: 6,
     paddingHorizontal: 16,
     alignItems: 'center',

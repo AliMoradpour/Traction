@@ -44,7 +44,7 @@ function getRiskColor(theme: any, level: string): string {
     case 'moderate':
       return theme.colors.warning;
     case 'high':
-      return '#F97316';
+      return '#D9895A';
     case 'critical':
       return theme.colors.danger;
     default:
@@ -137,7 +137,7 @@ export default function BurnoutScreen() {
 
           {/* Signal Breakdown */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>RISK SIGNALS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Risk signals</Text>
             <View style={styles.signalsList}>
               {SIGNAL_LABELS.map((label, i) => (
                 <View key={i} style={styles.signalItem}>
@@ -163,7 +163,7 @@ export default function BurnoutScreen() {
 
           {/* Recommendation */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>RECOMMENDATION</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Recommendation</Text>
             <Text style={[styles.recommendationText, { color: theme.colors.text }]}>
               {getRecommendation(burnout?.level ?? 'low')}
             </Text>
@@ -256,7 +256,6 @@ const styles = StyleSheet.create({
   levelText: {
     fontSize: 14,
     fontWeight: '700',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
   trendContainer: {

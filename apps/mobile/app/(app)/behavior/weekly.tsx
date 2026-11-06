@@ -128,7 +128,7 @@ export default function WeeklyMetricsScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           {/* Consistency */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>CONSISTENCY</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Consistency</Text>
             <View style={styles.consistencyRow}>
               <Text style={[styles.consistencyValue, { color: theme.colors.text }]}>{metrics?.consistency ?? 0}%</Text>
               <View style={styles.consistencyBarContainer}>
@@ -154,7 +154,7 @@ export default function WeeklyMetricsScreen() {
 
           {/* Completion Stats */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>COMPLETION STATS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Completion stats</Text>
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, { color: theme.colors.success }]}>{metrics?.weeklyCompletion ?? 0}</Text>
@@ -179,7 +179,7 @@ export default function WeeklyMetricsScreen() {
 
           {/* Planning Accuracy & Output */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>ACCURACY & OUTPUT</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Accuracy & output</Text>
             <View style={styles.statsRow}>
               <View style={styles.statItem}>
                 <Text style={[styles.statValue, { color: theme.colors.text }]}>{metrics?.planningAccuracy ?? 0}%</Text>

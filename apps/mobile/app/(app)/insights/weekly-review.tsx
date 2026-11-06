@@ -126,7 +126,7 @@ export default function WeeklyReviewScreen() {
             <View style={[styles.aiCard, { backgroundColor: theme.colors.primaryContainer }]}>
               <View style={styles.aiHeader}>
                 <Text style={styles.aiIcon}>✨</Text>
-                <Text style={[styles.aiLabel, { color: theme.colors.onPrimaryContainer }]}>AI SYNTHESIS</Text>
+                <Text style={[styles.aiLabel, { color: theme.colors.onPrimaryContainer }]}>AI synthesis</Text>
               </View>
               <Text style={[styles.aiTitle, { color: theme.colors.onPrimaryContainer }]}>Optimal Shift</Text>
               <Text style={[styles.aiContent, { color: theme.colors.onPrimaryContainer }]}>

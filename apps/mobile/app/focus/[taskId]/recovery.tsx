@@ -118,7 +118,7 @@ export default function RecoveryScreen() {
         </View>
 
         <View style={[styles.taskCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-          <Text style={[styles.taskLabel, { color: theme.colors.textMuted }]}>YOU WERE WORKING ON</Text>
+          <Text style={[styles.taskLabel, { color: theme.colors.textMuted }]}>You were working on</Text>
           <Text style={[styles.taskTitle, { color: theme.colors.text }]}>{taskTitle}</Text>
         </View>
 
@@ -285,7 +285,6 @@ const styles = StyleSheet.create({
   backLink: {
     fontSize: 13,
     fontWeight: '500',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
 });

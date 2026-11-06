@@ -145,7 +145,7 @@ export default function BehaviorDashboardScreen() {
           <Animated.View style={{ opacity: fadeAnim }}>
             {/* Today's Summary */}
             <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>TODAY'S SUMMARY</Text>
+              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Today's summary</Text>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
                   <Text style={[styles.summaryValue, { color: theme.colors.text }]}>
@@ -209,7 +209,7 @@ export default function BehaviorDashboardScreen() {
               onPress={() => router.push('/(app)/behavior/burnout' as Href)}
             >
               <View style={styles.cardHeaderRow}>
-                <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>BURNOUT RISK</Text>
+                <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Burnout risk</Text>
                 <RiskBadge level={burnout?.level ?? 'low'} theme={theme} />
               </View>
               <View style={styles.burnoutRow}>
@@ -228,7 +228,7 @@ export default function BehaviorDashboardScreen() {
               style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
               onPress={() => router.push('/(app)/behavior/procrastination' as Href)}
             >
-              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>PROCRASTINATION</Text>
+              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Procrastination</Text>
               <View style={styles.procrastinationRow}>
                 <View style={styles.procrastinationItem}>
                   <Text style={[styles.procrastinationValue, { color: ScoreColor(theme, procrastination?.score ?? 0, true) }]}>
@@ -401,7 +401,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     marginTop: 4,
-    textTransform: 'uppercase',
     letterSpacing: 0.03,
   },
   burnoutRow: {

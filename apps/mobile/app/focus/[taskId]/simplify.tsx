@@ -247,7 +247,6 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
   statDivider: {

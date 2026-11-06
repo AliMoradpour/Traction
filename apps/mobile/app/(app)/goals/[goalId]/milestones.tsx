@@ -24,10 +24,10 @@ function formatDate(dateString?: string): string {
 }
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  PENDING: { bg: '#F3F4F6', text: '#374151' },
-  IN_PROGRESS: { bg: '#DBEAFE', text: '#1D4ED8' },
-  COMPLETED: { bg: '#D1FAE5', text: '#065F46' },
-  SKIPPED: { bg: '#FEF3C7', text: '#92400E' },
+  PENDING: { bg: '#F2EBE1', text: '#3D3832' },
+  IN_PROGRESS: { bg: '#E6EDFC', text: '#2F57C2' },
+  COMPLETED: { bg: '#E5F0E8', text: '#4C7A5C' },
+  SKIPPED: { bg: '#FAEBE1', text: '#B5663A' },
 };
 
 export default function MilestonesScreen() {
@@ -239,7 +239,7 @@ export default function MilestonesScreen() {
                         <Text style={[styles.actionBtnText, { color: theme.colors.text }]}>Edit</Text>
                       </Pressable>
                       <Pressable
-                        style={[styles.actionBtn, { backgroundColor: theme.colors.dangerSurface || '#FEE2E2' }]}
+                        style={[styles.actionBtn, { backgroundColor: theme.colors.dangerSurface || '#FBE6E3' }]}
                         onPress={() => handleDelete(milestone.id)}
                       >
                         <Text style={[styles.actionBtnText, { color: theme.colors.danger }]}>Delete</Text>
@@ -279,7 +279,7 @@ export default function MilestonesScreen() {
         }
       >
         <View style={styles.modalField}>
-          <Text style={[styles.modalLabel, { color: theme.colors.textMuted }]}>TITLE</Text>
+          <Text style={[styles.modalLabel, { color: theme.colors.textMuted }]}>Title</Text>
           <TextInput
             style={[
               styles.modalInput,
@@ -296,7 +296,7 @@ export default function MilestonesScreen() {
           />
         </View>
         <View style={styles.modalField}>
-          <Text style={[styles.modalLabel, { color: theme.colors.textMuted }]}>DESCRIPTION</Text>
+          <Text style={[styles.modalLabel, { color: theme.colors.textMuted }]}>Description</Text>
           <TextInput
             style={[
               styles.modalInput,
@@ -478,7 +478,6 @@ const styles = StyleSheet.create({
   modalLabel: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
   modalInput: {

@@ -228,7 +228,7 @@ export default function GoalProjectionScreen() {
   }
 
   const m = computeMetrics(goal.progress, goal.startDate, goal.targetDate);
-  const healthColor = m.onTrack ? '#10B981' : '#EF4444';
+  const healthColor = m.onTrack ? '#6E9E7E' : '#D0554A';
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -500,7 +500,6 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
   statValue: {

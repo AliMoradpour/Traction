@@ -141,7 +141,7 @@ export default function ReplanScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           <Animated.View style={{ opacity: fadeAnim }}>
             <View style={[styles.capacityCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[styles.capacityLabel, { color: theme.colors.textMuted }]}>YOUR CAPACITY</Text>
+              <Text style={[styles.capacityLabel, { color: theme.colors.textMuted }]}>Your capacity</Text>
               <Text style={[styles.capacityValue, { color: theme.colors.text }]}>{availableMinutes} min remaining</Text>
               <Text style={[styles.capacityReason, { color: theme.colors.textMuted }]}>
                 Based on {readinessScore}% readiness and current time of day

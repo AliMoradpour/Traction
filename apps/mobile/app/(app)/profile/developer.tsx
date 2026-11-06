@@ -111,7 +111,7 @@ export default function DeveloperScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>DATA MANAGEMENT</Text>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>Data management</Text>
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Pressable
               style={styles.actionItem}
@@ -172,7 +172,7 @@ export default function DeveloperScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>DEVELOPMENT</Text>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>Development</Text>
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <Pressable
               style={styles.actionItem}

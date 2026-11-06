@@ -92,7 +92,7 @@ export default function ProcrastinationScreen() {
 
           {/* Patterns */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>DETECTED PATTERNS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Detected patterns</Text>
             {profile?.patterns && profile.patterns.length > 0 ? (
               <View style={styles.patternsList}>
                 {profile.patterns.map((pattern, i) => (
@@ -112,7 +112,7 @@ export default function ProcrastinationScreen() {
           {/* Common Reasons */}
           {profile?.commonReasons && profile.commonReasons.length > 0 && !profile.commonReasons.includes('None identified') && (
             <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>COMMON REASONS</Text>
+              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Common reasons</Text>
               <View style={styles.patternsList}>
                 {profile.commonReasons.map((reason, i) => (
                   <View key={i} style={[styles.patternItem, { backgroundColor: theme.colors.surfaceMuted }]}>
@@ -126,7 +126,7 @@ export default function ProcrastinationScreen() {
 
           {/* Recommendations */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>RECOMMENDATIONS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Recommendations</Text>
             <View style={styles.recsList}>
               {recommendations.map((rec, i) => (
                 <View key={i} style={styles.recItem}>

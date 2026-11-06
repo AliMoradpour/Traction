@@ -34,7 +34,7 @@ function ReadinessGauge({ score, theme }: { score: number; theme: any }) {
     score >= 70 ? theme.colors.success : score >= 40 ? theme.colors.warning : theme.colors.danger;
   return (
     <View style={[styles.gauge, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-      <Text style={[styles.gaugeLabel, { color: theme.colors.textMuted }]}>READINESS</Text>
+      <Text style={[styles.gaugeLabel, { color: theme.colors.textMuted }]}>Readiness</Text>
       <Text style={[styles.gaugeValue, { color }]}>{score}%</Text>
     </View>
   );
@@ -119,7 +119,7 @@ export default function ExecutionDashboardScreen() {
                 style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/execution/momentum' as Href)}
               >
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>MOMENTUM</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Momentum</Text>
                 <View style={styles.statValueRow}>
                   <Text style={[styles.statValue, { color: theme.colors.text }]}>{momentum?.currentStreak ?? 0}</Text>
                   <TrendArrow trend={momentum?.trend ?? 'stable'} theme={theme} />
@@ -131,7 +131,7 @@ export default function ExecutionDashboardScreen() {
                 style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/execution/resistance' as Href)}
               >
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>RESISTANCE</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Resistance</Text>
                 <Text
                   style={[
                     styles.statValue,
@@ -147,7 +147,7 @@ export default function ExecutionDashboardScreen() {
             {/* Focus Time + Stats */}
             <View style={styles.row}>
               <View style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>FOCUS TODAY</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Focus today</Text>
                 <Text style={[styles.statValue, { color: theme.colors.text }]}>
                   {stats?.focusTime.today ?? 0}m
                 </Text>
@@ -155,7 +155,7 @@ export default function ExecutionDashboardScreen() {
               </View>
 
               <View style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>COMPLETED</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Completed</Text>
                 <Text style={[styles.statValue, { color: theme.colors.text }]}>
                   {stats?.tasksCompleted.today ?? 0}
                 </Text>
@@ -166,7 +166,7 @@ export default function ExecutionDashboardScreen() {
             {/* Reliability + Planning */}
             <View style={styles.row}>
               <View style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>RELIABILITY</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Reliability</Text>
                 <Text
                   style={[
                     styles.statValue,
@@ -178,7 +178,7 @@ export default function ExecutionDashboardScreen() {
               </View>
 
               <View style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>PLANNING</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Planning</Text>
                 <Text
                   style={[
                     styles.statValue,

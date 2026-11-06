@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
   energyLabel: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
     marginBottom: 4,
   },

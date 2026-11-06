@@ -114,7 +114,7 @@ export default function DailyMetricsScreen() {
         <ScrollView contentContainerStyle={styles.content}>
           {/* Tasks */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>TASKS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Tasks</Text>
             <View style={styles.tasksVisual}>
               <View style={styles.tasksBarContainer}>
                 <View style={[styles.tasksBarBg, { backgroundColor: theme.colors.surfaceMuted }]}>
@@ -145,7 +145,7 @@ export default function DailyMetricsScreen() {
 
           {/* Delays */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>DELAYS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Delays</Text>
             <View style={styles.delaysRow}>
               <View style={styles.delayItem}>
                 <Text style={[styles.delayValue, { color: theme.colors.text }]}>{metrics.averageStartDelay}</Text>
@@ -161,7 +161,7 @@ export default function DailyMetricsScreen() {
 
           {/* Focus */}
           <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>FOCUS</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Focus</Text>
             <View style={styles.delaysRow}>
               <View style={styles.delayItem}>
                 <Text style={[styles.delayValue, { color: theme.colors.text }]}>{metrics.deepWorkMinutes}</Text>

@@ -21,7 +21,7 @@ function ResistanceScore({ score, theme }: { score: number; theme: any }) {
     score <= 30 ? theme.colors.success : score <= 60 ? theme.colors.warning : theme.colors.danger;
   return (
     <View style={[styles.scoreCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-      <Text style={[styles.scoreLabel, { color: theme.colors.textMuted }]}>RESISTANCE LEVEL</Text>
+      <Text style={[styles.scoreLabel, { color: theme.colors.textMuted }]}>Resistance level</Text>
       <Text style={[styles.scoreValue, { color }]}>{score}</Text>
       <Text style={[styles.scoreMax, { color: theme.colors.textMuted }]}>/ 100</Text>
     </View>

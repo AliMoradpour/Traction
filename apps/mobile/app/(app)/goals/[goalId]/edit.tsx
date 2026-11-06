@@ -101,7 +101,7 @@ export default function GoalEditScreen() {
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>TITLE</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Title</Text>
           <TextInput
             style={[
               styles.input,
@@ -119,7 +119,7 @@ export default function GoalEditScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>DESCRIPTION</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Description</Text>
           <TextInput
             style={[
               styles.input,
@@ -140,7 +140,7 @@ export default function GoalEditScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>CATEGORY</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Category</Text>
           <TextInput
             style={[
               styles.input,
@@ -195,7 +195,7 @@ export default function GoalEditScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>STATUS</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Status</Text>
           <View style={styles.chipGroup}>
             {STATUSES.map((s) => (
               <Pressable
@@ -218,7 +218,7 @@ export default function GoalEditScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>HEALTH</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Health</Text>
           <View style={styles.chipGroup}>
             {HEALTHS.map((h) => (
               <Pressable
@@ -285,7 +285,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
     marginBottom: 8,
   },

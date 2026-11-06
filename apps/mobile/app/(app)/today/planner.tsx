@@ -96,8 +96,8 @@ function normalizePlan(data: any): DailyPlan {
 function EnergyBadge({ level, theme }: { level: string; theme: any }) {
   const colors: Record<string, { bg: string; text: string }> = {
     high: { bg: '#ECFDF5', text: '#047857' },
-    medium: { bg: '#FEF3C7', text: '#B45309' },
-    low: { bg: '#FEE2E2', text: '#B91C1C' },
+    medium: { bg: '#FAEBE1', text: '#B45309' },
+    low: { bg: '#FBE6E3', text: '#B91C1C' },
   };
   const c = colors[level] || colors.medium;
   return (
@@ -114,7 +114,7 @@ function ReasoningCard({ text, theme }: { text: string; theme: any }) {
     <View style={[styles.reasoningCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
       <Pressable onPress={() => setExpanded(!expanded)}>
         <View style={styles.reasoningHeader}>
-          <Text style={[styles.reasoningLabel, { color: theme.colors.textMuted }]}>AI REASONING</Text>
+          <Text style={[styles.reasoningLabel, { color: theme.colors.textMuted }]}>AI reasoning</Text>
           <Text style={[styles.expandArrow, { color: theme.colors.textMuted }]}>{expanded ? '▲' : '▼'}</Text>
         </View>
       </Pressable>
@@ -272,7 +272,7 @@ export default function PlannerScreen() {
             {/* Energy Insights */}
             {(plan.energyInsights.peak || plan.energyInsights.low) && (
               <View style={[styles.insightCard, { backgroundColor: '#F0FDF4', borderColor: '#BBF7D0' }]}>
-                <Text style={[styles.insightLabel, { color: '#166534' }]}>ENERGY INSIGHTS</Text>
+                <Text style={[styles.insightLabel, { color: '#166534' }]}>Energy insights</Text>
                 {plan.energyInsights.peak ? (
                   <Text style={[styles.insightText, { color: '#15803D' }]}>
                     Peak: {plan.energyInsights.peak}
@@ -291,9 +291,9 @@ export default function PlannerScreen() {
 
             {/* Focus Recommendation */}
             {plan.focusRecommendation ? (
-              <View style={[styles.focusCard, { backgroundColor: '#EFF6FF', borderColor: '#BFDBFE' }]}>
-                <Text style={[styles.focusLabel, { color: '#1E40AF' }]}>FOCUS TODAY</Text>
-                <Text style={[styles.focusText, { color: '#1D4ED8' }]}>{plan.focusRecommendation}</Text>
+              <View style={[styles.focusCard, { backgroundColor: '#E6EDFC', borderColor: '#BFDBFE' }]}>
+                <Text style={[styles.focusLabel, { color: '#1E40AF' }]}>Focus today</Text>
+                <Text style={[styles.focusText, { color: '#2F57C2' }]}>{plan.focusRecommendation}</Text>
               </View>
             ) : null}
 
@@ -323,7 +323,7 @@ export default function PlannerScreen() {
             {/* Time Allocation */}
             {plan.timeAllocation ? (
               <View style={[styles.timeCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.timeLabel, { color: theme.colors.textMuted }]}>TIME ALLOCATION</Text>
+                <Text style={[styles.timeLabel, { color: theme.colors.textMuted }]}>Time allocation</Text>
                 <Text style={[styles.timeText, { color: theme.colors.text }]}>{plan.timeAllocation}</Text>
               </View>
             ) : null}

@@ -270,7 +270,7 @@ export default function SmartStartScreen() {
               </Text>
               {readiness && (
                 <View style={[styles.readinessCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                  <Text style={[styles.readinessLabel, { color: theme.colors.textMuted }]}>READINESS</Text>
+                  <Text style={[styles.readinessLabel, { color: theme.colors.textMuted }]}>Readiness</Text>
                   <Text
                     style={[
                       styles.readinessScore,
@@ -289,7 +289,7 @@ export default function SmartStartScreen() {
                 {estimatedDuration ? ` · ${estimatedDuration}m` : ''}
               </Text>
               <Button onPress={handleStart} style={{ marginTop: 24 }}>
-                START NOW
+                Start now
               </Button>
               <Button variant="ghost" onPress={handleBack} style={{ marginTop: 8 }}>
                 Go back

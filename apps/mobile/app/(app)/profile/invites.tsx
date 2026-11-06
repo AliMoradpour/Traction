@@ -164,7 +164,7 @@ export default function InvitesScreen() {
 
         {/* Send Invite Form */}
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>SEND INVITE</Text>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>Send invite</Text>
           <View style={[styles.inputCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <TextInput
               style={[styles.input, { color: theme.colors.text, borderColor: theme.colors.border }]}
@@ -193,7 +193,7 @@ export default function InvitesScreen() {
 
         {/* Invites List */}
         <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>SENT INVITES</Text>
+          <Text style={[styles.sectionLabel, { color: theme.colors.textMuted }]}>Sent invites</Text>
           {invitesLoading ? (
             <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>Loading invites...</Text>
           ) : !invites || invites.length === 0 ? (

@@ -86,10 +86,10 @@ export default function GoalAnalyticsScreen() {
   const velocity = goal.velocity || 'STABLE';
   const velocityTrend =
     velocity === 'INCREASING'
-      ? { label: 'Increasing', icon: '↑', color: '#10B981' }
+      ? { label: 'Increasing', icon: '↑', color: '#6E9E7E' }
       : velocity === 'DECREASING'
-      ? { label: 'Decreasing', icon: '↓', color: '#EF4444' }
-      : { label: 'Stable', icon: '→', color: '#F59E0B' };
+      ? { label: 'Decreasing', icon: '↓', color: '#D0554A' }
+      : { label: 'Stable', icon: '→', color: '#D9895A' };
 
   const healthScore = health?.score ?? null;
 
@@ -98,28 +98,28 @@ export default function GoalAnalyticsScreen() {
       label: 'COMPLETION',
       value: `${completionPercentage}%`,
       icon: '◉',
-      color: completionPercentage >= 70 ? '#10B981' : completionPercentage >= 40 ? '#F59E0B' : '#EF4444',
+      color: completionPercentage >= 70 ? '#6E9E7E' : completionPercentage >= 40 ? '#D9895A' : '#D0554A',
     },
     {
       label: 'WEEKLY AVG',
       value: weeklyConsistency,
       sublabel: 'milestones/wk',
       icon: '↻',
-      color: '#3B82F6',
+      color: '#3D6BE0',
     },
     {
       label: 'MONTHLY VELOCITY',
       value: milestoneVelocity,
       sublabel: 'milestones/mo',
       icon: '⚡',
-      color: '#8B5CF6',
+      color: '#3D6BE0',
     },
     {
       label: 'MILESTONES LEFT',
       value: `${remainingMilestones}`,
       sublabel: `of ${totalMilestones} total`,
       icon: '◎',
-      color: '#F59E0B',
+      color: '#D9895A',
     },
     {
       label: 'PROGRESS TREND',
@@ -133,12 +133,12 @@ export default function GoalAnalyticsScreen() {
       icon: '♥',
       color:
         goal.health === 'ON_TRACK'
-          ? '#10B981'
+          ? '#6E9E7E'
           : goal.health === 'SLIGHTLY_BEHIND'
-          ? '#F59E0B'
+          ? '#D9895A'
           : goal.health === 'BEHIND_SCHEDULE'
-          ? '#F97316'
-          : '#EF4444',
+          ? '#D9895A'
+          : '#D0554A',
     },
   ];
 
@@ -272,7 +272,6 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 11,
     fontWeight: '600',
-    textTransform: 'uppercase',
     letterSpacing: 0.05,
   },
   statValue: {

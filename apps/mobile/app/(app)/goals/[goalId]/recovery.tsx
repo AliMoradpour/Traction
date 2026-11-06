@@ -24,10 +24,10 @@ interface RecoveryData {
 }
 
 const URGENCY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  low: { bg: '#D1FAE5', text: '#065F46', border: '#A7F3D0' },
-  medium: { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
+  low: { bg: '#E5F0E8', text: '#4C7A5C', border: '#A7F3D0' },
+  medium: { bg: '#FAEBE1', text: '#B5663A', border: '#FDE68A' },
   high: { bg: '#FFEDD5', text: '#9A3412', border: '#FED7AA' },
-  critical: { bg: '#FEE2E2', text: '#991B1B', border: '#FECACA' },
+  critical: { bg: '#FBE6E3', text: '#991B1B', border: '#FECACA' },
 };
 
 export default function GoalRecoveryScreen() {
@@ -118,7 +118,7 @@ export default function GoalRecoveryScreen() {
         )}
 
         {recoveryData?.consequences && (
-          <View style={[styles.card, { backgroundColor: theme.colors.dangerSurface, borderColor: '#FEE2E2' }]}>
+          <View style={[styles.card, { backgroundColor: theme.colors.dangerSurface, borderColor: '#FBE6E3' }]}>
             <Text style={[styles.cardTitle, { color: theme.colors.dangerText }]}>What Happens If Nothing Changes</Text>
             <Text style={[styles.cardText, { color: theme.colors.textMuted }]}>{recoveryData.consequences}</Text>
           </View>

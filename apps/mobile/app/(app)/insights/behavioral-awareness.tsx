@@ -19,10 +19,10 @@ function ScoreBar({ label, score, color }: { label: string; score: number; color
 }
 
 const BURNOUT_COLORS: Record<string, string> = {
-  low: '#10B981',
-  moderate: '#F59E0B',
-  high: '#F97316',
-  critical: '#EF4444',
+  low: '#6E9E7E',
+  moderate: '#D9895A',
+  high: '#D9895A',
+  critical: '#D0554A',
 };
 
 export default function BehavioralAwarenessScreen() {
@@ -83,10 +83,10 @@ export default function BehavioralAwarenessScreen() {
               <View style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
                 <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Behavior Scores</Text>
                 <ScoreBar label="Consistency" score={indicators.consistencyScore} color={theme.colors.primary} />
-                <ScoreBar label="Execution" score={indicators.executionScore} color="#3B82F6" />
-                <ScoreBar label="Reliability" score={indicators.reliabilityScore} color="#10B981" />
-                <ScoreBar label="Planning" score={indicators.planningAccuracy} color="#8B5CF6" />
-                <ScoreBar label="Momentum" score={indicators.momentumScore} color="#F59E0B" />
+                <ScoreBar label="Execution" score={indicators.executionScore} color="#3D6BE0" />
+                <ScoreBar label="Reliability" score={indicators.reliabilityScore} color="#6E9E7E" />
+                <ScoreBar label="Planning" score={indicators.planningAccuracy} color="#3D6BE0" />
+                <ScoreBar label="Momentum" score={indicators.momentumScore} color="#D9895A" />
                 <ScoreBar label="Recovery" score={indicators.recoveryScore} color="#EC4899" />
               </View>
             ) : null}
@@ -172,10 +172,10 @@ const styles = StyleSheet.create({
   cardTitle: { fontSize: 17, fontWeight: '600', marginBottom: 12 },
   cardLabel: { fontSize: 14, marginBottom: 4 },
   scoreRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  scoreLabel: { width: 100, fontSize: 13, color: '#9CA3AF' },
+  scoreLabel: { width: 100, fontSize: 13, color: '#A39A8E' },
   scoreTrack: { flex: 1, height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4, marginHorizontal: 8 },
   scoreFill: { height: '100%', borderRadius: 4 },
-  scoreValue: { width: 40, fontSize: 13, fontWeight: '600', color: '#9CA3AF', textAlign: 'right' },
+  scoreValue: { width: 40, fontSize: 13, fontWeight: '600', color: '#A39A8E', textAlign: 'right' },
   riskBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
   riskText: { fontSize: 11, fontWeight: '700' },
   signalList: { marginTop: 8, gap: 4 },

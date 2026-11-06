@@ -77,7 +77,7 @@ export default function GoalFeasibilityScreen() {
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.intro}>
-          <Text style={[styles.label, { color: theme.colors.textMuted }]}>FORECAST</Text>
+          <Text style={[styles.label, { color: theme.colors.textMuted }]}>Forecast</Text>
           <Text style={[styles.title, { color: theme.colors.text }]}>{goal.title}</Text>
           <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>
             {CONFIDENCE_NOTE[f.confidence]}
@@ -86,7 +86,7 @@ export default function GoalFeasibilityScreen() {
 
         <View style={styles.row}>
           <View style={[styles.card, styles.half, card]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>ON-TIME CHANCE</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>On-time chance</Text>
             <Text style={[styles.cardValue, { color: theme.colors.text }]}>
               {f.probability === null ? '—' : `${Math.round(f.probability * 100)}%`}
             </Text>
@@ -96,7 +96,7 @@ export default function GoalFeasibilityScreen() {
           </View>
 
           <View style={[styles.card, styles.half, card]}>
-            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>RISK</Text>
+            <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Risk</Text>
             <Text style={[styles.cardValue, { color: theme.colors.text }]}>
               {f.onTrack === null ? '—' : f.onTrack ? 'On pace' : 'Behind'}
             </Text>
@@ -117,7 +117,7 @@ export default function GoalFeasibilityScreen() {
         <View style={[styles.card, card]}>
           <View style={styles.timelineHeader}>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>TIMELINE</Text>
+              <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Timeline</Text>
               <Text style={[styles.cardValue, { color: theme.colors.text }]}>
                 {f.daysRemaining === null
                   ? 'No deadline'
@@ -139,7 +139,7 @@ export default function GoalFeasibilityScreen() {
         </View>
 
         <View style={[styles.card, card]}>
-          <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>PACE</Text>
+          <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Pace</Text>
           <View style={styles.paceRow}>
             <Text style={[styles.paceLabel, { color: theme.colors.textMuted }]}>Your pace</Text>
             <Text style={[styles.paceValue, { color: theme.colors.text }]}>

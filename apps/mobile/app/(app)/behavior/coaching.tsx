@@ -43,9 +43,9 @@ function ScoreLabel(score: number): string {
 function RiskBadge({ level, theme }: { level: string; theme: any }) {
   const colors: Record<string, { bg: string; text: string }> = {
     low: { bg: '#ECFDF5', text: '#047857' },
-    moderate: { bg: '#FEF3C7', text: '#B45309' },
+    moderate: { bg: '#FAEBE1', text: '#B45309' },
     high: { bg: '#FFF7ED', text: '#C2410C' },
-    critical: { bg: '#FEE2E2', text: '#B91C1C' },
+    critical: { bg: '#FBE6E3', text: '#B91C1C' },
   };
   const c = colors[level] || colors.low;
   return (
@@ -242,7 +242,7 @@ export default function CoachingScreen() {
           <Animated.View style={{ opacity: fadeAnim }}>
             {burnout ? (
               <View style={[styles.statusCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
-                <Text style={[styles.statusLabel, { color: theme.colors.textMuted }]}>OVERALL STATUS</Text>
+                <Text style={[styles.statusLabel, { color: theme.colors.textMuted }]}>Overall status</Text>
                 <View style={styles.statusRow}>
                   <RiskBadge level={burnout.level ?? 'low'} theme={theme} />
                   {burnout.trend ? (
