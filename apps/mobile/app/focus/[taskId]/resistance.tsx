@@ -3,6 +3,7 @@ import { useCallback,useState } from 'react';
 import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { aiService, behaviorService } from '@/services';
 import { useTractionTheme } from '@/theme';
@@ -88,7 +89,7 @@ export default function ResistanceScreen() {
                   style={[styles.reasonCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                   onPress={() => handleSelect(reason.id)}
                 >
-                  <Text style={styles.reasonIcon}>{reason.icon}</Text>
+                  <Glyph emoji={reason.icon} style={styles.reasonIcon} />
                   <Text style={[styles.reasonLabel, { color: theme.colors.text }]}>{reason.label}</Text>
                   <Text style={[styles.reasonArrow, { color: theme.colors.textSubtle }]}>›</Text>
                 </Pressable>
@@ -114,7 +115,7 @@ export default function ResistanceScreen() {
             ) : analysis?.steps ? (
               <View style={[styles.recommendationCard, { backgroundColor: theme.colors.accentMuted }]}>
                 <View style={styles.recommendationHeader}>
-                  <Text style={styles.recommendationIcon}>✨</Text>
+                  <Glyph emoji="✨" style={styles.recommendationIcon} />
                   <Text style={[styles.recommendationTitle, { color: theme.colors.accentText }]}>AI Recommendation</Text>
                 </View>
                 <View style={styles.stepsList}>
@@ -131,7 +132,7 @@ export default function ResistanceScreen() {
             ) : (
               <View style={[styles.recommendationCard, { backgroundColor: theme.colors.accentMuted }]}>
                 <View style={styles.recommendationHeader}>
-                  <Text style={styles.recommendationIcon}>💡</Text>
+                  <Glyph emoji="💡" style={styles.recommendationIcon} />
                   <Text style={[styles.recommendationTitle, { color: theme.colors.accentText }]}>Tip</Text>
                 </View>
                 <Text style={[styles.tipText, { color: theme.colors.accentText }]}>

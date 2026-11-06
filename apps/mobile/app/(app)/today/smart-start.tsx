@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useReadinessScore } from '@/hooks/useExecution';
 import { useTasks } from '@/hooks/useTasks';
@@ -238,7 +239,7 @@ export default function SmartStartScreen() {
                     ]}
                     onPress={() => handleToggleDistraction(item.key)}
                   >
-                    <Text style={styles.checkIcon}>{item.icon}</Text>
+                    <Glyph emoji={item.icon} style={styles.checkIcon} />
                     <Text style={[styles.checkLabel, { color: theme.colors.text }]}>{item.label}</Text>
                     <View
                       style={[

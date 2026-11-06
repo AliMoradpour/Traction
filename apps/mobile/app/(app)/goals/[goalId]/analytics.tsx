@@ -2,6 +2,7 @@ import { useLocalSearchParams,useRouter } from 'expo-router';
 import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useGoal, useGoalHealth,useGoalMilestones } from '@/hooks/useGoals';
 import { useTractionTheme } from '@/theme';
@@ -101,34 +102,34 @@ export default function GoalAnalyticsScreen() {
       color: completionPercentage >= 70 ? '#6E9E7E' : completionPercentage >= 40 ? '#D9895A' : '#D0554A',
     },
     {
-      label: 'WEEKLY AVG',
+      label: 'Weekly avg',
       value: weeklyConsistency,
       sublabel: 'milestones/wk',
       icon: '↻',
       color: '#3D6BE0',
     },
     {
-      label: 'MONTHLY VELOCITY',
+      label: 'Monthly velocity',
       value: milestoneVelocity,
       sublabel: 'milestones/mo',
       icon: '⚡',
       color: '#3D6BE0',
     },
     {
-      label: 'MILESTONES LEFT',
+      label: 'Milestones left',
       value: `${remainingMilestones}`,
       sublabel: `of ${totalMilestones} total`,
       icon: '◎',
       color: '#D9895A',
     },
     {
-      label: 'PROGRESS TREND',
+      label: 'Progress trend',
       value: velocityTrend.label,
       icon: velocityTrend.icon,
       color: velocityTrend.color,
     },
     {
-      label: 'HEALTH SCORE',
+      label: 'Health score',
       value: healthScore !== null ? `${healthScore}` : goal.health.replace(/_/g, ' '),
       icon: '♥',
       color:
@@ -161,7 +162,7 @@ export default function GoalAnalyticsScreen() {
               style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
             >
               <View style={[styles.statIconWrap, { backgroundColor: stat.color + '18' }]}>
-                <Text style={[styles.statIcon, { color: stat.color }]}>{stat.icon}</Text>
+                <Glyph emoji={stat.icon} style={[styles.statIcon, { color: stat.color }]} />
               </View>
               <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>{stat.label}</Text>
               <Text style={[styles.statValue, { color: theme.colors.text }]}>{stat.value}</Text>

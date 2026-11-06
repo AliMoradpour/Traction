@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet,Text, View } from 'react-native';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { useTractionTheme } from '@/theme';
 
 interface LoadingSpinnerProps {
@@ -44,7 +45,7 @@ interface EmptyStateProps {
 export function EmptyState({ title, message, icon }: EmptyStateProps) {
   return (
     <View style={styles.emptyContainer}>
-      {icon && <Text style={styles.emptyIcon}>{icon}</Text>}
+      {icon && <Glyph emoji={icon} style={styles.emptyIcon} />}
       <Text style={styles.emptyTitle}>{title}</Text>
       {message && <Text style={styles.emptyMessage}>{message}</Text>}
     </View>

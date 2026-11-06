@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { type StyleProp, StyleSheet, Text, View, type ViewStyle } from 'react-native';
 
+import { Glyph } from '@/components/calm/Glyph';
+
 import { type TractionTheme,useTractionTheme } from '../../theme';
 import { Button, type ButtonProps } from './Button';
 
@@ -33,7 +35,7 @@ export function EmptyGoalsState({ onAddGoal }: { onAddGoal: () => void }) {
 
   return (
     <EmptyState
-      icon={<Text style={{ fontSize: 32 }}>🎯</Text>}
+      icon={<Glyph emoji="🎯" style={{ fontSize: 32 }} />}
       title="No goals yet"
       description="Setting goals helps AI prioritize your daily tasks based on what matters most to you."
       action={{
@@ -50,7 +52,7 @@ export function EmptyTasksState({ onAddTask }: { onAddTask: () => void }) {
 
   return (
     <EmptyState
-      icon={<Text style={{ fontSize: 32 }}>📋</Text>}
+      icon={<Glyph emoji="📋" style={{ fontSize: 32 }} />}
       title="No tasks for today"
       description="Add tasks to your day and let AI help you prioritize based on your energy and friction patterns."
       action={{
@@ -67,7 +69,7 @@ export function EmptyInsightsState() {
 
   return (
     <EmptyState
-      icon={<Text style={{ fontSize: 32 }}>🧠</Text>}
+      icon={<Glyph emoji="🧠" style={{ fontSize: 32 }} />}
       title="No insights yet"
       description="Keep using Traction and we'll start identifying patterns in your behavior to help you work smarter."
     />
@@ -87,7 +89,7 @@ export function ErrorState({
 
   return (
     <EmptyState
-      icon={<Text style={{ fontSize: 32 }}>⚠️</Text>}
+      icon={<Glyph emoji="⚠️" style={{ fontSize: 32 }} />}
       title={title}
       description={description}
       action={

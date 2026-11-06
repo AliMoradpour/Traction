@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import {
   useBehaviorIndicators,
   useBurnoutRisk,
@@ -257,7 +258,7 @@ export default function BehaviorDashboardScreen() {
               style={[styles.navCard, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }]}
               onPress={() => router.push('/(app)/behavior/coaching' as Href)}
             >
-              <Text style={styles.navIcon}>🧠</Text>
+              <Glyph emoji="🧠" style={styles.navIcon} />
               <Text style={[styles.navTitle, { color: '#FFFFFF' }]}>Get Coaching</Text>
               <Text style={[styles.navArrow, { color: '#FFFFFF' }]}>›</Text>
             </Pressable>
@@ -268,7 +269,7 @@ export default function BehaviorDashboardScreen() {
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/behavior/daily' as Href)}
               >
-                <Text style={styles.navIcon}>📅</Text>
+                <Glyph emoji="📅" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>Daily Breakdown</Text>
                 <Text style={[styles.navArrow, { color: theme.colors.textSubtle }]}>›</Text>
               </Pressable>
@@ -276,7 +277,7 @@ export default function BehaviorDashboardScreen() {
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/behavior/weekly' as Href)}
               >
-                <Text style={styles.navIcon}>📊</Text>
+                <Glyph emoji="📊" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>Weekly Trends</Text>
                 <Text style={[styles.navArrow, { color: theme.colors.textSubtle }]}>›</Text>
               </Pressable>
@@ -284,7 +285,7 @@ export default function BehaviorDashboardScreen() {
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/behavior/indicators' as Href)}
               >
-                <Text style={styles.navIcon}>📈</Text>
+                <Glyph emoji="📈" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>All Indicators</Text>
                 <Text style={[styles.navArrow, { color: theme.colors.textSubtle }]}>›</Text>
               </Pressable>

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useMomentum,useReadinessScore, useResistance } from '@/hooks/useExecution';
 import { useTractionTheme } from '@/theme';
@@ -51,7 +52,7 @@ function RecommendationCard({ rec, theme }: { rec: CoachingRecommendation; theme
     <View style={[styles.recCard, { backgroundColor: theme.colors.surfaceElevated, borderColor }]}>
       <Pressable onPress={() => setExpanded(!expanded)}>
         <View style={styles.recHeader}>
-          <Text style={styles.recIcon}>{rec.icon}</Text>
+          <Glyph emoji={rec.icon} style={styles.recIcon} />
           <View style={styles.recTitleSection}>
             <Text style={[styles.recTitle, { color: theme.colors.text }]}>{rec.title}</Text>
             <Text style={[styles.recMetric, { color: theme.colors.textMuted }]}>{rec.metric}</Text>

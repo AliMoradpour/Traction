@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { useAIRecommendations } from '@/hooks/useAI';
 import { useAcceptRecommendation, useDismissRecommendation } from '@/hooks/useAI';
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
@@ -60,7 +61,7 @@ export default function InsightsScreen() {
 
           {filteredRecommendations.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>✨</Text>
+              <Glyph emoji="✨" style={[styles.emptyIcon, { color: theme.colors.textMuted }]} />
               <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No insights yet</Text>
               <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
                 Complete more tasks and track behaviors to unlock personalized insights.
@@ -71,7 +72,7 @@ export default function InsightsScreen() {
               {filteredRecommendations.map((rec) => (
                 <View key={rec.id} style={[styles.insightCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
                   <View style={styles.insightHeader}>
-                    <Text style={styles.insightIcon}>💡</Text>
+                    <Glyph emoji="💡" style={styles.insightIcon} />
                     <Text style={[styles.insightLabel, { color: theme.colors.primary }]}>What we learned</Text>
                   </View>
                   <Text style={[styles.insightLearned, { color: theme.colors.text }]}>{rec.title}</Text>
@@ -100,7 +101,7 @@ export default function InsightsScreen() {
               style={[styles.quickLinkCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
               onPress={() => router.push('/(app)/insights/weekly-review')}
             >
-              <Text style={styles.quickLinkIcon}>📈</Text>
+              <Glyph emoji="📈" style={styles.quickLinkIcon} />
               <View style={styles.quickLinkContent}>
                 <Text style={[styles.quickLinkTitle, { color: theme.colors.text }]}>Weekly Review</Text>
                 <Text style={[styles.quickLinkSubtitle, { color: theme.colors.textMuted }]}>View your weekly patterns</Text>
@@ -112,7 +113,7 @@ export default function InsightsScreen() {
               style={[styles.quickLinkCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
               onPress={() => router.push('/(app)/insights/behavioral-awareness')}
             >
-              <Text style={styles.quickLinkIcon}>🧠</Text>
+              <Glyph emoji="🧠" style={styles.quickLinkIcon} />
               <View style={styles.quickLinkContent}>
                 <Text style={[styles.quickLinkTitle, { color: theme.colors.text }]}>Behavioral Awareness</Text>
                 <Text style={[styles.quickLinkSubtitle, { color: theme.colors.textMuted }]}>Deep dive into your habits</Text>

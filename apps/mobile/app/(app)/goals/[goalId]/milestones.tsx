@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator,Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -252,7 +253,7 @@ export default function MilestonesScreen() {
           </View>
         ) : (
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>🎯</Text>
+            <Glyph emoji="🎯" style={[styles.emptyIcon, { color: theme.colors.textMuted }]} />
             <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No milestones yet</Text>
             <Text style={[styles.emptyDescription, { color: theme.colors.textMuted }]}>
               Break your goal into smaller milestones to track progress.

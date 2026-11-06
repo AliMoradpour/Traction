@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { useDailyBrief } from '@/hooks/useAI';
 import { useTasks } from '@/hooks/useTasks';
 import { useTractionTheme } from '@/theme';
@@ -171,7 +172,7 @@ function TimeBlockSection({
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionIcon}>{icon}</Text>
+        <Glyph emoji={icon} style={styles.sectionIcon} />
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{title}</Text>
         <Text style={[styles.taskCount, { color: theme.colors.textMuted }]}>{tasks.length}</Text>
       </View>
@@ -244,7 +245,7 @@ export default function PlannerScreen() {
         </View>
       ) : isError ? (
         <View style={styles.centerContent}>
-          <Text style={[styles.errorIcon, { color: theme.colors.textMuted }]}>⚠️</Text>
+          <Glyph emoji="⚠️" style={[styles.errorIcon, { color: theme.colors.textMuted }]} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>AI plan unavailable</Text>
           <Text style={[styles.errorSubtext, { color: theme.colors.textMuted }]}>
             Check your connection and try again
@@ -306,7 +307,7 @@ export default function PlannerScreen() {
             {todayTasks.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionIcon}>📋</Text>
+                  <Glyph emoji="📋" style={styles.sectionIcon} />
                   <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>Unscheduled Tasks</Text>
                 </View>
                 {todayTasks.map((task: any) => (

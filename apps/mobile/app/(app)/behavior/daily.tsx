@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useDailyMetrics } from '@/hooks/useBehavior';
 import { useTractionTheme } from '@/theme';
@@ -104,7 +105,7 @@ export default function DailyMetricsScreen() {
         </View>
       ) : !hasData ? (
         <View style={styles.centerContent}>
-          <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>📋</Text>
+          <Glyph emoji="📋" style={[styles.emptyIcon, { color: theme.colors.textMuted }]} />
           <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>No activity recorded</Text>
           <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
             No tasks, focus sessions, or events for this day.

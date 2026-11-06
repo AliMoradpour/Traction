@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator,ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useWeeklyReview } from '@/hooks/useAI';
 import { useTractionTheme } from '@/theme';
@@ -61,7 +62,7 @@ export default function WeeklyReviewScreen() {
         <View style={styles.bentoGrid}>
           <View style={[styles.winsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>🏆</Text>
+              <Glyph emoji="🏆" style={styles.cardIcon} />
               <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Significant Wins</Text>
             </View>
             {wins.length === 0 ? (
@@ -81,7 +82,7 @@ export default function WeeklyReviewScreen() {
           <View style={[styles.commitmentsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <View style={styles.cardHeader}>
               <View style={styles.cardHeaderLeft}>
-                <Text style={styles.cardIcon}>📋</Text>
+                <Glyph emoji="📋" style={styles.cardIcon} />
                 <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Commitments</Text>
               </View>
               {commitments.length > 0 && (
@@ -106,7 +107,7 @@ export default function WeeklyReviewScreen() {
 
           <View style={[styles.patternsCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardIcon}>🧠</Text>
+              <Glyph emoji="🧠" style={styles.cardIcon} />
               <Text style={[styles.cardTitle, { color: theme.colors.text }]}>Behavior Patterns</Text>
             </View>
             {patterns.length === 0 ? (
@@ -125,7 +126,7 @@ export default function WeeklyReviewScreen() {
           {nextShift ? (
             <View style={[styles.aiCard, { backgroundColor: theme.colors.primaryContainer }]}>
               <View style={styles.aiHeader}>
-                <Text style={styles.aiIcon}>✨</Text>
+                <Glyph emoji="✨" style={styles.aiIcon} />
                 <Text style={[styles.aiLabel, { color: theme.colors.onPrimaryContainer }]}>AI synthesis</Text>
               </View>
               <Text style={[styles.aiTitle, { color: theme.colors.onPrimaryContainer }]}>Optimal Shift</Text>

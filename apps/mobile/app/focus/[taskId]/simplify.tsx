@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useSimplifyTask } from '@/hooks/useTasks';
 import { TaskStep } from '@/services/task.service';
@@ -55,7 +56,7 @@ export default function SimplifyScreen() {
       <ScrollView contentContainerStyle={styles.content}>
         {!hasLoaded && !simplifyTask.isPending ? (
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyIcon, { color: theme.colors.textMuted }]}>✨</Text>
+            <Glyph emoji="✨" style={[styles.emptyIcon, { color: theme.colors.textMuted }]} />
             <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Break this task down</Text>
             <Text style={[styles.emptySubtitle, { color: theme.colors.textMuted }]}>
               Let AI split this task into manageable micro-steps
@@ -92,7 +93,7 @@ export default function SimplifyScreen() {
 
             <View style={[styles.aiCard, { backgroundColor: theme.colors.accentMuted }]}>
               <View style={styles.aiHeader}>
-                <Text style={styles.aiIcon}>✨</Text>
+                <Glyph emoji="✨" style={styles.aiIcon} />
                 <Text style={[styles.aiTitle, { color: theme.colors.accentText }]}>AI Insight</Text>
               </View>
               <Text style={[styles.aiContent, { color: theme.colors.accentText }]}>
@@ -140,7 +141,7 @@ export default function SimplifyScreen() {
                         >
                           {step.title}
                         </Text>
-                        <Text style={[styles.stepEffort, { color: theme.colors.textMuted }]}>⏱ {step.durationMinutes}m</Text>
+                        <Text style={[styles.stepEffort, { color: theme.colors.textMuted }]}>{step.durationMinutes} min</Text>
                       </View>
                     </View>
                     <Text style={[styles.stepNumber, { color: theme.colors.textSubtle }]}>#{index + 1}</Text>

@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useGoal, useGoalFeasibility } from '@/hooks/useGoals';
@@ -162,7 +163,7 @@ export default function GoalFeasibilityScreen() {
 
         <View style={[styles.insightCard, card]}>
           <View style={[styles.insightIcon, { backgroundColor: theme.colors.primary }]}>
-            <Text style={styles.insightIconText}>✨</Text>
+            <Glyph emoji="✨" style={styles.insightIconText} />
           </View>
           <Text style={[styles.insightText, { color: theme.colors.text }]}>{f.recommendation}</Text>
         </View>

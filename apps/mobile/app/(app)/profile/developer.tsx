@@ -6,6 +6,7 @@ import { Alert, Platform,Pressable, ScrollView, Share, StyleSheet, Text, View } 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { apiClient } from '@/api/client';
+import { Glyph } from '@/components/calm/Glyph';
 import config from '@/lib/config';
 import { issueReporter } from '@/lib/issueReporter';
 import { useOnboardingStore } from '@/store/onboarding.store';
@@ -118,7 +119,7 @@ export default function DeveloperScreen() {
               onPress={handleResetLocalData}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🗑️</Text>
+                <Glyph emoji="🗑️" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Reset Local Data</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Clear AsyncStorage and SecureStore</Text>
@@ -132,7 +133,7 @@ export default function DeveloperScreen() {
               onPress={handleResetOnboarding}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🔄</Text>
+                <Glyph emoji="🔄" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Reset Onboarding</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Reset onboarding to incomplete state</Text>
@@ -146,7 +147,7 @@ export default function DeveloperScreen() {
               onPress={handleResetAiCache}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🧠</Text>
+                <Glyph emoji="🧠" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Reset AI Cache</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Clear cached AI data on server</Text>
@@ -160,7 +161,7 @@ export default function DeveloperScreen() {
               onPress={handleResetBehaviorMetrics}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>📊</Text>
+                <Glyph emoji="📊" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Reset Behavior Metrics</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Placeholder — coming soon</Text>
@@ -179,7 +180,7 @@ export default function DeveloperScreen() {
               onPress={handleExportLogs}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>📤</Text>
+                <Glyph emoji="📤" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Export Logs</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>Share debug logs and system info</Text>
@@ -190,7 +191,7 @@ export default function DeveloperScreen() {
             <View style={[styles.divider, { backgroundColor: theme.colors.border }]} />
             <Pressable style={styles.actionItem}>
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🌐</Text>
+                <Glyph emoji="🌐" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>API Environment</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>{config.apiUrl}</Text>
@@ -203,7 +204,7 @@ export default function DeveloperScreen() {
               onPress={handleToggleDebugOverlay}
             >
               <View style={styles.actionLeft}>
-                <Text style={styles.actionIcon}>🔧</Text>
+                <Glyph emoji="🔧" style={styles.actionIcon} />
                 <View>
                   <Text style={[styles.actionLabel, { color: theme.colors.text }]}>Debug Overlay</Text>
                   <Text style={[styles.actionDescription, { color: theme.colors.textMuted }]}>

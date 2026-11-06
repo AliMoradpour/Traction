@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useExecutionStats,useMomentum, useReadinessScore, useResistance } from '@/hooks/useExecution';
 import { useTractionTheme } from '@/theme';
@@ -196,14 +197,14 @@ export default function ExecutionDashboardScreen() {
                 style={[styles.actionCard, { backgroundColor: theme.colors.primary }]}
                 onPress={() => router.push('/(app)/today/smart-start' as Href)}
               >
-                <Text style={styles.actionIcon}>⚡</Text>
+                <Glyph emoji="⚡" style={styles.actionIcon} />
                 <Text style={[styles.actionTitle, { color: '#FFFFFF' }]}>Smart Start</Text>
               </Pressable>
               <Pressable
                 style={[styles.actionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/today' as Href)}
               >
-                <Text style={styles.actionIcon}>▶</Text>
+                <Glyph emoji="▶" style={styles.actionIcon} />
                 <Text style={[styles.actionTitle, { color: theme.colors.text }]}>Start Focus</Text>
               </Pressable>
             </View>
@@ -212,7 +213,7 @@ export default function ExecutionDashboardScreen() {
                 style={[styles.actionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
                 onPress={() => router.push('/(app)/execution/coaching' as Href)}
               >
-                <Text style={styles.actionIcon}>🎯</Text>
+                <Glyph emoji="🎯" style={styles.actionIcon} />
                 <Text style={[styles.actionTitle, { color: theme.colors.text }]}>Get Coaching</Text>
               </Pressable>
             </View>

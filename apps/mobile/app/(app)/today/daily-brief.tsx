@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator,Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { useDailyBrief } from '@/hooks/useAI';
 import { useTractionTheme } from '@/theme';
 
@@ -75,7 +76,7 @@ export default function DailyBriefScreen() {
         {focusWindow ? (
           <View style={[styles.energyCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
             <View style={styles.energyHeader}>
-              <Text style={styles.energyIcon}>⚡</Text>
+              <Glyph emoji="⚡" style={styles.energyIcon} />
               <Text style={[styles.energyTitle, { color: theme.colors.text }]}>Focus Window</Text>
             </View>
             <Text style={[styles.focusWindowText, { color: theme.colors.text }]}>{focusWindow}</Text>
@@ -116,7 +117,7 @@ export default function DailyBriefScreen() {
 
         {recommendations.length > 0 && (
           <View style={[styles.aiInsightCard, { backgroundColor: theme.colors.accentMuted }]}>
-            <Text style={styles.aiIcon}>✨</Text>
+            <Glyph emoji="✨" style={styles.aiIcon} />
             <View style={styles.aiContent}>
               <Text style={[styles.aiTitle, { color: theme.colors.accentText }]}>AI Recommendations</Text>
               {recommendations.map((rec: string, index: number) => (

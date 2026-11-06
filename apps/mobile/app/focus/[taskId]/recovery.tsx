@@ -158,7 +158,7 @@ export default function RecoveryScreen() {
               style={{ width: '100%' }}
               disabled={resumeSession.isPending}
             >
-              {resumeSession.isPending ? 'Resuming...' : '▶ CONTINUE SESSION'}
+              {resumeSession.isPending ? 'Resuming…' : 'Continue session'}
             </Button>
             <Pressable onPress={() => setChoice(null)}>
               <Text style={[styles.backLink, { color: theme.colors.textMuted }]}>Go back</Text>

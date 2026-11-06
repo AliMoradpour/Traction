@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert,Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import { Button } from '@/components/ui/Button';
 import { useTrackBehavior } from '@/hooks/useBehavior';
 import { useTasks } from '@/hooks/useTasks';
@@ -200,7 +201,7 @@ export default function ReflectionScreen() {
                       {task.title}
                     </Text>
                     {pendingTasks.includes(task.id) && (
-                      <Text style={styles.pauseIcon}>⏸</Text>
+                      <Glyph emoji="⏸" style={styles.pauseIcon} />
                     )}
                   </Pressable>
                 ))}
@@ -234,7 +235,7 @@ export default function ReflectionScreen() {
                   ]}
                   onPress={() => setSelectedReason(reason.id)}
                 >
-                  <Text style={styles.reasonIcon}>{reason.icon}</Text>
+                  <Glyph emoji={reason.icon} style={styles.reasonIcon} />
                   <Text
                     style={[
                       styles.reasonLabel,

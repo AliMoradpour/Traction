@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Glyph } from '@/components/calm/Glyph';
 import {
   useBehaviorIndicators,
   useBurnoutRisk,
@@ -86,7 +87,7 @@ function CoachingSectionCard({ section, theme }: { section: CoachingSection; the
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionIcon}>{section.icon}</Text>
+        <Glyph emoji={section.icon} style={styles.sectionIcon} />
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>{section.title}</Text>
       </View>
       {section.items.map((item, i) => (
