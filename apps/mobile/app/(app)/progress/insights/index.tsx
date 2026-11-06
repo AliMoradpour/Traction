@@ -36,7 +36,7 @@ export default function InsightsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Self-Awareness</Text>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Suggestions</Text>
         </View>
         {frictionScore !== null && (
           <View style={[styles.frictionBadge, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}>
@@ -99,7 +99,7 @@ export default function InsightsScreen() {
           <View style={styles.quickLinks}>
             <Pressable
               style={[styles.quickLinkCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => router.push('/(app)/insights/weekly-review')}
+              onPress={() => router.push('/(app)/progress/insights/weekly-review')}
             >
               <Glyph emoji="📈" style={styles.quickLinkIcon} />
               <View style={styles.quickLinkContent}>
@@ -111,7 +111,7 @@ export default function InsightsScreen() {
 
             <Pressable
               style={[styles.quickLinkCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => router.push('/(app)/insights/behavioral-awareness')}
+              onPress={() => router.push('/(app)/progress/insights/behavioral-awareness')}
             >
               <Glyph emoji="🧠" style={styles.quickLinkIcon} />
               <View style={styles.quickLinkContent}>

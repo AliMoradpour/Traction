@@ -45,10 +45,6 @@ export default function AppLayout() {
           name="profile"
           options={{ title: 'You', tabBarIcon: (props) => <ProfileIcon {...props} /> }}
         />
-        {/* Detail areas opened from Progress; kept as routes but not shown in the tab bar. */}
-        <Tabs.Screen name="insights" options={{ href: null }} />
-        <Tabs.Screen name="behavior" options={{ href: null }} />
-        <Tabs.Screen name="execution" options={{ href: null }} />
       </Tabs>
     </View>
   );

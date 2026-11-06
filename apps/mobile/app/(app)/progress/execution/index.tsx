@@ -77,7 +77,7 @@ export default function ExecutionDashboardScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Execution Engine</Text>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Momentum</Text>
           <Text style={[styles.headerDate, { color: theme.colors.textMuted }]}>
             {dayName}, {monthDay}
           </Text>
@@ -118,7 +118,7 @@ export default function ExecutionDashboardScreen() {
             <View style={styles.row}>
               <Pressable
                 style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/execution/momentum' as Href)}
+                onPress={() => router.push('/(app)/progress/execution/momentum' as Href)}
               >
                 <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Momentum</Text>
                 <View style={styles.statValueRow}>
@@ -130,7 +130,7 @@ export default function ExecutionDashboardScreen() {
 
               <Pressable
                 style={[styles.statCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/execution/resistance' as Href)}
+                onPress={() => router.push('/(app)/progress/execution/resistance' as Href)}
               >
                 <Text style={[styles.statLabel, { color: theme.colors.textMuted }]}>Resistance</Text>
                 <Text
@@ -211,7 +211,7 @@ export default function ExecutionDashboardScreen() {
             <View style={styles.quickActions}>
               <Pressable
                 style={[styles.actionCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/execution/coaching' as Href)}
+                onPress={() => router.push('/(app)/progress/execution/coaching' as Href)}
               >
                 <Glyph emoji="🎯" style={styles.actionIcon} />
                 <Text style={[styles.actionTitle, { color: theme.colors.text }]}>Get Coaching</Text>

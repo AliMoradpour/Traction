@@ -10,10 +10,10 @@ import { type TractionTheme, useTractionTheme } from '@/theme';
 type IconName = ComponentProps<typeof Ionicons>['name'];
 
 const SECTIONS: { title: string; detail: string; icon: IconName; href: Href }[] = [
-  { title: 'Suggestions', detail: 'Ideas based on how you work', icon: 'bulb-outline', href: '/insights' },
-  { title: 'Habits and patterns', detail: 'Consistency, procrastination, burnout', icon: 'pulse-outline', href: '/behavior' },
-  { title: 'Momentum', detail: 'Readiness, streaks and resistance', icon: 'trending-up-outline', href: '/execution' },
-  { title: 'Weekly review', detail: 'Wins, lessons and next week', icon: 'calendar-outline', href: '/insights/weekly-review' },
+  { title: 'Suggestions', detail: 'Ideas based on how you work', icon: 'bulb-outline', href: '/progress/insights' },
+  { title: 'Habits and patterns', detail: 'Consistency, procrastination, burnout', icon: 'pulse-outline', href: '/progress/behavior' },
+  { title: 'Momentum', detail: 'Readiness, streaks and resistance', icon: 'trending-up-outline', href: '/progress/execution' },
+  { title: 'Weekly review', detail: 'Wins, lessons and next week', icon: 'calendar-outline', href: '/progress/insights/weekly-review' },
 ];
 
 export default function ProgressScreen() {

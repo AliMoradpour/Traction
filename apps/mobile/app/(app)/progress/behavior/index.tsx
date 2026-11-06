@@ -124,7 +124,7 @@ export default function BehaviorDashboardScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Behavior Engine</Text>
+          <Text style={[styles.headerTitle, { color: theme.colors.text }]}>Habits and patterns</Text>
           <Text style={[styles.headerDate, { color: theme.colors.textMuted }]}>
             {dayName}, {monthDay}
           </Text>
@@ -189,7 +189,7 @@ export default function BehaviorDashboardScreen() {
                 <Pressable
                   key={item.key}
                   style={[styles.indicatorCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                  onPress={() => router.push('/(app)/behavior/indicators' as Href)}
+                  onPress={() => router.push('/(app)/progress/behavior/indicators' as Href)}
                 >
                   <Text
                     style={[
@@ -207,7 +207,7 @@ export default function BehaviorDashboardScreen() {
             {/* Burnout Risk Card */}
             <Pressable
               style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => router.push('/(app)/behavior/burnout' as Href)}
+              onPress={() => router.push('/(app)/progress/behavior/burnout' as Href)}
             >
               <View style={styles.cardHeaderRow}>
                 <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Burnout risk</Text>
@@ -227,7 +227,7 @@ export default function BehaviorDashboardScreen() {
             {/* Procrastination Card */}
             <Pressable
               style={[styles.card, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-              onPress={() => router.push('/(app)/behavior/procrastination' as Href)}
+              onPress={() => router.push('/(app)/progress/behavior/procrastination' as Href)}
             >
               <Text style={[styles.cardLabel, { color: theme.colors.textMuted }]}>Procrastination</Text>
               <View style={styles.procrastinationRow}>
@@ -256,7 +256,7 @@ export default function BehaviorDashboardScreen() {
             {/* Coaching Button */}
             <Pressable
               style={[styles.navCard, { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary }]}
-              onPress={() => router.push('/(app)/behavior/coaching' as Href)}
+              onPress={() => router.push('/(app)/progress/behavior/coaching' as Href)}
             >
               <Glyph emoji="🧠" style={styles.navIcon} />
               <Text style={[styles.navTitle, { color: '#FFFFFF' }]}>Get Coaching</Text>
@@ -267,7 +267,7 @@ export default function BehaviorDashboardScreen() {
             <View style={styles.navGrid}>
               <Pressable
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/behavior/daily' as Href)}
+                onPress={() => router.push('/(app)/progress/behavior/daily' as Href)}
               >
                 <Glyph emoji="📅" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>Daily Breakdown</Text>
@@ -275,7 +275,7 @@ export default function BehaviorDashboardScreen() {
               </Pressable>
               <Pressable
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/behavior/weekly' as Href)}
+                onPress={() => router.push('/(app)/progress/behavior/weekly' as Href)}
               >
                 <Glyph emoji="📊" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>Weekly Trends</Text>
@@ -283,7 +283,7 @@ export default function BehaviorDashboardScreen() {
               </Pressable>
               <Pressable
                 style={[styles.navCard, { backgroundColor: theme.colors.surfaceElevated, borderColor: theme.colors.border }]}
-                onPress={() => router.push('/(app)/behavior/indicators' as Href)}
+                onPress={() => router.push('/(app)/progress/behavior/indicators' as Href)}
               >
                 <Glyph emoji="📈" style={styles.navIcon} />
                 <Text style={[styles.navTitle, { color: theme.colors.text }]}>All Indicators</Text>
