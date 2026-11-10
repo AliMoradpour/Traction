@@ -20,6 +20,7 @@ export class AIRateLimitService {
   private readonly limits: RateLimitConfig[] = [
     { feature: 'daily-brief', limit: 1, windowMinutes: 24 * 60 },
     { feature: 'weekly-review', limit: 1, windowMinutes: 7 * 24 * 60 },
+    { feature: 'monthly-review', limit: 6, windowMinutes: 24 * 60 },
     { feature: 'goal-recovery', limit: 3, windowMinutes: 24 * 60 },
     { feature: 'task-breakdown', limit: 20, windowMinutes: 24 * 60 },
     { feature: 'stuck-analysis', limit: 10, windowMinutes: 24 * 60 },

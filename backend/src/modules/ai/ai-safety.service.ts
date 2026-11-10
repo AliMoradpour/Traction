@@ -34,6 +34,8 @@ export class AISafetyService {
         return 'Unable to generate daily brief. Please try again later.';
       case 'weekly-review':
         return 'Unable to generate weekly review. Please try again later.';
+      case 'monthly-review':
+        return 'Unable to generate monthly review. Please try again later.';
       case 'goal-recovery':
         return 'Unable to generate goal recovery. Please try again later.';
       case 'task-breakdown':

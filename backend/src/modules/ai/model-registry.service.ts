@@ -34,6 +34,7 @@ export class ModelRegistryService {
     const featureModels: Record<string, string> = {
       'daily-brief': this.models.primary,
       'weekly-review': this.models.primary,
+      'monthly-review': this.models.primary,
       'task-breakdown': this.models.primary,
       'goal-recovery': this.models.primary,
       'stuck-analysis': this.models.primary,

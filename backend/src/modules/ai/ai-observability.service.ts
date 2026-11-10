@@ -107,6 +107,7 @@ export class AIObservabilityService {
     const features = [
       'daily-brief',
       'weekly-review',
+      'monthly-review',
       'task-breakdown',
       'goal-recovery',
       'stuck-analysis',

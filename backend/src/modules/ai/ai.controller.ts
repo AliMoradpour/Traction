@@ -13,6 +13,7 @@ import { DailyBriefService } from './daily-brief.service';
 import { TaskBreakdownService } from './task-breakdown.service';
 import { StuckAnalysisService, StuckFeeling } from './stuck-analysis.service';
 import { WeeklyReviewService } from './weekly-review.service';
+import { MonthlyReviewService } from './monthly-review.service';
 import { GoalRecoveryService } from './goal-recovery.service';
 import { AIRateLimitService } from './ai-rate-limit.service';
 import { AIObservabilityService } from './ai-observability.service';
@@ -37,6 +38,7 @@ export class AIController {
     private readonly taskBreakdownService: TaskBreakdownService,
     private readonly stuckAnalysisService: StuckAnalysisService,
     private readonly weeklyReviewService: WeeklyReviewService,
+    private readonly monthlyReviewService: MonthlyReviewService,
     private readonly goalRecoveryService: GoalRecoveryService,
     private readonly rateLimitService: AIRateLimitService,
     private readonly observabilityService: AIObservabilityService,
@@ -142,6 +144,14 @@ export class AIController {
   @ApiResponse({ status: 200, description: 'Weekly review' })
   async getWeeklyReview(@CurrentUser('id') userId: string) {
     return this.weeklyReviewService.getWeeklyReview(userId);
+  }
+
+  @Get('monthly-review')
+  @ApiOperation({ summary: 'Get the review of a month (defaults to last month)' })
+  @ApiQuery({ name: 'month', required: false, example: '2026-10' })
+  @ApiResponse({ status: 200, description: 'Monthly review' })
+  async getMonthlyReview(@CurrentUser('id') userId: string, @Query('month') month?: string) {
+    return this.monthlyReviewService.getMonthlyReview(userId, month);
   }
 
   @Post('goal-recovery/:goalId')
