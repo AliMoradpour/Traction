@@ -17,6 +17,7 @@ import { ExecutionModule } from './modules/execution/execution.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { InvitesModule } from './modules/invites/invites.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
     InvitesModule,
     FeedbackModule,
   ],
+  controllers: [HealthController],
   providers: [
     // Without this guard ThrottlerModule is configured but never enforced, so every
     // @Throttle() limit (login, register, password reset, ...) would be a no-op.

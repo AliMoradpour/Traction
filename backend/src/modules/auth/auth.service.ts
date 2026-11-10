@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -36,6 +37,12 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    // A personal deployment can close sign-ups once its owner has an account,
+    // so nobody else can register and use the server (and its AI key).
+    if (process.env.ALLOW_REGISTRATION === 'false') {
+      throw new ForbiddenException('Sign-ups are closed on this server');
+    }
+
     // Check if user exists
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email },
