@@ -19,6 +19,15 @@ const config: ExpoConfig = {
     },
     package: 'com.traction.app',
   },
+  web: {
+    output: 'single',
+    bundler: 'metro',
+    name: 'Traction',
+    shortName: 'Traction',
+    themeColor: '#FAF6F0',
+    backgroundColor: '#FAF6F0',
+    favicon: './public/icon-192.png',
+  },
   plugins: [
     'expo-router',
     'expo-font',

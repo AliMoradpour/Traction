@@ -12,10 +12,12 @@ import { useConnectivity } from '@/hooks/useConnectivity';
 import { issueReporter } from '@/lib/issueReporter';
 import { perf } from '@/lib/perf';
 import { queryClient } from '@/lib/queryClient';
+import { installWebAlert } from '@/lib/webAlert';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { useAuthStore } from '@/store/auth.store';
 
+installWebAlert();
 SplashScreen.preventAutoHideAsync();
 
 function OfflineBanner() {

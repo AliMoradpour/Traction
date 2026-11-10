@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef,useState } from 'react';
-import { Platform } from 'react-native';
+
+import config from '@/lib/config';
 
 export function useConnectivity() {
   const [isConnected, setIsConnected] = useState<boolean>(true);
@@ -9,19 +10,18 @@ export function useConnectivity() {
   const checkConnection = useCallback(async () => {
     if (isChecking) return;
     setIsChecking(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      const response = await fetch('https://httpbin.org/get', {
-        method: 'HEAD',
-        signal: controller.signal,
-        cache: 'no-store',
-      });
-      clearTimeout(timeoutId);
-      setIsConnected(response.ok);
-    } catch {
-      setIsConnected(false);
+      // Ping our own server rather than a third-party site that may be blocked.
+      await fetch(`${config.apiUrl}/health`, { signal: controller.signal, cache: 'no-store' });
+      setIsConnected(true);
+    } catch (error) {
+      // A slow answer usually means the hosted server is waking up, not that the
+      // phone is offline; only a failed connection counts as offline.
+      if ((error as Error)?.name !== 'AbortError') setIsConnected(false);
     } finally {
+      clearTimeout(timeoutId);
       setIsChecking(false);
     }
   }, [isChecking]);
