@@ -1,0 +1,70 @@
+# Render Blueprint: the Traction API (NestJS) and the web app (installable on iPhone).
+# The database lives on Neon; paste its connection string as DATABASE_URL.
+# Step-by-step guide: docs/DEPLOY.md
+
+services:
+  - type: web
+    name: traction-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: dev
+    rootDir: backend
+    # --include=dev: the Nest CLI and Prisma CLI are dev dependencies but are needed to build.
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    # Free instances have no pre-deploy step, so migrations run at start.
+    startCommand: npx prisma migrate deploy && node dist/main
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: TZ
+        value: Asia/Tehran
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 15m
+      - key: JWT_REFRESH_EXPIRATION
+        value: 30d
+      - key: ALLOW_REGISTRATION
+        value: "true"
+      - key: REMINDER_CRON_KEY
+        generateValue: true
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: https://github.com/AliMoradpour/Traction
+
+  - type: web
+    name: traction-app
+    runtime: static
+    branch: dev
+    rootDir: apps/mobile
+    buildCommand: npm ci && npx expo export --platform web
+    staticPublishPath: dist
+    routes:
+      # Single-page app: every path loads index.html and the app's router takes over.
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: EXPO_PUBLIC_API_URL
+        sync: false
+      - key: EXPO_PUBLIC_APP_ENV
+        value: production
