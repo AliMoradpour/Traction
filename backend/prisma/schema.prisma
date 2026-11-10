@@ -34,6 +34,7 @@ model User {
   inviteUsed    Invite?    @relation("InviteUsed")
   feedback      Feedback[]
   passwordResetTokens PasswordResetToken[]
+  monthPlans    MonthPlan[]
 
   @@map("users")
 }
@@ -530,4 +531,19 @@ model PasswordResetToken {
 
   @@index([userId])
   @@map("password_reset_tokens")
+}
+
+// A user's intentions for one calendar month: a few focus areas and a note.
+model MonthPlan {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month     String   // "YYYY-MM"
+  focuses   String[] @default([])
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, month])
+  @@map("month_plans")
 }

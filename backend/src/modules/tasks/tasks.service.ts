@@ -44,6 +44,13 @@ export class TasksService {
       where.goalId = query.goalId;
     }
 
+    if (query.from || query.to) {
+      where.scheduledAt = {
+        ...(query.from && { gte: new Date(query.from) }),
+        ...(query.to && { lt: new Date(query.to) }),
+      };
+    }
+
     const tasks = await this.prisma.task.findMany({
       where,
       orderBy: [{ priority: 'desc' }, { scheduledAt: 'asc' }, { createdAt: 'desc' }],

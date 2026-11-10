@@ -147,6 +147,16 @@ export class TaskQueryDto {
   @IsString()
   @IsOptional()
   goalId?: string;
+
+  @ApiPropertyOptional({ description: 'Scheduled at or after this instant' })
+  @IsDateString()
+  @IsOptional()
+  from?: string;
+
+  @ApiPropertyOptional({ description: 'Scheduled before this instant' })
+  @IsDateString()
+  @IsOptional()
+  to?: string;
 }
 
 export class TaskResponseDto {
