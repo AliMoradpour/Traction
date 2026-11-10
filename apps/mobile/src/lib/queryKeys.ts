@@ -91,6 +91,12 @@ export const queryKeys = {
     status: () => [...queryKeys.ai.all, 'status'] as const,
   },
 
+  planning: {
+    all: ['planning'] as const,
+    month: (month: string) => [...queryKeys.planning.all, 'month', month] as const,
+    review: (month: string) => [...queryKeys.planning.all, 'review', month] as const,
+  },
+
   admin: {
     all: ['admin'] as const,
     dashboard: () => [...queryKeys.admin.all, 'dashboard'] as const,

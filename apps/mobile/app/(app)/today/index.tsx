@@ -145,8 +145,10 @@ export default function TodayScreen() {
     : null;
 
   const quickActions: { label: string; icon: IconName; href: Href }[] = [
-    { label: 'Smart start', icon: 'flash-outline', href: '/(app)/today/smart-start' as Href },
+    { label: 'Week', icon: 'calendar-clear-outline', href: '/(app)/today/week' as Href },
+    { label: 'Month', icon: 'calendar-outline', href: '/(app)/today/month' as Href },
     { label: 'Plan day', icon: 'list-outline', href: '/(app)/today/planner' as Href },
+    { label: 'Smart start', icon: 'flash-outline', href: '/(app)/today/smart-start' as Href },
     { label: 'Reflect', icon: 'moon-outline', href: '/(app)/today/reflection' as Href },
   ];
 
@@ -319,7 +321,7 @@ function createStyles(theme: TractionTheme) {
     },
     moodTitle: { ...theme.typography.bodyMd, fontWeight: '600', color: theme.colors.text },
     moodText: { ...theme.typography.labelSm, color: theme.colors.textMuted, marginTop: 2 },
-    actions: { flexDirection: 'row', gap: 8, marginTop: 16 },
+    actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 },
     action: {
       flexDirection: 'row',
       alignItems: 'center',

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { useBehaviorIndicators } from '@/hooks/useBehavior';
 import { useReadinessScore } from '@/hooks/useExecution';
 import { useTasks, useUpdateTask } from '@/hooks/useTasks';
+import { addDays, localNoonISO } from '@/lib/dates';
 import { type Task } from '@/services/task.service';
 import { useTractionTheme } from '@/theme';
 
@@ -97,11 +98,10 @@ export default function ReplanScreen() {
         await updateTask.mutateAsync({ id: task.id, data: { status: 'IN_PROGRESS' } });
       }
       for (const task of plan.moveTomorrow) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        // Local noon of tomorrow: a bare UTC date could land on the wrong local day.
         await updateTask.mutateAsync({
           id: task.id,
-          data: { scheduledAt: tomorrow.toISOString().split('T')[0] },
+          data: { scheduledAt: localNoonISO(addDays(new Date(), 1)) },
         });
       }
       Alert.alert('Plan Applied', 'Your day has been replanned based on your current capacity.', [

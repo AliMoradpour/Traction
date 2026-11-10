@@ -401,6 +401,99 @@ export function EmptyHint({
   );
 }
 
+/** A wrapping row of pill-shaped choices; tap to select. */
+export function ChoiceChips<T>({
+  options,
+  selected,
+  onSelect,
+}: {
+  options: { label: string; value: T }[];
+  selected: T | null | undefined;
+  onSelect: (value: T) => void;
+}) {
+  const theme = useTractionTheme();
+  return (
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      {options.map((o) => {
+        const isSelected = o.value === selected;
+        return (
+          <Pressable
+            key={o.label}
+            onPress={() => onSelect(o.value)}
+            style={chipStyle(theme, isSelected)}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: isSelected }}
+          >
+            <Text style={chipTextStyle(theme, isSelected)}>{o.label}</Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Horizontal strip of the next two weeks for picking a day. */
+export function DayPicker({ value, onChange, days = 14 }: { value: Date; onChange: (day: Date) => void; days?: number }) {
+  const theme = useTractionTheme();
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const list = Array.from({ length: days }, (_, i) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + i));
+  const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+  // A day chosen from the month calendar may lie outside the strip; show it first.
+  if (!list.some((d) => sameDay(d, value))) list.unshift(value);
+
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 8 }}>
+      {list.map((d, i) => {
+        const isSelected = sameDay(d, value);
+        const offset = Math.round((d.getTime() - start.getTime()) / 86400000);
+        const top = offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short' });
+        const bottom = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return (
+          <Pressable
+            key={`${d.toDateString()}-${i}`}
+            onPress={() => onChange(d)}
+            style={[chipStyle(theme, isSelected), { alignItems: 'center', minWidth: 64, paddingVertical: 8 }]}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: isSelected }}
+            accessibilityLabel={`${top}, ${bottom}`}
+          >
+            <Text style={chipTextStyle(theme, isSelected)}>{top}</Text>
+            <Text
+              style={{
+                ...theme.typography.labelSm,
+                fontSize: 12,
+                color: isSelected ? theme.colors.accentText : theme.colors.textMuted,
+              }}
+            >
+              {bottom}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+function chipStyle(theme: TractionTheme, selected: boolean): ViewStyle {
+  return {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: theme.radius.full,
+    borderWidth: 1.5,
+    borderColor: selected ? theme.colors.accent : theme.colors.border,
+    backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surface,
+  };
+}
+
+function chipTextStyle(theme: TractionTheme, selected: boolean) {
+  return {
+    ...theme.typography.bodyMd,
+    fontWeight: '600' as const,
+    color: selected ? theme.colors.accentText : theme.colors.text,
+  };
+}
+
 export function BodyText({ children, muted }: { children: ReactNode; muted?: boolean }) {
   const theme = useTractionTheme();
   return (

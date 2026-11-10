@@ -11,6 +11,9 @@ export default function TodayLayout() {
       <Stack.Screen name="planner" />
       <Stack.Screen name="smart-start" />
       <Stack.Screen name="replan" />
+      <Stack.Screen name="week" />
+      <Stack.Screen name="month" />
+      <Stack.Screen name="monthly-review" />
     </Stack>
   );
 }

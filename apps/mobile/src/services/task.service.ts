@@ -56,8 +56,19 @@ export interface TaskStep {
   order: number;
 }
 
+export type TaskListParams = {
+  status?: string;
+  category?: string;
+  scheduledDate?: string;
+  goalId?: string;
+  /** Scheduled at or after this ISO instant. */
+  from?: string;
+  /** Scheduled before this ISO instant. */
+  to?: string;
+};
+
 export const taskService = {
-  list: async (params?: { status?: string; category?: string; scheduledDate?: string; goalId?: string }): Promise<Task[]> => {
+  list: async (params?: TaskListParams): Promise<Task[]> => {
     const response = await apiClient.get(endpoints.tasks.list, { params });
     return response.data;
   },

@@ -1,12 +1,23 @@
 import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Text, View } from 'react-native';
 
-import { Card, EmptyHint, Group, Page, Pill, Row, SectionTitle } from '@/components/calm';
+import {
+  Card,
+  ChoiceChips,
+  DayPicker,
+  EmptyHint,
+  Group,
+  Page,
+  Pill,
+  Row,
+  SectionTitle,
+} from '@/components/calm';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useGoals } from '@/hooks/useGoals';
 import { useCompleteTask, useDeleteTask, useTask, useUpdateTask } from '@/hooks/useTasks';
+import { isSameDay, localNoonISO, startOfDay } from '@/lib/dates';
 import { useTractionTheme } from '@/theme';
 
 type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
@@ -19,7 +30,8 @@ const PRIORITIES: { label: string; value: Priority }[] = [
   { label: 'Urgent', value: 'URGENT' },
 ];
 
-const durationLabel = (m: number) => (m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m / 60} h`);
+const durationLabel = (m: number) =>
+  m < 60 ? `${m} min` : m % 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m / 60} h`;
 
 export default function TaskDetailsScreen() {
   const theme = useTractionTheme();
@@ -37,6 +49,7 @@ export default function TaskDetailsScreen() {
   const [priority, setPriority] = useState<Priority>('MEDIUM');
   const [duration, setDuration] = useState<number | null>(null);
   const [goalId, setGoalId] = useState<string | undefined>();
+  const [day, setDay] = useState<Date | null>(null);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
@@ -46,9 +59,13 @@ export default function TaskDetailsScreen() {
       setPriority(task.priority || 'MEDIUM');
       setDuration(task.duration ?? null);
       setGoalId(task.goalId);
+      setDay(task.scheduledAt ? startOfDay(new Date(task.scheduledAt)) : null);
       setInitialized(true);
     }
   }, [task, initialized]);
+
+  const originalDay = task?.scheduledAt ? startOfDay(new Date(task.scheduledAt)) : null;
+  const dayChanged = !!day && (!originalDay || !isSameDay(day, originalDay));
 
   const changed =
     !!task &&
@@ -56,7 +73,8 @@ export default function TaskDetailsScreen() {
       description.trim() !== (task.description || '') ||
       priority !== (task.priority || 'MEDIUM') ||
       duration !== (task.duration ?? null) ||
-      goalId !== task.goalId);
+      goalId !== task.goalId ||
+      dayChanged);
 
   const handleSave = () => {
     if (!taskId) return;
@@ -69,11 +87,13 @@ export default function TaskDetailsScreen() {
           priority,
           duration: duration ?? undefined,
           goalId: goalId || undefined,
+          ...(dayChanged && day ? { scheduledAt: localNoonISO(day) } : {}),
         },
       },
       {
         onSuccess: () => router.back(),
-        onError: (error: any) => Alert.alert("Couldn't save your changes", error?.message || 'Please try again.'),
+        onError: (error: any) =>
+          Alert.alert("Couldn't save your changes", error?.message || 'Please try again.'),
       },
     );
   };
@@ -88,7 +108,8 @@ export default function TaskDetailsScreen() {
         onPress: () =>
           deleteTask.mutate(taskId, {
             onSuccess: () => router.back(),
-            onError: (error: any) => Alert.alert("Couldn't delete the task", error?.message || 'Please try again.'),
+            onError: (error: any) =>
+              Alert.alert("Couldn't delete the task", error?.message || 'Please try again.'),
           }),
       },
     ]);
@@ -100,48 +121,20 @@ export default function TaskDetailsScreen() {
         {isLoading ? (
           <ActivityIndicator color={theme.colors.accent} style={{ marginTop: 32 }} />
         ) : (
-          <EmptyHint icon="cloud-offline-outline" title="We couldn't load this task" text="Go back and try again." />
+          <EmptyHint
+            icon="cloud-offline-outline"
+            title="We couldn't load this task"
+            text="Go back and try again."
+          />
         )}
       </Page>
     );
   }
 
   const isDone = task.status === 'COMPLETED';
-  const durationOptions = Array.from(new Set([...DURATIONS, ...(task.duration ? [task.duration] : [])])).sort(
-    (a, b) => a - b,
-  );
-
-  const chip = (selected: boolean) => ({
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: theme.radius.full,
-    borderWidth: 1.5,
-    borderColor: selected ? theme.colors.accent : theme.colors.border,
-    backgroundColor: selected ? theme.colors.accentMuted : theme.colors.surface,
-  });
-  const chipText = (selected: boolean) => ({
-    ...theme.typography.bodyMd,
-    fontWeight: '600' as const,
-    color: selected ? theme.colors.accentText : theme.colors.text,
-  });
-  const chips = <T,>(options: { label: string; value: T }[], selected: T | null | undefined, onSelect: (v: T) => void) => (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-      {options.map((o) => {
-        const isSelected = o.value === selected;
-        return (
-          <Pressable
-            key={o.label}
-            onPress={() => onSelect(o.value)}
-            style={chip(isSelected)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: isSelected }}
-          >
-            <Text style={chipText(isSelected)}>{o.label}</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
+  const durationOptions = Array.from(
+    new Set([...DURATIONS, ...(task.duration ? [task.duration] : [])]),
+  ).sort((a, b) => a - b);
 
   return (
     <Page
@@ -164,14 +157,20 @@ export default function TaskDetailsScreen() {
         {isDone ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Pill label="Done" tone="sage" />
-            <Text style={{ ...theme.typography.bodyMd, color: theme.colors.text }}>Nice work. This one is finished.</Text>
+            <Text style={{ ...theme.typography.bodyMd, color: theme.colors.text }}>
+              Nice work. This one is finished.
+            </Text>
           </View>
         ) : (
           <View style={{ gap: 8 }}>
             <Button variant="primary" onPress={() => router.push(`/focus/${taskId}`)}>
               Start focusing
             </Button>
-            <Button variant="secondary" onPress={() => completeTask.mutate(taskId)} loading={completeTask.isPending}>
+            <Button
+              variant="secondary"
+              onPress={() => completeTask.mutate(taskId)}
+              loading={completeTask.isPending}
+            >
               Mark as done
             </Button>
           </View>
@@ -200,24 +199,31 @@ export default function TaskDetailsScreen() {
       <SectionTitle title="Details" />
       <Input label="Task" value={title} onChangeText={setTitle} placeholder="What needs doing?" />
 
+      {!isDone ? (
+        <>
+          <SectionTitle title="When?" detail={day ? undefined : 'No day set'} />
+          <DayPicker value={day ?? startOfDay(new Date())} onChange={setDay} />
+        </>
+      ) : null}
+
       <SectionTitle title="How long will it take?" />
-      {chips(
-        durationOptions.map((m) => ({ label: durationLabel(m), value: m })),
-        duration,
-        (m) => setDuration(m === duration ? null : m),
-      )}
+      <ChoiceChips
+        options={durationOptions.map((m) => ({ label: durationLabel(m), value: m }))}
+        selected={duration}
+        onSelect={(m) => setDuration(m === duration ? null : m)}
+      />
 
       <SectionTitle title="How important is it?" />
-      {chips(PRIORITIES, priority, setPriority)}
+      <ChoiceChips options={PRIORITIES} selected={priority} onSelect={setPriority} />
 
       {goals && goals.length > 0 ? (
         <>
           <SectionTitle title="Part of a goal?" />
-          {chips(
-            goals.map((g) => ({ label: g.title, value: g.id })),
-            goalId,
-            (id) => setGoalId(id === goalId ? undefined : id),
-          )}
+          <ChoiceChips
+            options={goals.map((g) => ({ label: g.title, value: g.id }))}
+            selected={goalId}
+            onSelect={(id) => setGoalId(id === goalId ? undefined : id)}
+          />
         </>
       ) : null}
 
@@ -231,7 +237,14 @@ export default function TaskDetailsScreen() {
       />
 
       <Group>
-        <Row first icon="trash-outline" iconTint="clay" title="Delete task" destructive onPress={handleDelete} />
+        <Row
+          first
+          icon="trash-outline"
+          iconTint="clay"
+          title="Delete task"
+          destructive
+          onPress={handleDelete}
+        />
       </Group>
     </Page>
   );
