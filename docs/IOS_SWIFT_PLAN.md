@@ -12,8 +12,8 @@ Written 2026-11-11. Tick the boxes as we go: this file is the map.
 |---|---|---|
 | `backend/` | NestJS API + Postgres (Render + Neon) | **Kept.** The Swift app talks to the same API. A few additions for public release (Phase 11). |
 | `apps/mobile/` | Expo / React Native app | **Kept** for Android and as the web app. Not deleted. |
-| `apps/ios/` | **New.** Native Swift app, built with [xtool](https://github.com/xtool-org/xtool) | Built phase by phase below. |
-| Website | **New.** Landing page, privacy policy, support page | Phase 12. App Store review requires the privacy and support pages. |
+| [`traction-ios-app`](https://github.com/AliMoradpour/traction-ios-app) (separate repo) | **New.** Native Swift app, built with [xtool](https://github.com/xtool-org/xtool) | Built phase by phase below. Work on its `dev` branch. |
+| `apps/website/` (this repo) | **New.** Marketing and brand site: landing page, privacy policy, support page | Phase 12. App Store review requires the privacy and support pages. |
 
 ### How the tools fit together
 
@@ -35,10 +35,10 @@ Written 2026-11-11. Tick the boxes as we go: this file is the map.
 
 ---
 
-## Project layout (what Phase 1 creates)
+## Project layout (what Phase 1 creates in the `traction-ios-app` repo)
 
 ```
-apps/ios/
+traction-ios-app/
   Package.swift          # SwiftPM package, iOS 17+
   xtool.yml              # bundle ID, Info.plist path
   Support/Info.plist     # extra Info.plist keys (app name, notifications text, …)
@@ -87,7 +87,7 @@ If USB passthrough fails with `AFCClient.Error.muxError`, xtool's docs have a wo
 ## Phase 1 — Skeleton app
 
 **I do**
-- Create `apps/ios/` (layout above), bundle ID `app.traction.ios` (changeable later).
+- Create the Swift package in the `traction-ios-app` repo (layout above), bundle ID `app.traction.ios` (changeable later).
 - Design kit in SwiftUI from `DESIGN.md`: colors (light + dark), type scale, 4-pt spacing, card, button, text field, empty and error states.
 - Tab bar: **Today · Goals · Progress · You**, with placeholder screens.
 - `TractionCore`: API client that adds `/api` the same way the Expo app does, a JSON date decoder, error mapping, a "server is waking up" message for Render's ~50 s cold start. First tests.
@@ -222,7 +222,11 @@ Things checked in the code on 2026-11-11 that must change before strangers use i
 
 ---
 
-## Phase 12 — Website
+## Phase 12 — Website (marketing and brand)
+
+Lives in this repo under `apps/website/`.
+
+**Brand first:** name, logo, colors and voice, taken from `DESIGN.md` so the site, the iPhone app and the web app look like one product. The App Store icon and screenshots reuse the same assets.
 
 **Pages:** Home (what Traction does, screenshots, App Store badge), Privacy policy, Terms, Support / contact, and a link to the web app (the existing Expo web build).
 
@@ -244,7 +248,7 @@ Things checked in the code on 2026-11-11 that must change before strangers use i
 4. Fill in the App Privacy questionnaire (I'll prepare the answers) and the age rating.
 
 **I do**
-- A small Xcode project description (XcodeGen) that wraps the same `apps/ios` code, used only by the cloud Mac.
+- A small Xcode project description (XcodeGen) that wraps the same `traction-ios-app` code, used only by the cloud Mac.
 - GitHub Actions workflow on a macOS runner: build, sign, upload to **TestFlight**.
 - Screenshots (6.9" and 6.5" iPhone sizes), App Store description, keywords.
 
