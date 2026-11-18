@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>راهنمای انتقال به مک‌بوک</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="cover">
+  <div class="logo"><img src="logo-mark.png" alt=""></div>
+  <h1>راهنمای انتقال به مک‌بوک</h1>
+  <p class="sub">از لپ‌تاپ ویندوزی به مک، بدون از دست دادن چیزی</p>
+  <span class="tag">چک‌لیست گام به گام</span>
+  <p class="meta">آبان ۱۴۰۵ (نوامبر ۲۰۲۶)</p>
+</section>
+
+<h1>بخش ۱: پیش از کنار گذاشتن لپ‌تاپ ویندوزی</h1>
+<p>همهٔ کد تِرَکشن در گیت‌هاب است، اما چند چیز فقط روی همین لپ‌تاپ وجود دارد. این چک‌لیست را کامل کنید.</p>
+
+<h2>۱. خصوصی‌کردن مخزن</h2>
+<div class="warn"><strong>مهم</strong>مخزن <code>Traction</code> هنگام نوشتن این راهنما <strong>عمومی</strong> بود. در گیت‌هاب: مخزن → <strong>Settings → General → Danger Zone → Change visibility → Private</strong>. پس از آن، فایل‌های <code>.env.backup</code> و مستندات را push کنید.</div>
+
+<h2>۲. ذخیرهٔ تغییرهای پروژه‌های دیگر</h2>
+<p>بررسی پوشهٔ <code>Projects</code> در تاریخ ۲۷ آبان ۱۴۰۵:</p>
+<table>
+  <tr><th>پروژه</th><th>وضعیت</th><th>اقدام</th></tr>
+  <tr><td><code>Traction</code></td><td>چند کامیت push نشده (منتظر خصوصی‌شدن)</td><td>پس از خصوصی‌کردن: <code>git push origin dev</code></td></tr>
+  <tr><td><code>Abresani</code></td><td><strong>۷ تغییر ذخیره‌نشده</strong></td><td>کامیت و push کنید، وگرنه از دست می‌روند</td></tr>
+  <tr><td><code>tosof</code></td><td><strong>۷ تغییر ذخیره‌نشده</strong></td><td>کامیت و push کنید، وگرنه از دست می‌روند</td></tr>
+  <tr><td><code>traction-ios-app</code>، <code>planner</code>، <code>rudiapp</code>، <code>express-crashcourse-project</code></td><td>همه در گیت‌هاب ذخیره‌اند</td><td>—</td></tr>
+</table>
+<p>فایل‌های <code>.env</code> پروژه‌های دیگر هم در گیت نیستند؛ اگر لازمشان دارید، به همین روش از آن‌ها پشتیبان بگیرید.</p>
+
+<h2>۳. چیزهایی که در گیت نیستند</h2>
+<table>
+  <tr><th>چیز</th><th>کجاست</th><th>لازم است منتقل شود؟</th></tr>
+  <tr><td>پایگاه دادهٔ محلی (Docker)</td><td>حجم <code>traction-pg-data</code></td><td>خیر؛ فقط حساب‌های آزمایشی. روی مک از نو ساخته می‌شود</td></tr>
+  <tr><td>تنظیمات <code>.env</code></td><td>از این به بعد در مخزن: <code>.env.backup</code></td><td>بله؛ در مخزن ذخیره شده</td></tr>
+  <tr><td>یادداشت‌های Claude</td><td>از این به بعد در مخزن: <code>CLAUDE.md</code></td><td>بله؛ در مخزن ذخیره شده</td></tr>
+  <tr><td>فایل‌های اصلی لوگو (کیفیت بالا)</td><td>پیام‌رسان تلگرام (از Downloads پاک شده‌اند)</td><td>بله؛ دوباره از تلگرام بگیرید و در پوشهٔ امنی نگه دارید</td></tr>
+  <tr><td>کلید SSH گیت‌هاب</td><td>روی ویندوز</td><td>خیر؛ روی مک کلید تازه بسازید</td></tr>
+  <tr><td>اسرار تولید</td><td>داشبوردهای Render و Neon</td><td>خیر؛ آنلاین هستند</td></tr>
+</table>
+
+<h2>۴. حساب‌ها و رمزها</h2>
+<p>مطمئن شوید رمز این حساب‌ها را دارید (در مدیر رمز یا iCloud Keychain):</p>
+<table>
+  <tr><th>حساب</th><th>کاربرد</th></tr>
+  <tr><td>GitHub (<code>AliMoradpour</code>)</td><td>همهٔ کدها</td></tr>
+  <tr><td>Expo (<code>alimoradpour</code>)</td><td>اجرای اپ روی آیفون با Expo Go، ساخت APK</td></tr>
+  <tr><td>Render</td><td>سرور و وب‌اپ</td></tr>
+  <tr><td>Neon</td><td>پایگاه داده</td></tr>
+  <tr><td>OpenRouter</td><td>هوش مصنوعی</td></tr>
+  <tr><td>Apple ID</td><td>مک، آیفون و آیندهٔ App Store</td></tr>
+  <tr><td>Claude</td><td>دستیار برنامه‌نویسی</td></tr>
+</table>
+
+<div class="page-break"></div>
+<h1>بخش ۲: راه‌اندازی مک‌بوک</h1>
+<p>دستورها را در <strong>Terminal</strong> اجرا کنید (<code>⌘ + Space</code>، بنویسید Terminal). نسخهٔ کامل و به‌روز: <code>docs/fa/setup-mac.md</code></p>
+
+<ol class="steps">
+  <li><strong>Homebrew، Node، Git و Docker</strong>
+<pre>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install node git
+brew install --cask docker
+open -a Docker</pre></li>
+  <li><strong>Xcode</strong> را از App Store نصب کنید و یک بار باز کنید (برای اپ Swift).</li>
+  <li><strong>کلید SSH و اتصال به گیت‌هاب</strong>
+<pre>ssh-keygen -t ed25519 -C "your-email"
+pbcopy &lt; ~/.ssh/id_ed25519.pub</pre>
+  در گیت‌هاب: Settings → SSH and GPG keys → New SSH key → بچسبانید.</li>
+  <li><strong>دریافت پروژه‌ها</strong>
+<pre>mkdir -p ~/Projects &amp;&amp; cd ~/Projects
+git clone git@github.com:AliMoradpour/Traction.git
+git clone git@github.com:AliMoradpour/traction-ios-app.git
+cd Traction &amp;&amp; git checkout dev</pre></li>
+  <li><strong>فایل‌های تنظیمات</strong>
+<pre>cp backend/.env.backup backend/.env
+cp apps/mobile/.env.backup apps/mobile/.env
+ipconfig getifaddr en0      # IP مک؛ در apps/mobile/.env جای 192.168.1.6 بگذارید</pre></li>
+  <li><strong>پایگاه دادهٔ محلی</strong>
+<pre>docker run -d --name traction-pg --restart unless-stopped \
+  -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=traction \
+  -v traction-pg-data:/var/lib/postgresql/data -p 5544:5432 postgres:17</pre></li>
+  <li><strong>سرور</strong>
+<pre>cd ~/Projects/Traction/backend
+npm install &amp;&amp; npx prisma generate &amp;&amp; npx prisma migrate deploy
+npm run start:dev</pre></li>
+  <li><strong>اپ روی آیفون</strong>
+<pre>cd ~/Projects/Traction/apps/mobile
+npm install
+npx expo login
+npx expo start --lan --clear</pre>
+  QR را با دوربین آیفون اسکن کنید (آیفون و مک روی یک Wi-Fi).</li>
+  <li><strong>Claude:</strong> برنامهٔ Claude را نصب و پوشهٔ <code>~/Projects/Traction</code> را باز کنید. فایل <code>CLAUDE.md</code> خودکار خوانده می‌شود.</li>
+</ol>
+
+<div class="ok"><strong>نشانهٔ موفقیت</strong><code>curl http://localhost:3100/api/health</code> پاسخ <code>{"status":"ok"}</code> می‌دهد و تِرَکشن روی آیفون از طریق Expo Go باز می‌شود.</div>
+
+<h2>پس از انتقال</h2>
+<ul>
+  <li>برنامهٔ اپ Swift (<code>docs/IOS_SWIFT_PLAN.md</code>) برای ویندوز و xtool نوشته شده؛ با مک می‌توان آن را برای <strong>Xcode</strong> بازنویسی کرد که ساده‌تر و کامل‌تر است.</li>
+  <li>پیش از فروش یا واگذاری لپ‌تاپ ویندوزی، از حساب‌ها خارج شوید و دیسک را پاک کنید.</li>
+</ul>
+
+<footer class="docfoot">تِرَکشن · راهنمای انتقال به مک · منبع: <code>docs/fa/pdf-src/mac-migration-guide.html</code></footer>
+</body>
+</html>
