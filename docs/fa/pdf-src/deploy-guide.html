@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>راهنمای استقرار تِرَکشن</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section class="cover">
+  <div class="logo"><img src="logo-mark.png" alt=""></div>
+  <h1>راهنمای استقرار تِرَکشن</h1>
+  <p class="sub">آنلاین‌کردن سرور، پایگاه داده و وب‌اپ با Neon و Render</p>
+  <span class="tag">رایگان · حدود ۲۰ دقیقه</span>
+  <p class="meta">نسخهٔ ۱ · آبان ۱۴۰۵ (نوامبر ۲۰۲۶)</p>
+</section>
+
+<h1>این راهنما چه کاری انجام می‌دهد؟</h1>
+<p>پس از انجام این راهنما، تِرَکشن بدون نیاز به روشن‌بودن لپ‌تاپ شما، از هر جایی روی آیفون (به صورت اپ نصب‌شده روی صفحهٔ اصلی) و اندروید کار می‌کند. همهٔ سرویس‌های این راهنما رایگان هستند.</p>
+
+<table>
+  <tr><th>بخش</th><th>سرویس</th><th>نقش</th></tr>
+  <tr><td>پایگاه داده</td><td><strong>Neon</strong> <span class="ltr">(neon.tech)</span></td><td>نگه‌داری همهٔ داده‌ها (PostgreSQL)</td></tr>
+  <tr><td>سرور API</td><td><strong>Render</strong>، سرویس <code>traction-api</code></td><td>اجرای کد <code>backend/</code></td></tr>
+  <tr><td>وب‌اپ</td><td><strong>Render</strong>، سرویس <code>traction-app</code></td><td>نسخهٔ وب اپ که روی آیفون نصب می‌شود</td></tr>
+  <tr><td>هوش مصنوعی (اختیاری)</td><td><strong>OpenRouter</strong> <span class="ltr">(openrouter.ai)</span></td><td>قابلیت‌های هوشمند</td></tr>
+</table>
+
+<div class="warn"><strong>پیش از شروع</strong>
+مخزن گیت‌هاب <code>Traction</code> باید <strong>خصوصی (Private)</strong> باشد. نشانی‌ها، رمزها و کلیدهایی که در این مراحل می‌گیرید را <strong>فقط</strong> در داشبورد همان سرویس‌ها بچسبانید؛ هرگز در گیت، چت یا ایمیل نفرستید.</div>
+
+<h2>مرحلهٔ ۱: پایگاه داده روی Neon (۵ دقیقه)</h2>
+<ol class="steps">
+  <li>به <span class="ltr">https://neon.tech</span> بروید و وارد شوید (با گیت‌هاب یا ایمیل).</li>
+  <li>یک پروژهٔ جدید بسازید. منطقه (Region) را <strong>Frankfurt</strong> انتخاب کنید (نزدیک به سرور Render).</li>
+  <li>در داشبورد پروژه روی <strong>Connect</strong> بزنید، گزینهٔ <strong>Connection pooling</strong> را خاموش کنید و نشانی اتصال را کپی کنید. با <code>postgresql://</code> شروع می‌شود.</li>
+  <li>این نشانی همان <code>DATABASE_URL</code> است. آن را جایی امن نگه دارید و به کسی ندهید.</li>
+</ol>
+
+<h2>مرحلهٔ ۲: سرور و وب‌اپ روی Render (۱۰ دقیقه)</h2>
+<ol class="steps">
+  <li>به <span class="ltr">https://render.com</span> بروید و با حساب گیت‌هاب وارد شوید.</li>
+  <li><strong>New → Blueprint</strong> را بزنید و مخزن <code>Traction</code> را انتخاب کنید. Render فایل <code>render.yaml</code> را می‌خواند و دو سرویس نشان می‌دهد: <code>traction-api</code> و <code>traction-app</code>. شاخه: <code>dev</code>.</li>
+  <li>Render مقدارهای محرمانه را می‌پرسد:
+    <table>
+      <tr><th>متغیر</th><th>مقدار</th></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>نشانی Neon از مرحلهٔ ۱</td></tr>
+      <tr><td><code>OPENROUTER_API_KEY</code></td><td>کلید شما از <span class="ltr">openrouter.ai/keys</span> (برای قابلیت‌های هوشمند)؛ اگر ندارید فعلاً <code>x</code></td></tr>
+      <tr><td><code>CORS_ORIGIN</code></td><td>فعلاً <code>x</code> (در گام ۶ پر می‌شود)</td></tr>
+      <tr><td><code>EXPO_PUBLIC_API_URL</code></td><td>فعلاً <code>x</code> (در گام ۶ پر می‌شود)</td></tr>
+      <tr><td><code>VAPID_PUBLIC_KEY</code> و <code>VAPID_PRIVATE_KEY</code></td><td><code>x</code> (برای یادآورهای آینده)</td></tr>
+    </table>
+  </li>
+  <li><strong>Apply</strong> را بزنید و صبر کنید تا هر دو سرویس ساخته شوند (بار اول حدود ۵ تا ۱۰ دقیقه).</li>
+  <li>دو نشانی که Render می‌دهد را کپی کنید، مثلاً <span class="ltr">https://traction-api-xxxx.onrender.com</span> و <span class="ltr">https://traction-app-xxxx.onrender.com</span>.</li>
+  <li>جای خالی‌ها را پر کنید و هر سرویس را دوباره deploy کنید (<strong>Manual Deploy → Deploy latest commit</strong>):
+    <ul>
+      <li><code>traction-api</code> → Environment → <code>CORS_ORIGIN</code> = نشانی <strong>app</strong></li>
+      <li><code>traction-app</code> → Environment → <code>EXPO_PUBLIC_API_URL</code> = نشانی <strong>api</strong></li>
+    </ul>
+  </li>
+</ol>
+<div class="ok"><strong>بررسی</strong>
+نشانی <code>&lt;api&gt;/api/health</code> را در مرورگر باز کنید. باید <code>{"status":"ok",...}</code> ببینید.</div>
+
+<h2>مرحلهٔ ۳: نصب روی آیفون</h2>
+<ol class="steps">
+  <li>نشانی <strong>app</strong> را در <strong>Safari</strong> باز کنید و حساب بسازید.</li>
+  <li>دکمهٔ <strong>Share</strong> (مربع با فلش) → <strong>Add to Home Screen</strong> را بزنید. حالا تِرَکشن را از صفحهٔ اصلی باز کنید.</li>
+  <li>در Render، برای <code>traction-api</code> مقدار <code>ALLOW_REGISTRATION</code> را <code>false</code> کنید و دوباره deploy کنید تا کس دیگری نتواند در سرور شما حساب بسازد. (برای دعوت کاربران آزمایشی، فعلاً <code>true</code> بگذارید.)</li>
+</ol>
+
+<h2>مرحلهٔ ۴: اندروید (اختیاری)</h2>
+<p>ساخت ابری EAS فایل <code>.env</code> محلی را نمی‌بیند. نشانی سرور را در <code>apps/mobile/eas.json</code> زیر پروفایل <code>preview</code> بگذارید:</p>
+<pre>"preview": {
+  "distribution": "internal",
+  "env": { "EXPO_PUBLIC_API_URL": "https://traction-api-xxxx.onrender.com" }
+}</pre>
+<p>سپس:</p>
+<pre>cd apps/mobile
+npx eas-cli build -p android --profile preview</pre>
+<p>پیوند نصب APK را به گوشی‌های اندروید بفرستید.</p>
+
+<h2>به‌روزرسانی‌های بعدی</h2>
+<ul>
+  <li>هر push به شاخهٔ <code>dev</code> هر دو سرویس را خودکار دوباره می‌سازد.</li>
+  <li>مهاجرت‌های پایگاه داده هنگام شروع سرور خودکار اجرا می‌شوند (<code>npx prisma migrate deploy</code>).</li>
+  <li>وضعیت ساخت و لاگ‌ها: داشبورد Render → سرویس → <strong>Logs</strong>.</li>
+</ul>
+
+<h2>تنظیمات اختیاری</h2>
+<table>
+  <tr><th>کار</th><th>متغیر در <code>traction-api</code></th></tr>
+  <tr><td>ارسال ایمیل بازنشانی رمز</td><td><code>SMTP_HOST</code>، <code>SMTP_PORT</code>، <code>SMTP_USER</code>، <code>SMTP_PASS</code>، <code>SMTP_FROM</code>، <code>PASSWORD_RESET_URL</code></td></tr>
+  <tr><td>تغییر مدل هوش مصنوعی</td><td><code>AI_MODEL_PRIMARY</code>، <code>AI_MODEL_FALLBACK</code></td></tr>
+  <tr><td>منطقهٔ زمانی (برای ماه‌ها)</td><td><code>TZ</code> (پیش‌فرض <code>Asia/Tehran</code>)</td></tr>
+</table>
+
+<h2>نکته‌های مهم</h2>
+<ul>
+  <li><strong>خواب سرور رایگان:</strong> سرور رایگان Render پس از ۱۵ دقیقه بی‌کاری می‌خوابد. اولین باز کردن پس از استراحت ممکن است تا یک دقیقه طول بکشد؛ پس از آن سریع است.</li>
+  <li><strong>داده‌ها:</strong> داده‌ها در Neon می‌مانند؛ سرور Render هیچ داده‌ای نگه نمی‌دارد.</li>
+  <li><strong>پشتیبان:</strong> Neon امکان بازگشت به نقطه‌ای در گذشته را دارد (داشبورد Neon → Restore).</li>
+  <li><strong>لو رفتن کلید:</strong> در همان سرویس کلید جدید بسازید، در Render جایگزین کنید و دوباره deploy کنید.</li>
+</ul>
+
+<h2>عیب‌یابی</h2>
+<table>
+  <tr><th>نشانه</th><th>علت محتمل و راه‌حل</th></tr>
+  <tr><td>ساخت <code>traction-api</code> شکست خورد</td><td>Logs را ببینید؛ معمولاً <code>DATABASE_URL</code> اشتباه است یا pooling روشن است</td></tr>
+  <tr><td>وب‌اپ باز می‌شود ولی وارد نمی‌شود</td><td><code>EXPO_PUBLIC_API_URL</code> یا <code>CORS_ORIGIN</code> درست پر نشده یا پس از پر کردن deploy نشده</td></tr>
+  <tr><td>ثبت‌نام خطا می‌دهد</td><td><code>ALLOW_REGISTRATION</code> برابر <code>false</code> است</td></tr>
+  <tr><td>صفحه‌های هوشمند خالی‌اند</td><td><code>OPENROUTER_API_KEY</code> تنظیم نشده؛ نشانی <code>/api/ai/status</code> را ببینید</td></tr>
+</table>
+
+<footer class="docfoot">تِرَکشن · راهنمای استقرار · منبع: <code>docs/fa/pdf-src/deploy-guide.html</code> و <code>docs/DEPLOY.md</code></footer>
+</body>
+</html>

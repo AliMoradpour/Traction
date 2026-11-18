@@ -1,0 +1,87 @@
+/* Shared print style for the Persian PDFs (A4, RTL, Vazirmatn, Traction's calm palette). */
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Regular.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Medium.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-Bold.woff2') format('woff2'); font-weight: 700; }
+@font-face { font-family: 'Vazirmatn'; src: url('fonts/Vazirmatn-ExtraBold.woff2') format('woff2'); font-weight: 800; }
+
+:root {
+  --paper: #FAF6F0; --card: #FFFFFF; --sand: #F2EBE1; --line: #E7DED1;
+  --ink: #2A2621; --muted: #6E665C; --faint: #A39A8E;
+  --blue: #3D6BE0; --blue-soft: #E6EDFC; --sage: #6E9E7E; --sage-soft: #E5F0E8;
+  --clay: #D9895A; --clay-soft: #FAEBE1; --red: #A8392F; --red-soft: #FBE6E3;
+}
+
+@page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  margin: 0; font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif; color: var(--ink);
+  font-size: 10.5pt; line-height: 1.85; direction: rtl; text-align: right; background: #fff;
+}
+
+/* Cover */
+.cover {
+  height: 257mm; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; background: var(--paper); border-radius: 8mm; padding: 20mm; page-break-after: always;
+}
+.cover .logo { width: 34mm; height: 34mm; border-radius: 50%; background: var(--blue-soft); display: flex; align-items: center; justify-content: center; margin-bottom: 12mm; }
+.cover .logo img { width: 18mm; }
+.cover h1 { font-size: 28pt; font-weight: 800; margin: 0 0 4mm; line-height: 1.4; }
+.cover .sub { font-size: 13pt; color: var(--muted); margin: 0; }
+.cover .meta { margin-top: 16mm; font-size: 10pt; color: var(--faint); }
+.cover .tag { display: inline-block; margin-top: 8mm; padding: 1.5mm 5mm; border-radius: 99px; background: var(--sage-soft); color: #4C7A5C; font-weight: 700; font-size: 10pt; }
+
+/* Headings and text */
+h1 { font-size: 19pt; font-weight: 800; margin: 0 0 4mm; line-height: 1.5; }
+h2 { font-size: 14.5pt; font-weight: 800; margin: 9mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 1.5px solid var(--line); page-break-after: avoid; }
+h3 { font-size: 11.5pt; font-weight: 700; margin: 6mm 0 2mm; page-break-after: avoid; }
+p { margin: 0 0 3mm; }
+ul, ol { margin: 0 0 3mm; padding-right: 6mm; padding-left: 0; }
+li { margin-bottom: 1.2mm; }
+strong { font-weight: 700; }
+.muted { color: var(--muted); }
+.page-break { page-break-before: always; }
+
+/* Latin snippets: keep left-to-right so code and addresses are not reversed */
+code, .ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+code { font-family: Consolas, 'SF Mono', Menlo, monospace; font-size: 9pt; background: var(--sand); padding: 0.3mm 1.6mm; border-radius: 1.5mm; }
+pre { direction: ltr; text-align: left; font-family: Consolas, 'SF Mono', Menlo, monospace; font-size: 8.8pt; line-height: 1.6;
+  background: #2A2621; color: #F3EEE7; padding: 4mm 5mm; border-radius: 3mm; white-space: pre-wrap; word-break: break-all; margin: 0 0 4mm; page-break-inside: avoid; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; margin: 0 0 4mm; font-size: 9.6pt; page-break-inside: auto; }
+th { background: var(--sand); font-weight: 700; text-align: right; }
+th, td { border: 1px solid var(--line); padding: 1.8mm 2.5mm; vertical-align: top; }
+tr { page-break-inside: avoid; }
+
+/* Callouts and cards */
+.note, .warn, .ok, .tip { border-radius: 3mm; padding: 3mm 4mm; margin: 0 0 4mm; page-break-inside: avoid; }
+.note { background: var(--blue-soft); }
+.warn { background: var(--clay-soft); }
+.ok { background: var(--sage-soft); }
+.tip { background: var(--sand); }
+.note strong:first-child, .warn strong:first-child, .ok strong:first-child, .tip strong:first-child { display: block; margin-bottom: 1mm; }
+
+.steps { counter-reset: step; list-style: none; padding: 0; }
+.steps > li { counter-increment: step; position: relative; padding-right: 10mm; margin-bottom: 3mm; page-break-inside: avoid; }
+.steps > li::before { content: counter(step, persian); position: absolute; right: 0; top: 0.4mm; width: 7mm; height: 7mm; border-radius: 50%;
+  background: var(--blue); color: #fff; font-weight: 700; font-size: 9.5pt; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-bottom: 4mm; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; margin-bottom: 4mm; }
+.card { background: var(--paper); border-radius: 3mm; padding: 4mm; page-break-inside: avoid; }
+.card h3 { margin-top: 0; }
+.stat { font-size: 20pt; font-weight: 800; line-height: 1.3; }
+.blank { display: inline-block; min-width: 40mm; border-bottom: 1.2px dashed var(--faint); color: var(--faint); }
+
+/* Slides (company presentation) */
+.slide { height: 257mm; padding: 6mm 4mm; page-break-after: always; display: flex; flex-direction: column; }
+.slide:last-child { page-break-after: auto; }
+.slide .kicker { color: var(--blue); font-weight: 700; font-size: 10pt; margin-bottom: 2mm; }
+.slide h1 { font-size: 24pt; }
+.slide .lead { font-size: 13pt; color: var(--muted); margin-bottom: 8mm; }
+.slide .grow { flex: 1; }
+.big-quote { font-size: 18pt; font-weight: 800; line-height: 1.7; margin: 10mm 0; }
+
+footer.docfoot { margin-top: 10mm; font-size: 8.5pt; color: var(--faint); border-top: 1px solid var(--line); padding-top: 2mm; }
