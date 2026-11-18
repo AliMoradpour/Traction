@@ -8,8 +8,8 @@ local Claude memory folder on the old Windows laptop).
 - New to mobile development; Claude writes the code. Explain jargon in one line,
   go one step at a time, and keep the owner's part to clicks (creating accounts,
   paying, pasting secrets into dashboards, never into chat).
-- Tests on an **iPhone** (Expo Go during development, the home-screen web app
-  in daily use). Prefers Persian for documentation (`docs/fa/`).
+- Tests on an **iPhone** (Expo Go during development; the home-screen web app
+  once it is deployed on Render). Prefers Persian for documentation (`docs/fa/`).
 - Moving from a Windows laptop to a **MacBook** (November 2026).
 
 ## Git

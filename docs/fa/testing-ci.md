@@ -49,6 +49,6 @@ cd backend && npx tsc --noEmit && npx eslint "src/**/*.ts" && npm test
 cd apps/mobile && npx tsc --noEmit && npm run lint && npm test
 ```
 
-Lint اپ هنوز حدود ۱۴۶ هشدار دارد (خطا صفر)؛ بیشتر متغیرهای بلااستفاده و `any` در صفحه‌های قدیمی.
+Lint اپ هنوز حدود ۱۴۸ هشدار دارد (خطا صفر)؛ بیشتر متغیرهای بلااستفاده و `any` در صفحه‌های قدیمی.
 
 </div>
